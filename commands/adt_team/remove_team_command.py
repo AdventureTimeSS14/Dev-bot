@@ -7,7 +7,7 @@ from config import ADMIN_TEAM, HEAD_ADT_TEAM
 
 @bot.command()
 @has_any_role_by_id(HEAD_ADT_TEAM)
-async def remove_team(ctx, user: discord.Member, *roles: discord.Role):
+async def remove_team(ctx, user: discord.Member, *roles: discord.Role, reason: str):
     # Проверка на кол-во введеных ролей
     if len(roles) != 2:
         await ctx.send("Должно быть введенно две роли: <роль отдела> <роль должности>.")
@@ -46,5 +46,6 @@ async def remove_team(ctx, user: discord.Member, *roles: discord.Role):
         )
         embed.add_field(name=f"Отдел: **{role_dep.name}**", value="", inline=False)
         embed.add_field(name=f"Должность: **{role_job.name}**", value="", inline=False)
+        embed.add_field(name=f"Причина: **{reason}**", value="", inline=False)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
         await channel_get.send(embed=embed)
