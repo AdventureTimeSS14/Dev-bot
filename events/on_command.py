@@ -1,5 +1,7 @@
 import datetime
 
+from discord.ext import commands
+
 from bot_init import bot
 from config import LOG_CHANNEL_ID
 
@@ -30,6 +32,14 @@ async def on_command(ctx):
     # Логирование в консоль
     print(f"✅ Команда выполнена: {ctx.command.name} от {ctx.author} в канале {ctx.channel} в {current_time}")
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        # Если команда не найдена, отправляем сообщение с предложением использовать &help
+        await ctx.send("❌ Команда не найдена! Попробуйте использовать команду `&help`, чтобы узнать доступные команды.")
+    else:
+        # Если произошла другая ошибка, выводим её
+        await ctx.send(f"❌ Произошла ошибка: {error}")
 
 def format_command_log_message(ctx, current_time):
     """

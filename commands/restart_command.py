@@ -3,7 +3,7 @@ import sys
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from commands.misc.shutdows_deff import shutdown_def
-from config import HEAD_ADT_TEAM, LOG_CHANNEL_ID
+from config import HEAD_ADT_TEAM
 
 
 @bot.command(name="restart")

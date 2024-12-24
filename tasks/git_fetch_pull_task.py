@@ -101,7 +101,7 @@ async def fetch_merged_pull_requests():
                         f"- **Название:** {pr_title}\n"
                         f"- **Автор:** {author_name}\n"
                         f"- **Ссылка:** [Открыть PR #{pr_number}]({pr_url})\n"
-                        f"- **Дата мержа:** {merged_at.strftime('%Y-%m-%d %H:%M:%S')} UTC"
+                        f"- **Дата мержа:** {merged_at.strftime('%Y-%m-%d %H:%M:%S')} UTC\n_ _"
                     )
                     await log_channel.send(log_message)
                 else:

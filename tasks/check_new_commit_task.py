@@ -122,7 +122,7 @@ async def monitor_commits():
         channel = bot.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send(message)
-            # await channel.send(f"{bot.user} завершает свою работу! Ожидайте перезапуска в течении 10 минут.")
+            
         await shutdown_def()
 
         # Завершаем работу бота

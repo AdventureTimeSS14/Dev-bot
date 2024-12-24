@@ -40,7 +40,7 @@ async def db_status(ctx):
         # Логируем успешное подключение
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
-            await log_channel.send(f"✅ Успешное подключение к БД MariaDB. Запрошено пользователем: {ctx.author}.")
+            await log_channel.send(f"✅ Успешное подключение к БД MariaDB. Запрошено пользователем: {ctx.author}.\n_ _")
 
     except mariadb.Error as db_error:
         # Создаем embed для ошибки подключения
@@ -58,7 +58,7 @@ async def db_status(ctx):
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             await log_channel.send(
-                f"❌ Ошибка подключения к БД MariaDB: {db_error}. Запрошено пользователем: {ctx.author}."
+                f"❌ Ошибка подключения к БД MariaDB: {db_error}. Запрошено пользователем: {ctx.author}.\n_ _"
             )
 
     except Exception as e:
@@ -77,7 +77,7 @@ async def db_status(ctx):
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             await log_channel.send(
-                f"❌ Непредвиденная ошибка при подключении к БД MariaDB: {e}. Запрошено пользователем: {ctx.author}."
+                f"❌ Непредвиденная ошибка при подключении к БД MariaDB: {e}. Запрошено пользователем: {ctx.author}.\n_ _"
             )
 
     finally:

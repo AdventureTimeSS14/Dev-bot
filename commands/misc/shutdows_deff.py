@@ -117,7 +117,7 @@ async def send_to_log_channel():
     try:
         channel = bot.get_channel(LOG_CHANNEL_ID)
         if channel:
-            await channel.send(f"⚠️ {bot.user} завершает свою работу! Перезапуск начнётся в течение 10 минут.")
+            await channel.send(f"⚠️ {bot.user} завершает свою работу! Перезапуск начнётся в течение 10 минут.\n_ _")
         else:
             print(f"❌ Лог-канал с ID {LOG_CHANNEL_ID} не найден.")
     except Exception as e:

@@ -77,7 +77,7 @@ async def db_info(ctx):
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             await log_channel.send(
-                f"❌ Ошибка подключения к базе данных: {db_error}. Запрошено пользователем {ctx.author}."
+                f"❌ Ошибка подключения к базе данных: {db_error}. Запрошено пользователем {ctx.author}.\n_ _"
             )
 
     except Exception as e:
@@ -93,7 +93,7 @@ async def db_info(ctx):
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             await log_channel.send(
-                f"❌ Непредвиденная ошибка при выполнении команды db_info: {e}. Запрошено пользователем {ctx.author}."
+                f"❌ Непредвиденная ошибка при выполнении команды db_info: {e}. Запрошено пользователем {ctx.author}.\n_ _"
             )
 
     finally:
