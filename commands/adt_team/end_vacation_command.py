@@ -1,9 +1,30 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands import RoleNotFound, MemberNotFound
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, VACATION_ROLE
+
+
+# Кастомный конвертер для ролей
+class RoleConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        role = discord.utils.get(ctx.guild.roles, name=argument)
+        if role is None:
+            raise RoleNotFound(argument)
+        return role
+
+
+# Кастомный конвертер для участников
+class MemberConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        member = discord.utils.get(ctx.guild.members, name=argument)
+        if member is None:
+            member = discord.utils.get(ctx.guild.members, nick=argument)  # пробуем найти по никнейму
+        if member is None:
+            raise MemberNotFound(argument)
+        return member
 
 
 @bot.command()
@@ -12,9 +33,10 @@ async def end_vacation(ctx, user: discord.Member):
     """
     Завершает отпуск указанного пользователя, удаляя роль отпуска.
     """
-    # Получаем роль отпуска
-    role_vacation = ctx.guild.get_role(VACATION_ROLE)
-    if not role_vacation:
+    # Получаем роль отпуска с использованием кастомного конвертера
+    try:
+        role_vacation = await RoleConverter().convert(ctx, VACATION_ROLE)
+    except RoleNotFound:
         await ctx.send("❌ Ошибка: Роль отпуска не найдена на сервере.")
         return
 

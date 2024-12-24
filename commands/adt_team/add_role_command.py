@@ -1,15 +1,34 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
+from discord.ext.commands import RoleNotFound, MemberNotFound
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import HEAD_ADT_TEAM
 
 
+# Кастомный конвертер для ролей
+class RoleConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        role = discord.utils.get(ctx.guild.roles, name=argument)
+        if role is None:
+            raise RoleNotFound(argument)
+        return role
+
+
+# Кастомный конвертер для участников
+class MemberConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        member = discord.utils.get(ctx.guild.members, name=argument)
+        if member is None:
+            raise MemberNotFound(argument)
+        return member
+
+
 @bot.command()
 @has_any_role_by_id(HEAD_ADT_TEAM)
-async def add_role(ctx, user: discord.Member, *role_names: str):
+async def add_role(ctx, user: MemberConverter, *role_names: str):
     """
     Добавляет одну или несколько ролей указанному пользователю.
     """
@@ -22,10 +41,10 @@ async def add_role(ctx, user: discord.Member, *role_names: str):
     errors = []
 
     for role_name in role_names:
-        # Ищем роль по имени
-        role = get(ctx.guild.roles, name=role_name)
-
-        if not role:
+        # Ищем роль с использованием кастомного конвертера
+        try:
+            role = await RoleConverter().convert(ctx, role_name)
+        except RoleNotFound:
             errors.append(f"❌ Роль '{role_name}' не найдена на сервере.")
             continue
 
