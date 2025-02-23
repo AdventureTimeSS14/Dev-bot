@@ -20,6 +20,7 @@ from commands import (
     user_role_command,
     admin_help_command,
     media_clear_command,
+    user_role_mention_command,
 )
 from commands.post_admin import (
     restart_command,
