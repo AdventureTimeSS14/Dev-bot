@@ -38,7 +38,7 @@ def pardon_ban(ban_id):
 
     # Получаем текущее время в часовом поясе Europe/Moscow
     tz = pytz.timezone("Europe/Moscow")
-    unban_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"  # Обрезаем до миллисекунд
+    unban_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
 
     # Вставляем новую запись в server_unban
     cursor.execute(

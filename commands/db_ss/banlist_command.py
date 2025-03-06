@@ -88,19 +88,19 @@ async def banlist(ctx, *, nick_name: str):
 
         # Начинаем строить информацию о бане
         ban_info = (
-            f"📅 **Дата бана:** `{ban_time_str}`\n"
-            f"⏳ **Истекает:** `{exp_time_str}`\n"
-            f"📜 **Причина:** `{reason}`\n"
-            f"👮 **Админ:** `{admin_nickname}`"
+            f"> 📅 **Дата бана:** `{ban_time_str}`\n"
+            f"> ⏳ **Истекает:** `{exp_time_str}`\n"
+            f"> 📜 **Причина:** `{reason}`\n"
+            f"> 👮 **Админ:** `{admin_nickname}`"
         )
 
         # Если бан был снят
         if unban_time:
             unban_time_str = unban_time.strftime("%Y-%m-%d %H:%M:%S")
             ban_info += (
-                f"\n\n✅ **Бан был снят!**\n"
-                f"🕒 **Дата разбана:** `{unban_time_str}`\n"
-                f"🔓 **Разбанил:** `{unban_admin_nickname}`"
+                f"\n> ✅ **Бан был снят!**\n"
+                f"> 🕒 **Дата разбана:** `{unban_time_str}`\n"
+                f"> 🔓 **Разбанил:** `{unban_admin_nickname}`"
             )
 
         embed.add_field(
