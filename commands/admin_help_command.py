@@ -49,6 +49,10 @@ ADMIN_COMMANDS = [
         "name": "🔍 &check_nick <NickName>",
         "description": "Проверяет на мультиаккаунт игрока.",
     },
+    {
+        "name": "🛑 &banlist <NickName>",
+        "description": "Выводит список банов и разбанов игрока.",
+    },
 ]
 
 @bot.command(name="admin_help")

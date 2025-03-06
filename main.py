@@ -28,9 +28,10 @@ from commands.post_admin import (
     admin_info_command,
     bunker_command,
     admin_presets_command,
-    game_rules_command
+    game_rules_command,
 )
 from commands.db_ss import (
+    banlist_command,
     multi_akk_db_command,
     player_notes_command,
     player_time_command,
