@@ -15,6 +15,13 @@ def pardon_ban(ban_id):
     conn = psycopg2.connect(**DB_PARAMS)
     cursor = conn.cursor()
 
+    # Проверяем, существует ли бан с таким ban_id в таблице server_ban
+    cursor.execute("SELECT 1 FROM server_ban WHERE server_ban_id = %s", (ban_id,))
+    if not cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return False, f"❌ Ошибка: Бан с ID `{ban_id}` не существует."
+
     # Получаем user_id разбанивающего админа
     cursor.execute(
         "SELECT user_id FROM player WHERE last_seen_user_name = %s",
