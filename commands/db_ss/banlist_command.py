@@ -72,7 +72,7 @@ async def banlist(ctx, *, nick_name: str):
 
     # Создаем Embed с инфой о банах
     embed = disnake.Embed(
-        title=f"🔍 Баны игрока {nick_name} (Общее количество: {total_bans})",
+        title=f"🔍 Баны игрока {nick_name} ({total_bans})",
         color=disnake.Color.orange(),
         timestamp=current_time
     )
