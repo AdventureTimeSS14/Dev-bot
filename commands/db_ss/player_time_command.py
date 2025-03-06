@@ -12,12 +12,6 @@ from datetime import datetime, timedelta  # Импортируем timedelta
 @bot.command()
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 async def player_stats(ctx, *, user_name: str):
-    # Проверка на запрещенного пользователя
-    forbidden_user_id = "725633890726838282"  # ID пользователя, которому запрещен доступ
-    if str(ctx.author.id) == forbidden_user_id:
-        await ctx.send('У вас нет доступа к этой информации.')
-        return
-
     try:
         # Подключение к базе данных
         connection = psycopg2.connect(**DB_PARAMS)
