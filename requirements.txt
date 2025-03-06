@@ -3,6 +3,7 @@ curl_cffi
 aiohttp
 psycopg2
 beautifulsoup4
+pytz
 fuzzywuzzy==0.18.0
 g4f==0.3.2.4
 nest-asyncio==1.6.0
