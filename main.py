@@ -33,6 +33,7 @@ from commands.post_admin import (
 from commands.db_ss import (
     banlist_command,
     multi_akk_db_command,
+    pardon_command,
     player_notes_command,
     player_time_command,
 )

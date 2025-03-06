@@ -53,6 +53,11 @@ ADMIN_COMMANDS = [
         "name": "🛑 &banlist <NickName>",
         "description": "Выводит список банов и разбанов игрока.",
     },
+    {
+        "name": "🔓 &pardon <ban_id>",
+        "description": "Разбанивает пользователя по id его серверного бана.(не путать с разбанов для ролей).",
+    },
+    
 ]
 
 @bot.command(name="admin_help")

@@ -114,6 +114,9 @@ async def get_github_user_info(username):
             async with session.get(url, headers=headers) as response:
                 response.raise_for_status()
                 user_info = await response.json()
+                if not user_info:
+                    print(f"❌ Нет данных о пользователе {username}")
+                    return None
                 return user_info
     except aiohttp.ClientError as e:
         print(f"❌ Ошибка при получении информации о пользователе: {e}")
