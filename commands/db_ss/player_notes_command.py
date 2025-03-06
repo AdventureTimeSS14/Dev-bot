@@ -80,7 +80,7 @@ class PlayerNotesView(disnake.ui.View):
             # Определяем, нужно ли выводить информацию о редактировании
             edit_info = ''
             if created_at != last_edited_at:
-                edit_info = f"\n> 🖊 **Редактировал:** `{last_edited_at}`"
+                edit_info = f"> 🖊 **Редактировал:** `{last_edited_at}`"
 
             embed.add_field(
                 name=f'📕 Заметка ID: `{note_id}`',
