@@ -30,7 +30,7 @@ def fetch_banlist(nick_name):
     WHERE sb.player_user_id = (
         SELECT user_id FROM player WHERE last_seen_user_name = %s
     )
-    ORDER BY sb.ban_time DESC
+    ORDER BY sb.server_ban_id ASC  -- Сортируем по ID в порядке возрастания
     """
     cursor.execute(query, (nick_name,))
     result = cursor.fetchall()
