@@ -62,11 +62,15 @@ ADMIN_COMMANDS = [
         "description": "Выводит список персонажей игрока с общей информацией о них.",
     },
     {
-        "name": "👑 &admins [<mrp/dev>]",
+        "name": "🎃 &admin <NickName>",
+        "description": "Показывает имеет ли данный пользователь права на mrp & dev сервере.",
+    },
+    {
+        "name": "👑 &admins [<mrp/dev>] (default: mrp)",
         "description": "Выводит список админов на mrp или dev указывая title и админ ранг.",
     },
     {
-        "name": "📂 &uploads [<mrp/dev>]",
+        "name": "📂 &uploads [<mrp/dev>] (default: mrp)",
         "description": "Выводит логи загрузок файлов ogg? в виде списка. Можно указать mrp или dev.",
     },
 ]

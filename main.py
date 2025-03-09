@@ -31,6 +31,7 @@ from commands.post_admin import (
     game_rules_command,
 )
 from commands.db_ss import (
+    admin_command,
     admins_command,
     banlist_command,
     multi_akk_db_command,
