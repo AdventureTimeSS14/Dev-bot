@@ -38,6 +38,7 @@ from commands.db_ss import (
     player_notes_command,
     player_time_command,
     profiles_command,
+    uploads_command,
 )
 from commands.adt_team import (
     add_role_command,

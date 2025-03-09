@@ -65,6 +65,10 @@ ADMIN_COMMANDS = [
         "name": "👑 &admins [<mrp/dev>]",
         "description": "Выводит список админов на mrp или dev указывая title и админ ранг.",
     },
+    {
+        "name": "📂 &uploads [<mrp/dev>]",
+        "description": "Выводит логи загрузок файлов ogg? в виде списка. Можно указать mrp или dev.",
+    },
 ]
 
 @bot.command(name="admin_help")
