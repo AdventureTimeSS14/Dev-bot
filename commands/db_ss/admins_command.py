@@ -4,22 +4,35 @@ from datetime import datetime
 import pytz
 from bot_init import bot
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
-from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS, DB_DATABASE, DB_USER, DB_PORT, DB_HOST, DB_PASSWORD
 from commands.misc.check_roles import has_any_role_by_id
 
 # Функция запроса списка администраторов из базы данных
 def fetch_admins(server):
-    schema = "ss14.public" if server.lower() == "mrp" else "ss14_dev.public"
-    conn = psycopg2.connect(**DB_PARAMS)
+    db_name = "ss14" if server.lower() == "mrp" else "ss14_dev"
+
+    # Подключение к базе данных
+    DB_PARAMS = {
+        'database': db_name,
+        'user': DB_USER,
+        'password': DB_PASSWORD,
+        'host': DB_HOST,
+        'port': DB_PORT
+    }
+
+    conn_params = {**DB_PARAMS}
+    conn = psycopg2.connect(**conn_params)
     cursor = conn.cursor()
 
-    query = f"""
+    # SQL-запрос
+    query = """
     SELECT p.last_seen_user_name, a.title, ar.name
-    FROM {schema}.admin a
-    JOIN {schema}.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
-    LEFT JOIN {schema}.player p ON a.user_id = p.user_id
+    FROM public.admin a  -- Указываем явную схему public
+    JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
+    LEFT JOIN public.player p ON a.user_id = p.user_id
     ORDER BY p.last_seen_user_name ASC
     """
+
     cursor.execute(query)
     admins = cursor.fetchall()
 

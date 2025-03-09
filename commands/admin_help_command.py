@@ -61,7 +61,10 @@ ADMIN_COMMANDS = [
         "name": "👥 &profiles <NickName>",
         "description": "Выводит список персонажей игрока с общей информацией о них.",
     },
-    
+    {
+        "name": "👑 &admins [<mrp/dev>]",
+        "description": "Выводит список админов на mrp или dev указывая title и админ ранг.",
+    },
 ]
 
 @bot.command(name="admin_help")
