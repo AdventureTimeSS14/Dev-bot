@@ -91,7 +91,7 @@ class AdminsView(disnake.ui.View):
 
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
 
-    @disnake.ui.button(label="➡️ Вперёд", style=disnake.ButtonStyle.blurple, disabled=True)
+    @disnake.ui.button(label="Вперёд ➡️", style=disnake.ButtonStyle.blurple, disabled=True)
     async def next_page(self, button: disnake.ui.Button, interaction: disnake.Interaction):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message("❌ Вы не можете управлять этим сообщением!", ephemeral=True)

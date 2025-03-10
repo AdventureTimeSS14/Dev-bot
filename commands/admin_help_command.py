@@ -89,6 +89,10 @@ ADMIN_COMMANDS = [
         "name": "🏷️ &admin_rank [<Mrp/Dev>](default: mrp)",
         "description": "Выводит список допустимых админ рангов. Мрп или Дев сервера.",
     },
+    {
+        "name": "👮‍♂️ &jobs",
+        "description": "Выводит список всех департаментов с их профессиями. Сборки ADT.",
+    }
 ]
 
 @bot.command(name="admin_help")

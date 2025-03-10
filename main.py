@@ -28,6 +28,7 @@ from commands.post_admin import (
     admin_info_command,
     bunker_command,
     admin_presets_command,
+    playtime_command,
     game_rules_command,
 )
 from commands.db_ss import (

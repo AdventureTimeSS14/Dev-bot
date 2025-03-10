@@ -51,7 +51,7 @@ class BanlistView(disnake.ui.View):
         self.total_pages = max((len(self.bans) - 1) // self.per_page, 0)
         self.page = self.total_pages
 
-        # Если мы на последней странице, отключаем кнопку "➡️ Вперёд"
+        # Если мы на последней странице, отключаем кнопку "Вперёд ➡️"
         self.children[1].disabled = True if self.page == self.total_pages else False
 
     def get_page_embed(self):
@@ -109,11 +109,11 @@ class BanlistView(disnake.ui.View):
         if self.page == 0:
             button.disabled = True
 
-        self.children[1].disabled = False  # Включаем кнопку "➡️ Вперёд"
+        self.children[1].disabled = False  # Включаем кнопку "Вперёд ➡️"
 
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
 
-    @disnake.ui.button(label="➡️ Вперёд", style=disnake.ButtonStyle.blurple, disabled=True)
+    @disnake.ui.button(label="Вперёд ➡️", style=disnake.ButtonStyle.blurple, disabled=True)
     async def next_page(self, button: disnake.ui.Button, interaction: disnake.Interaction):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message("❌ Вы не можете управлять этим сообщением!", ephemeral=True)
