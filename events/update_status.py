@@ -60,17 +60,22 @@ def get_ss14_status_url(url: str, port: int) -> str:
         ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
     )
 
-def fetch_metrics(url: str) -> dict:
+def fetch_metrics(url: str, retries=3, delay=5) -> dict:
     """
-    Получает метрики с указанного URL и возвращает их в виде словаря.
+    Запрашивает метрики с повторами в случае ошибки.
     """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return parse_metrics(response.text)
-    except requests.RequestException as e:
-        print(f"Ошибка при получении метрик: {e}")
-        return {}
+    for attempt in range(retries):
+        try:
+            print(f"Попытка {attempt+1}: Получаю метрики с {url}...")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            print("Метрики успешно получены.")
+            return parse_metrics(response.text)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            print(f"Ошибка: {e} (попытка {attempt+1})")
+            time.sleep(delay)
+    print("Не удалось получить метрики после нескольких попыток.")
+    return {}
 
 def parse_metrics(metrics_text: str) -> dict:
     """
