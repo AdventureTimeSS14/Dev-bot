@@ -1,5 +1,5 @@
 disnake
-yaml
+yaml==6.0.1
 curl_cffi
 aiohttp
 psycopg2
