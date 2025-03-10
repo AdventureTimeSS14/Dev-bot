@@ -58,7 +58,7 @@ ADMIN_COMMANDS = [
         "description": "Разбанивает пользователя по id его серверного бана.(не путать с разбаном для ролей).",
     },
     {
-        "name": "📂 &uploads [<mrp/dev>] (default: mrp)",
+        "name": "📂 &uploads [<mrp/dev>](default: mrp)",
         "description": "Выводит логи загрузок файлов ogg? в виде списка. Можно указать mrp или dev.",
     },
     {
@@ -70,24 +70,24 @@ ADMIN_COMMANDS = [
         "description": "Показывает имеет ли данный пользователь права на mrp & dev сервере.",
     },
     {
-        "name": "👑 &admins [<mrp/dev>] (default: mrp)",
+        "name": "👑 &admins [<mrp/dev>](default: mrp)",
         "description": "Выводит список админов на mrp или dev указывая title и админ ранг.",
     },
     {
-        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](По умолчанию Mrp можно не вводить)",
+        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](default: mrp)",
         "description": "Добавляет нового администратора в таблицу администраторов, на мрп или деве.***(Если аргументы из более одного слова, заключаем в кавычки)***",
     },
     {
-        "name": "📤 &perm_del <NickName> [<Mrp/Dev>](По умолчанию Mrp можно не вводить)",
+        "name": "📤 &perm_del <NickName> [<Mrp/Dev>](default: mrp)",
         "description": "Удаляет пользователя из таблицы администраторов, на мрп или деве.",
     },
     {
-        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](По умолчанию Mrp можно не вводить)",
+        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](default: mrp)",
         "description": "Изменяет пользователю админские права, на мрп или деве.***(Если аргументы из более одного слова, заключаем в кавычки)***",  
     },
     {
-        "name": "🏷️ &admin_rank",
-        "description": "Выводит список допустимых админ рангов.",
+        "name": "🏷️ &admin_rank [<Mrp/Dev>](default: mrp)",
+        "description": "Выводит список допустимых админ рангов. Мрп или Дев сервера.",
     },
 ]
 
