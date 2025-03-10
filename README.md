@@ -1,5 +1,5 @@
 # Discord Бот Adventure Time: Установка и запуск
-# Автор: @Schrodinger71
+# Автор [Schrödinger](https://github.com/Schrodinger71)
 
 [![Deploy Discord Bot](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/deploy.yml)
 [![Flake8 test](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml)
