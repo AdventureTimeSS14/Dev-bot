@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from urllib.parse import urlparse, urlunparse
 
+import requests
 import aiohttp
 import dateutil.parser
 import disnake
@@ -59,6 +60,29 @@ def get_ss14_status_url(url: str, port: int) -> str:
         ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
     )
 
+def fetch_metrics(url: str) -> dict:
+    """
+    Получает метрики с указанного URL и возвращает их в виде словаря.
+    """
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return parse_metrics(response.text)
+    except requests.RequestException as e:
+        print(f"Ошибка при получении метрик: {e}")
+        return {}
+
+def parse_metrics(metrics_text: str) -> dict:
+    """
+    Парсит текст метрик Prometheus и возвращает значения интересующих метрик.
+    """
+    metrics = {}
+    for line in metrics_text.splitlines():
+        if line.startswith("join_queue_count"):
+            metrics["join_queue_count"] = int(line.split()[-1])
+        elif line.startswith("join_queue_bypass_count"):
+            metrics["join_queue_bypass_count"] = int(line.split()[-1])
+    return metrics
 
 def create_status_embed(
     address: str, status_data: dict, author=None
@@ -95,8 +119,12 @@ def get_embed_fields(status_data: dict) -> dict:
     """
     Создаёт словарь с полями для Embed.
     """
+    metrics_url = "http://193.164.18.155:1212/metrics"
+    metrics = fetch_metrics(metrics_url)
+
     fields = {
         "Игроков": f"{status_data.get('players', '?')}/{status_data.get('soft_max_players', '?')}",
+        "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
         "Раунд": status_data.get("round_id", "?"),
         "Карта": status_data.get("map", "Неизвестно"),
         "Режим игры": status_data.get("preset", "?"),
