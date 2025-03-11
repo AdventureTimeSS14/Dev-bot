@@ -63,7 +63,7 @@ DB_PORT=***
 USER=***
 PASSWORD=***
 HOST=***
-PORT=32769
+PORT=***
 DATABASE=***
 ```
 
