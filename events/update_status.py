@@ -124,8 +124,8 @@ def get_embed_fields(status_data: dict) -> dict:
     """
     Создаёт словарь с полями для Embed.
     """
-    metrics_url = "http://193.164.18.155:1212/metrics"
-    metrics = fetch_metrics(metrics_url)
+    # metrics_url = "http://193.164.18.155:1212/metrics"
+    # metrics = fetch_metrics(metrics_url)
 
     fields = {
         "Игроков": f"{status_data.get('players', '?')}/{status_data.get('soft_max_players', '?')}",
