@@ -61,36 +61,36 @@ def get_ss14_status_url(url: str, port: int) -> str:
         ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
     )
 
-async def fetch_metrics(url: str, retries=3, delay=15) -> dict:
-    """
-    Запрашивает метрики с повторами в случае ошибки.
-    """
-    for attempt in range(retries):
-        try:
-            print(f"Попытка {attempt+1}: Получаю метрики с {url}...")
-            response = requests.get(url, timeout=15)
-            response.raise_for_status()
-            print("Метрики успешно получены.")
-            return parse_metrics(response.text)
-        except (requests.Timeout, requests.ConnectionError) as e:
-            print(f"Ошибка: {e} (попытка {attempt+1})")
-            time.sleep(delay)
-    print("Не удалось получить метрики после нескольких попыток.")
-    return {}
+# async def fetch_metrics(url: str, retries=3, delay=15) -> dict:
+#     """
+#     Запрашивает метрики с повторами в случае ошибки.
+#     """
+#     for attempt in range(retries):
+#         try:
+#             print(f"Попытка {attempt+1}: Получаю метрики с {url}...")
+#             response = requests.get(url, timeout=15)
+#             response.raise_for_status()
+#             print("Метрики успешно получены.")
+#             return parse_metrics(response.text)
+#         except (requests.Timeout, requests.ConnectionError) as e:
+#             print(f"Ошибка: {e} (попытка {attempt+1})")
+#             time.sleep(delay)
+#     print("Не удалось получить метрики после нескольких попыток.")
+#     return {}
 
-def parse_metrics(metrics_text: str) -> dict:
-    """
-    Парсит текст метрик Prometheus и возвращает значения интересующих метрик.
-    """
-    metrics = {}
-    for line in metrics_text.splitlines():
-        if line.startswith("join_queue_count"):
-            metrics["join_queue_count"] = int(line.split()[-1])
-        elif line.startswith("join_queue_bypass_count"):
-            metrics["join_queue_bypass_count"] = int(line.split()[-1])
-    return metrics
+# def parse_metrics(metrics_text: str) -> dict:
+#     """
+#     Парсит текст метрик Prometheus и возвращает значения интересующих метрик.
+#     """
+#     metrics = {}
+#     for line in metrics_text.splitlines():
+#         if line.startswith("join_queue_count"):
+#             metrics["join_queue_count"] = int(line.split()[-1])
+#         elif line.startswith("join_queue_bypass_count"):
+#             metrics["join_queue_bypass_count"] = int(line.split()[-1])
+#     return metrics
 
-async def create_status_embed(
+def create_status_embed(
     address: str, status_data: dict, author=None
 ) -> disnake.Embed:
     """
@@ -101,7 +101,7 @@ async def create_status_embed(
     embed.set_footer(text=f"Адрес: {address}")
 
     # Получаем и добавляем информацию о сервере
-    embed_fields = await get_embed_fields(status_data)
+    embed_fields = get_embed_fields(status_data)
     for name, value in embed_fields.items():
         embed.add_field(name=name, value=value, inline=False)
 
@@ -121,16 +121,16 @@ async def create_status_embed(
     return embed
 
 
-async def get_embed_fields(status_data: dict) -> dict:
+def get_embed_fields(status_data: dict) -> dict:
     """
     Создаёт словарь с полями для Embed.
     """
-    metrics_url = "http://193.164.18.155:1212/metrics"
-    metrics = await fetch_metrics(metrics_url)
+    # metrics_url = "http://193.164.18.155:1212/metrics"
+    # metrics = await fetch_metrics(metrics_url)
 
     fields = {
         "Игроков": f"{status_data.get('players', '?')}/{status_data.get('soft_max_players', '?')}",
-        "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
+        # "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
         "Раунд": status_data.get("round_id", "?"),
         "Карта": status_data.get("map", "Неизвестно"),
         "Режим игры": status_data.get("preset", "?"),
