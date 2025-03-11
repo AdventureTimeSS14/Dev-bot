@@ -129,7 +129,7 @@ def get_embed_fields(status_data: dict) -> dict:
 
     fields = {
         "Игроков": f"{status_data.get('players', '?')}/{status_data.get('soft_max_players', '?')}",
-        "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
+        # "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
         "Раунд": status_data.get("round_id", "?"),
         "Карта": status_data.get("map", "Неизвестно"),
         "Режим игры": status_data.get("preset", "?"),
