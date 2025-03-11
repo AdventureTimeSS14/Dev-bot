@@ -7,7 +7,7 @@ psycopg2
 beautifulsoup4
 pytz
 fuzzywuzzy==0.18.0
-g4f==0.3.2.4
+g4f
 nest-asyncio==1.6.0
 python-dotenv==1.0.1
 python-Levenshtein==0.25.1
