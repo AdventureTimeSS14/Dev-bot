@@ -6,7 +6,7 @@ from config import SS14_ADDRESS, SS14_RUN_LEVELS
 from events.update_status import get_ss14_server_status_second
 
 
-@tasks.loop(seconds=15)
+@tasks.loop(seconds=30)
 async def update_status_presence():
     """
     Обновление Rich Presence бота.

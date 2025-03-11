@@ -1,6 +1,7 @@
 disnake
 pyyaml
 curl_cffi
+pycurl
 aiohttp
 psycopg2
 beautifulsoup4

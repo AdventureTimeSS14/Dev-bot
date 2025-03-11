@@ -13,7 +13,7 @@ from events.update_status import (
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}
 
 
-@tasks.loop(seconds=50)
+@tasks.loop(seconds=60)
 async def update_status_server_message_eddit():
     """
     Фоновая задача для обновления статуса сервера в сообщении.
