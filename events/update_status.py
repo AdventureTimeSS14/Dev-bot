@@ -5,6 +5,7 @@ import requests
 import aiohttp
 import dateutil.parser
 import disnake
+import time
 
 # Определение уровней игры для SS14
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}
@@ -60,7 +61,7 @@ def get_ss14_status_url(url: str, port: int) -> str:
         ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
     )
 
-def fetch_metrics(url: str, retries=3, delay=5) -> dict:
+async def fetch_metrics(url: str, retries=3, delay=5) -> dict:
     """
     Запрашивает метрики с повторами в случае ошибки.
     """
@@ -89,7 +90,7 @@ def parse_metrics(metrics_text: str) -> dict:
             metrics["join_queue_bypass_count"] = int(line.split()[-1])
     return metrics
 
-def create_status_embed(
+async def create_status_embed(
     address: str, status_data: dict, author=None
 ) -> disnake.Embed:
     """
@@ -100,7 +101,7 @@ def create_status_embed(
     embed.set_footer(text=f"Адрес: {address}")
 
     # Получаем и добавляем информацию о сервере
-    embed_fields = get_embed_fields(status_data)
+    embed_fields = await get_embed_fields(status_data)
     for name, value in embed_fields.items():
         embed.add_field(name=name, value=value, inline=False)
 
@@ -120,16 +121,16 @@ def create_status_embed(
     return embed
 
 
-def get_embed_fields(status_data: dict) -> dict:
+async def get_embed_fields(status_data: dict) -> dict:
     """
     Создаёт словарь с полями для Embed.
     """
-    # metrics_url = "http://193.164.18.155:1212/metrics"
-    # metrics = fetch_metrics(metrics_url)
+    metrics_url = "http://193.164.18.155:1212/metrics"
+    metrics = await fetch_metrics(metrics_url)
 
     fields = {
         "Игроков": f"{status_data.get('players', '?')}/{status_data.get('soft_max_players', '?')}",
-        # "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
+        "Игроков в очереди": metrics.get("join_queue_count", "Недоступно"),
         "Раунд": status_data.get("round_id", "?"),
         "Карта": status_data.get("map", "Неизвестно"),
         "Режим игры": status_data.get("preset", "?"),

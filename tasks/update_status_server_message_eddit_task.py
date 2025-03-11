@@ -30,7 +30,7 @@ async def update_status_server_message_eddit():
         if not status_data:
             embed = create_error_embed(SS14_ADDRESS)
         else:
-            embed = create_status_embed(SS14_ADDRESS, status_data)
+            embed = await create_status_embed(SS14_ADDRESS, status_data)
 
         await message.edit(embed=embed)
 

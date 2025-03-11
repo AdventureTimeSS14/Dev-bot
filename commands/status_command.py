@@ -38,7 +38,7 @@ async def get_status_command(ctx, server_name: str = None):
             return
 
         # Создаем Embed сообщение с использованием данных
-        embed = create_status_embed(address, status_data, ctx.author)
+        embed = await create_status_embed(address, status_data, ctx.author)
         await ctx.send(embed=embed)
 
     except Exception as e:
