@@ -61,7 +61,7 @@ def get_ss14_status_url(url: str, port: int) -> str:
         ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
     )
 
-async def fetch_metrics(url: str, retries=3, delay=5) -> dict:
+async def fetch_metrics(url: str, retries=3, delay=10) -> dict:
     """
     Запрашивает метрики с повторами в случае ошибки.
     """
