@@ -90,9 +90,17 @@ ADMIN_COMMANDS = [
         "description": "Выводит список допустимых админ рангов. Мрп или Дев сервера.",
     },
     {
-        "name": "👮‍♂️ &jobs",
-        "description": "Выводит список всех департаментов с их профессиями. Сборки ADT.",
-    }
+        "name": "👮‍♂️ &playtime",
+        "description": "Выводит список всех допустимых <ProtoPlayTimeTracker> таймтрекеров сборки ADT.",
+    },
+    {
+        "name": "⏱ &playtime_addrole <NickName> <ProtoPlayTimeTracker> <Time>",
+        "description": "Добавляет указанное количество времени игроку для определённой должности. Укажите никнейм игрока, идентификатор должности (ProtoIdJob) и количество времени (в минутах).",
+    },
+    {
+        "name": "💯 &playtime_generalrole <NickName>",
+        "description": "Добавляет общее время игроку для открытия всех стандартных должностей (кроме глав и СБ). Укажите никнейм игрока.",
+    },
 ]
 
 @bot.command(name="admin_help")
