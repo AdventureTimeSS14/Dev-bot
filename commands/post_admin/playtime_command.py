@@ -173,10 +173,10 @@ async def playtime_generalrole(ctx, nickname: str):
                 error_messages.append(f"Ошибка {response.status}: {error_text}")
 
     # Вывод результатов
-    await ctx.send(f"✅ Успешно обработано запросов: {success_count}/{len(job_times) + 1}")
+    print(f"✅ Успешно обработано запросов: {success_count}/{len(job_times) + 1}")
 
     if error_messages:
-        await ctx.send(f"❌ Ошибки при обработке:\n" + "\n".join(error_messages))
+        print(f"❌ Ошибки при обработке:\n" + "\n".join(error_messages))
 
 
 # @bot.command() # Для тестов
