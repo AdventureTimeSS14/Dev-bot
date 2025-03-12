@@ -8,7 +8,8 @@ from commands.misc.check_roles import has_any_role_by_id
 from config import (
     ADDRESS_MRP,
     HEAD_ADT_TEAM,
-    POST_ADMIN_HEADERS
+    POST_ADMIN_HEADERS,
+    WHITELIST_ROLE_PLAYTIME_POST,
 )
 
 GITHUB_URLS = [
@@ -86,7 +87,7 @@ async def playtime(ctx):
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
 async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 
@@ -127,7 +128,7 @@ async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
 async def playtime_generalrole(ctx, nickname: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 

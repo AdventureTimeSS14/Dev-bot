@@ -116,6 +116,11 @@ WHITELIST_ROLE_ID_ADMINISTRATION_POST = [
     1084459980419240016,  # Департамент Обжалований
 ]
 
+WHITELIST_ROLE_PLAYTIME_POST = [
+    1216123834697252914,  # Перенос времени
+]
+
+
 REPOSITORIES = {
     "n": "space_station_ADT",  # Репозиторий для нового проекта
     "o": "space_station",  # Репозиторий для основного проекта
