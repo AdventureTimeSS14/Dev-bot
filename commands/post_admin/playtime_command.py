@@ -119,10 +119,6 @@ async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
                     print("Запрос отправлен")
                 else:
                     await ctx.send(f"❌ Код ошибки: {response.status}")
-        except aiohttp.ClientTimeout:
-            print("Ошибка таймаута!")
-        except aiohttp.ClientError as e:
-            print("Ошибка соединения!")
         except Exception as e:
             print(f"Ошибка: {str(e)}")
 
