@@ -11,7 +11,7 @@ from commands.misc.check_roles import has_any_role_by_id
 UNBANNING_ADMIN = POST_ADMIN_NAME
 
 # Функция разбана
-def pardon_ban(ban_id):
+def pardon_ban(ban_id, adminName):
     conn = psycopg2.connect(**DB_PARAMS)
     cursor = conn.cursor()
 
@@ -25,14 +25,14 @@ def pardon_ban(ban_id):
     # Получаем user_id разбанивающего админа
     cursor.execute(
         "SELECT user_id FROM player WHERE last_seen_user_name = %s",
-        (UNBANNING_ADMIN,)
+        (adminName,)
     )
     admin_result = cursor.fetchone()
 
     if not admin_result:
         cursor.close()
         conn.close()
-        return False, f"❌ Ошибка: администратор `{UNBANNING_ADMIN}` не найден в БД."
+        return False, f"❌ Ошибка: администратор `{adminName}` не найден в БД."
 
     unbanning_admin_id = admin_result[0]
 
@@ -59,17 +59,17 @@ def pardon_ban(ban_id):
     conn.commit()
     cursor.close()
     conn.close()
-    return True, f"✅ Бан с ID `{ban_id}` успешно снят администратором `{UNBANNING_ADMIN}`."
+    return True, f"✅ Бан с ID `{ban_id}` успешно снят администратором `{adminName}`."
 
 # Команда для Discord-бота
 @bot.command()
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
-async def pardon(ctx, ban_id: int):
+async def pardon(ctx, ban_id: int, adminName: str = UNBANNING_ADMIN):
     """
     Разбанивает игрока по ID бана.
     Использование: &pardon <ban_id>
     """
-    success, message = pardon_ban(ban_id)
+    success, message = pardon_ban(ban_id, adminName)
 
     # Создаем Embed для ответа
     color = disnake.Color.green() if success else disnake.Color.red()
