@@ -1,23 +1,15 @@
+import random
 import re
 
 import disnake
 import requests
-import random
-
 from fuzzywuzzy import fuzz
-from bot_init import bot
-from events.utils import get_github_link
 
-from config import (
-    ADMIN_TEAM,
-    AUTHOR,
-    GLOBAL_SESSION,
-    LOG_CHANNEL_ID,
-    REPOSITORIES,
-    ADDRESS_MRP,
-    POST_ADMIN_HEADERS,
-)
+from bot_init import bot
+from config import (ADDRESS_MRP, ADMIN_TEAM, AUTHOR, GLOBAL_SESSION,
+                    LOG_CHANNEL_ID, POST_ADMIN_HEADERS, REPOSITORIES)
 from data import JsonData
+from events.utils import get_github_link
 
 
 @bot.event

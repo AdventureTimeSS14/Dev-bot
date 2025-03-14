@@ -1,11 +1,15 @@
+from datetime import datetime
+
 import disnake
 import psycopg2
-from datetime import datetime
 import pytz
+
 from bot_init import bot
-from config import HEAD_ADT_TEAM
-from commands.db_ss.setup_db_ss14_mrp import DB_USER, DB_PORT, DB_HOST, DB_PASSWORD
+from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
+                                              DB_USER)
 from commands.misc.check_roles import has_any_role_by_id
+from config import HEAD_ADT_TEAM
+
 
 def get_db_params(server):
     db_name = "ss14" if server.lower() == "mrp" else "ss14_dev"

@@ -1,9 +1,10 @@
 import disnake
 import requests
-from bot_init import bot
 from disnake.ext import commands
-from config import AUTHOR, ACTION_GITHUB, SERVER_ADMIN_POST
+
+from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
+from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
 
 
 # Функция для получения списка участников организации на GitHub

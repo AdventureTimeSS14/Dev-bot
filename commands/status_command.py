@@ -4,10 +4,9 @@
 
 from bot_init import bot
 from config import SS14_ADDRESS, SS14_ADDRESS_DEV
-from events.update_status import (
-    create_status_embed,
-    get_ss14_server_status_second,
-)
+from events.update_status import (create_status_embed,
+                                  get_ss14_server_status_second)
+
 
 # Команда для получения статуса
 @bot.command(name="status")

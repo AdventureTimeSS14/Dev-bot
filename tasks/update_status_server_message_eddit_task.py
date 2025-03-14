@@ -3,11 +3,8 @@ from disnake.ext import tasks
 
 from bot_init import bot
 from config import CHANNEL_ID_UPDATE_STATUS, SS14_ADDRESS
-from events.update_status import (
-    create_error_embed,
-    create_status_embed,
-    get_ss14_server_status_second,
-)
+from events.update_status import (create_error_embed, create_status_embed,
+                                  get_ss14_server_status_second)
 
 # Определение уровней игры для SS14
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}

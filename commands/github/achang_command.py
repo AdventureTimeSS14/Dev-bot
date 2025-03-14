@@ -3,13 +3,8 @@ from disnake.ext import commands
 
 from bot_init import bot
 
-from .github_processor import (
-    create_embed_list,
-    fetch_github_data,
-    send_embeds,
-    validate_repository,
-    validate_user,
-)
+from .github_processor import (create_embed_list, fetch_github_data,
+                               send_embeds, validate_repository, validate_user)
 
 
 @bot.command(name="achang")

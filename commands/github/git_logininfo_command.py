@@ -1,9 +1,11 @@
-import disnake
-import aiohttp
 import asyncio
-from bot_init import bot
-from config import AUTHOR, ACTION_GITHUB, REPOSITORIES
+
+import aiohttp
+import disnake
 from disnake.ext import commands
+
+from bot_init import bot
+from config import ACTION_GITHUB, AUTHOR, REPOSITORIES
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 

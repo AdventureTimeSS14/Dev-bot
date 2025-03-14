@@ -2,13 +2,11 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
-
 from commands.misc.check_roles import has_any_role_by_id
-from components.button_help_components import action_row_button_help, action_row_bug_report
+from components.button_help_components import (action_row_bug_report,
+                                               action_row_button_help)
+from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
-from config import (
-    WHITELIST_ROLE_ID_ADMINISTRATION_POST
-)
 COLOR = disnake.Color.dark_red()  # Красный цвет для эмбеда
 
 # Список команд и их описаний для администрирования

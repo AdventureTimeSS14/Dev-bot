@@ -1,9 +1,8 @@
 import disnake
-
+from disnake.ui import Modal, TextInput
 
 from bot_init import bot
 
-from disnake.ui import Modal, TextInput
 
 class BugReportModal(Modal):
     def __init__(self):

@@ -1,9 +1,11 @@
 import disnake
 import requests
-from bot_init import bot
-from config import AUTHOR, REPOSITORIES, ACTION_GITHUB, WHITELIST_ROLE_ID
 from disnake.ext import commands
+
+from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
+from config import ACTION_GITHUB, AUTHOR, REPOSITORIES, WHITELIST_ROLE_ID
+
 
 # Функция для запуска GitHub Actions workflow
 def trigger_github_action(repository, branch):

@@ -1,7 +1,9 @@
 import disnake
 import requests
+
 from bot_init import bot
 from config import AUTHOR, REPOSITORIES
+
 
 # URL для получения списка веток репозитория
 def get_branches_url(repository):

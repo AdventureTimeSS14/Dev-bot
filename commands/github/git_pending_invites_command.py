@@ -1,8 +1,10 @@
 import disnake
 import requests
-from bot_init import bot
-from config import AUTHOR, ACTION_GITHUB
 from disnake.ext import commands
+
+from bot_init import bot
+from config import ACTION_GITHUB, AUTHOR
+
 
 def get_pending_invitations(page=1, per_page=30, role="all"):
     """Получает список ожидающих приглашений в организацию GitHub."""

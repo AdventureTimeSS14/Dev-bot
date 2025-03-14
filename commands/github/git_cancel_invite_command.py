@@ -1,9 +1,11 @@
 import disnake
 import requests
-from bot_init import bot
-from config import AUTHOR, ACTION_GITHUB, SERVER_ADMIN_POST
 from disnake.ext import commands
+
+from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
+from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
+
 
 def cancel_invitation_by_login(login: str):
     """Отменяет приглашение по логину пользователя в организацию GitHub."""

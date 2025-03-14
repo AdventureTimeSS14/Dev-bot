@@ -6,13 +6,8 @@ from disnake.ext import tasks
 
 from bot_init import bot
 from commands.github.github_processor import fetch_github_data
-from config import (
-    AUTHOR,
-    CHANGELOG_CHANNEL_ID,
-    LOG_CHANNEL_ID,
-    REPOSITORIES,
-    SECOND_UPDATE_CHANGELOG,
-)
+from config import (AUTHOR, CHANGELOG_CHANNEL_ID, LOG_CHANNEL_ID, REPOSITORIES,
+                    SECOND_UPDATE_CHANGELOG)
 
 MAX_FIELD_LENGTH = 1024  # Максимальный размер поля для Embed
 

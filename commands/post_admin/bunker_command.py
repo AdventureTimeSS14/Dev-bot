@@ -2,12 +2,9 @@ import requests
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
+from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
-from config import (
-    ADDRESS_MRP,
-    WHITELIST_ROLE_ID_ADMINISTRATION_POST,
-    POST_ADMIN_HEADERS
-)
 
 @bot.command()
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)

@@ -5,11 +5,8 @@ import disnake
 from disnake.ext import tasks
 
 from bot_init import bot
-from config import (
-    CHANNEL_ID_UPDATE_STATUS,
-    MESSAGE_ID_TIME_SHUTDOWS,
-    TIME_SHUTDOWSE,
-)
+from config import (CHANNEL_ID_UPDATE_STATUS, MESSAGE_ID_TIME_SHUTDOWS,
+                    TIME_SHUTDOWSE)
 
 
 @tasks.loop(seconds=11)

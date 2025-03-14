@@ -5,7 +5,8 @@
 import disnake
 
 from bot_init import bot
-from components.button_help_components import action_row_button_help, action_row_bug_report
+from components.button_help_components import (action_row_bug_report,
+                                               action_row_button_help)
 
 
 @bot.command(name="help")

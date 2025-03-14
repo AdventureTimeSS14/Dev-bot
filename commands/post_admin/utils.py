@@ -1,6 +1,8 @@
 import asyncio
-import aiohttp
 import json  # Для сериализации данных
+
+import aiohttp
+
 
 async def send_server_request(ctx, url, post_data, headers, retries=3):
     """

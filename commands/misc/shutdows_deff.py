@@ -1,12 +1,8 @@
 import disnake
 
 from bot_init import bot
-from config import (
-    CHANNEL_ID_UPDATE_STATUS,
-    LOG_CHANNEL_ID,
-    MESSAGE_ID_TIME_SHUTDOWS,
-    SS14_ADDRESS,
-)
+from config import (CHANNEL_ID_UPDATE_STATUS, LOG_CHANNEL_ID,
+                    MESSAGE_ID_TIME_SHUTDOWS, SS14_ADDRESS)
 
 
 async def shutdown_def():

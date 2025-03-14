@@ -1,14 +1,11 @@
 import disnake
 from disnake.ext import commands
 
-from commands.github.utils import validate_and_return_if_invalid
 from bot_init import bot
-from .github_processor import (
-    create_embed_list,
-    fetch_github_data,
-    send_embeds,
-    validate_repository,
-)
+from commands.github.utils import validate_and_return_if_invalid
+
+from .github_processor import (create_embed_list, fetch_github_data,
+                               send_embeds, validate_repository)
 
 
 @bot.command(

@@ -1,16 +1,13 @@
+import asyncio
+
+import aiohttp
 import disnake
 import yaml
-import aiohttp
-import asyncio
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
-from config import (
-    ADDRESS_MRP,
-    HEAD_ADT_TEAM,
-    POST_ADMIN_HEADERS,
-    WHITELIST_ROLE_PLAYTIME_POST,
-)
+from config import (ADDRESS_MRP, HEAD_ADT_TEAM, POST_ADMIN_HEADERS,
+                    WHITELIST_ROLE_PLAYTIME_POST)
 
 GITHUB_URLS = [
     "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/Resources/Prototypes/Roles/play_time_trackers.yml",

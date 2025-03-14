@@ -1,8 +1,9 @@
 import disnake
 
 from bot_init import bot
+from components.button_help_components import (action_row_bug_report,
+                                               action_row_button_help)
 from config import ADMIN_TEAM
-from components.button_help_components import action_row_button_help, action_row_bug_report
 
 commands_info = {
     "Основные команды": {

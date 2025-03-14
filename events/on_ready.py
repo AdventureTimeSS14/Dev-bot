@@ -9,9 +9,8 @@ from tasks.check_new_commit_task import monitor_commits
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
 from tasks.update_status_presence_task import update_status_presence
-from tasks.update_status_server_message_eddit_task import (
-    update_status_server_message_eddit,
-)
+from tasks.update_status_server_message_eddit_task import \
+    update_status_server_message_eddit
 from tasks.update_time_shutdows_task import update_time_shutdows
 
 

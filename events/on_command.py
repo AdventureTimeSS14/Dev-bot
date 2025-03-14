@@ -3,9 +3,9 @@ import datetime
 import disnake
 from disnake.ext import commands
 from disnake.ui import View
-from components.button_help_components import button_bug_report
 
 from bot_init import bot
+from components.button_help_components import button_bug_report
 from config import LOG_CHANNEL_ID
 
 

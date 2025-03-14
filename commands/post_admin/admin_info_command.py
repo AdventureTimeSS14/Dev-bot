@@ -1,15 +1,11 @@
-import requests
 import disnake
+import requests
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from commands.post_admin.utils import get_field_value
-
-from config import (
-    WHITELIST_ROLE_ID_ADMINISTRATION_POST,
-    ADDRESS_MRP,
-    POST_ADMIN_HEADERS
-)
+from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command()

@@ -1,8 +1,9 @@
-import requests
 import disnake
+import requests
 from disnake.ext import commands
+
 from bot_init import bot
-from config import AUTHOR, ACTION_GITHUB
+from config import ACTION_GITHUB, AUTHOR
 
 
 # Функция для получения информации о репозитории

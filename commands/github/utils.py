@@ -1,6 +1,5 @@
-from .github_processor import (
-    validate_user
-)
+from .github_processor import validate_user
+
 
 async def validate_and_return_if_invalid(ctx):
     """

@@ -1,8 +1,9 @@
 import disnake
 import requests
-from bot_init import bot
-from config import AUTHOR, REPOSITORIES, ACTION_GITHUB
 from disnake.ext import commands
+
+from bot_init import bot
+from config import ACTION_GITHUB, AUTHOR, REPOSITORIES
 
 
 # Функция для обрезки текста до 512 символов

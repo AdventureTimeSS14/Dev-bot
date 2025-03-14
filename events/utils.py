@@ -1,11 +1,10 @@
+from datetime import datetime
+
 import disnake
 import requests
-from datetime import datetime
-from config import (
-    AUTHOR,
-    GLOBAL_SESSION,
-    REPOSITORIES,
-)
+
+from config import AUTHOR, GLOBAL_SESSION, REPOSITORIES
+
 
 async def get_github_link(repo_code, number):
     """

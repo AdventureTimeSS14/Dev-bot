@@ -1,5 +1,5 @@
 from disnake import ButtonStyle
-from disnake.ui import Button, ActionRow
+from disnake.ui import ActionRow, Button
 
 # Создание кнопок
 button_help = Button(label="&help", style=ButtonStyle.green, custom_id="button_help_id")
