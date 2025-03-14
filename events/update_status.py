@@ -1,11 +1,9 @@
-import time
 from datetime import datetime, timezone
 from urllib.parse import urlparse, urlunparse
 
 import aiohttp
 import dateutil.parser
 import disnake
-import requests
 
 # Определение уровней игры для SS14
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}
