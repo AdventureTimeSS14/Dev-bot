@@ -37,7 +37,7 @@ async def get_all_playtime_ids():
 
 class PlaytimeView(disnake.ui.View):
     def __init__(self, playtime_ids, items_per_page=20):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.playtime_ids = playtime_ids
         self.items_per_page = items_per_page
         self.index = 0

@@ -11,27 +11,29 @@ from dotenv import load_dotenv
 # Загрузка переменных из .env
 load_dotenv()
 
-
-def get_env_variable(name: str) -> str:
+def get_env_variable(name: str, default: str = "NULL") -> str:
     """
-    Функция для безопасного получения переменных окружения
+    Функция для безопасного получения переменных окружения.
+    Если переменная не найдена, возвращает значение по умолчанию.
     """
     value = os.getenv(name)
     if not value:
-        raise ValueError(f"{name} не найден в файле .env")
+        print(f"Предупреждение: {name} не найден в файле .env. Используется значение по умолчанию: {default}")
+        return default
     return value
-
 
 # Получение переменных из окружения
 DISCORD_KEY = get_env_variable("DISCORD_KEY")
 GITHUB = get_env_variable("GITHUB")
 ACTION_GITHUB = get_env_variable("ACTION_GITHUB")
+
 # Моя база данных MAriaDB
 USER = get_env_variable("USER")
 PASSWORD = get_env_variable("PASSWORD")
 HOST = get_env_variable("HOST")
 PORT = get_env_variable("PORT")
 DATABASE = get_env_variable("DATABASE")
+
 # Для управление DEV/MRP апдейт, рестарт
 POST_AUTHORIZATION_DEV = get_env_variable("POST_AUTHORIZATION_DEV")
 POST_AUTHORIZATION_MRP = get_env_variable("POST_AUTHORIZATION_MRP")
@@ -40,13 +42,15 @@ POST_USERNAME_DEV = get_env_variable("POST_USERNAME_DEV")
 POST_PASSWORD_DEV = get_env_variable("POST_PASSWORD_DEV")
 POST_USERNAME_MRP = get_env_variable("POST_USERNAME_MRP")
 POST_PASSWORD_MRP = get_env_variable("POST_PASSWORD_MRP")
+
 # Управление БД
 DB_HOST = get_env_variable("DB_HOST")
 DB_DATABASE = get_env_variable("DB_DATABASE")
 DB_USER = get_env_variable("DB_USER")
 DB_PASSWORD = get_env_variable("DB_PASSWORD")
 DB_PORT = get_env_variable("DB_PORT")
-# Имитация управление админкой
+
+# Отправка и авторизация ПОСТ запросов к admin_API ss14
 POST_ADMIN_API = get_env_variable("POST_ADMIN_API")
 POST_ADMIN_NAME = get_env_variable("POST_ADMIN_NAME")
 POST_ADMIN_GUID = get_env_variable("POST_ADMIN_GUID")
@@ -59,7 +63,8 @@ VACATION_ROLE = 1309454737032216617
 MY_USER_ID = 328502766622474240
 CHANNEL_ID_UPDATE_STATUS = 1320771026019422329
 MESSAGE_ID_TIME_SHUTDOWS = 1320771150938243195
-TIME_SHUTDOWSE = 5 * 3600 + 57 * 60  # Время в секундах
+
+TIME_SHUTDOWSE = 5 * 3600 + 57 * 60  # В секундах. 5 часов 57 минут. Время до отключения
 
 SS14_ADDRESS = "ss14://193.164.18.155"
 SS14_ADDRESS_DEV = "ss14://5.180.174.139"
@@ -76,6 +81,7 @@ GLOBAL_SESSION.headers.update({"Authorization": f"token {GITHUB}"})
 
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}
 
+# списки ID ролей для вайтлистов
 WHITELIST_ROLE_ID = [
     1060191651538145420,  # Разработка
     1347877224430436493,  # Глава проекта

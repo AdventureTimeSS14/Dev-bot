@@ -41,7 +41,7 @@ def fetch_player_notes(user_name):
 # Класс для управления страницами
 class PlayerNotesView(disnake.ui.View):
     def __init__(self, ctx, notes, user_name):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.notes = notes
         self.user_name = user_name

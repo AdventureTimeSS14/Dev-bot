@@ -33,7 +33,7 @@ def fetch_profiles(nick_name):
 # Класс для управления страницами
 class ProfilesView(disnake.ui.View):
     def __init__(self, ctx, profiles, nick_name):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.profiles = profiles
         self.nick_name = nick_name

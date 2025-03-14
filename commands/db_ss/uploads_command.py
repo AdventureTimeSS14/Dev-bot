@@ -41,7 +41,7 @@ def fetch_uploads(server):
 # Класс для управления страницами логов загрузок
 class UploadsView(disnake.ui.View):
     def __init__(self, ctx, uploads, server):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.uploads = uploads
         self.server = server.upper()

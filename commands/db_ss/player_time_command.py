@@ -29,7 +29,7 @@ def fetch_player_stats(user_name):
 # Класс для управления страницами
 class PlayerStatsView(disnake.ui.View):
     def __init__(self, ctx, stats, user_name):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.stats = stats
         self.user_name = user_name

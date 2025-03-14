@@ -142,4 +142,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    bot.run(DISCORD_KEY)  # Запуск бота, без asyncio.run()
+    if DISCORD_KEY == "NULL":
+        logging.error("Not DISCORD_KEY. Programm Dev-bot shutdown!!")
+    else:
+        bot.run(DISCORD_KEY)  # Запуск бота, без asyncio.run()

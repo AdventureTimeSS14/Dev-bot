@@ -41,7 +41,7 @@ def fetch_banlist(nick_name):
 # Класс для управления страницами
 class BanlistView(disnake.ui.View):
     def __init__(self, ctx, bans, nick_name):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.bans = bans
         self.nick_name = nick_name

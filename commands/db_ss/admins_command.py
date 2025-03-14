@@ -44,7 +44,7 @@ def fetch_admins(server):
 # Класс для управления страницами
 class AdminsView(disnake.ui.View):
     def __init__(self, ctx, admins, server):
-        super().__init__(timeout=180)
+        super().__init__(timeout=500)
         self.ctx = ctx
         self.admins = admins
         self.server = server.upper()
