@@ -42,7 +42,7 @@ async def user_role(ctx, *role_names: str):
             )
         else:
             await ctx.send(f"⚠️ **Нет пользователей с ролью '{role.name}'.**")
-    
+
     except disnake.errors.HTTPException as e:
         # Если ошибка превышения лимита, показываем только первых 10 пользователей
         if e.code == 50035:  # Проверка на ошибку из-за превышения лимита
