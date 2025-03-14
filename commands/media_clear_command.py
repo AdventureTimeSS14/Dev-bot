@@ -22,7 +22,11 @@ async def media_clear(ctx, count: int):
                 continue
 
             # Проверяем, содержит ли сообщение вложения (медиа, файлы и т. д.)
-            if not message.attachments and not message.content.startswith("https://tenor.com") and not message.content.startswith("https://youtube.com"):
+            if (
+                not message.attachments
+                and not message.content.startswith("https://tenor.com")
+                and not message.content.startswith("https://youtube.com")
+            ):
                 await message.delete()
                 deleted += 1
 
