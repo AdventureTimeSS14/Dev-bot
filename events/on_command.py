@@ -58,10 +58,8 @@ async def on_command_error(ctx, error):
     """
     view = View()
     view.add_item(button_bug_report)
-    
-    if isinstance(error, commands.CommandNotFound):
 
-        
+    if isinstance(error, commands.CommandNotFound):
         # Если команда не найдена, отправляем сообщение с предложением использовать &help
         await ctx.send(
             "❌ Команда не найдена! "
