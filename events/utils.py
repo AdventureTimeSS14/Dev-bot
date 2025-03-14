@@ -93,7 +93,7 @@ async def get_github_link(repo_code, number):
                 reviews_data = reviews_response.json()
                 approved_reviewers = (
                     [review['user']['login']
-                    for review in reviews_data 
+                    for review in reviews_data
                     if review['state'] == 'APPROVED']
                 )
                 if approved_reviewers:
