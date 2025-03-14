@@ -109,7 +109,7 @@ async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
                 f"на должность **{protojob}** успешно отправлен!\n"
                 f"⏱ Добавлено времени: **{time}**."
     )
-    
+
     # Отправка POST запроса асинхронно без ожидания ответа
     async with aiohttp.ClientSession() as session:
         try:
@@ -144,7 +144,7 @@ async def playtime_generalrole(ctx, nickname: str):
 
     async with aiohttp.ClientSession() as session:
         tasks = []
-        
+
         # Отправка запросов на каждую роль
         for job, time in job_times.items():
             data = {
