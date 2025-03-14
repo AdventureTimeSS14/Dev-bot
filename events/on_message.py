@@ -6,8 +6,7 @@ import requests
 from fuzzywuzzy import fuzz
 
 from bot_init import bot
-from config import (ADDRESS_MRP, ADMIN_TEAM, AUTHOR, GLOBAL_SESSION,
-                    LOG_CHANNEL_ID, POST_ADMIN_HEADERS, REPOSITORIES)
+from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS
 from data import JsonData
 from events.utils import get_github_link
 
@@ -41,7 +40,7 @@ async def on_message(message):
 
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
-    
+
     await check_time_transfer_with_fuzz(message)
 
 
@@ -172,12 +171,13 @@ async def handle_github_pattern(message):
         # Если 'n' не найдено, то присваиваем 'n' по умолчанию
         repo_code = 'n' if not repo_code else repo_code
         embed_or_str = await get_github_link(repo_code, number)
-        
+
         # Если получен embed (объект disnake.Embed)
         if isinstance(embed_or_str, disnake.Embed):
             await message.channel.send(embed=embed_or_str)
         elif isinstance(embed_or_str, str):
-            await message.channel.send(embed=disnake.Embed(description=embed_or_str))  # Отправка строки как обычного сообщения
+            # Отправка строки как обычного сообщения
+            await message.channel.send(embed=disnake.Embed(description=embed_or_str))
         else:
             await message.channel.send("Не удалось получить информацию о PR или Issue.")
 
@@ -206,10 +206,11 @@ async def check_time_transfer_with_fuzz(message):
         if fuzz.token_sort_ratio(message.content.lower(), phrase) > 80:
             # Ответ бота
             response = (
-                "Вы говорите о переносе времени? Для таких вопросов ты можешь обратиться в следующий канал: "
+                "Вы говорите о переносе времени? "
+                "Для таких вопросов ты можешь обратиться в следующий канал: "
                 "https://discord.com/channels/901772674865455115/1341819793451384852"
             )
-            
+
             # Отправляем ответ в канал
             await message.channel.send(response)
             break
