@@ -114,7 +114,8 @@ async def get_pr_info(ctx, pr_number: int):
         return
 
     try:
-        await channel.send(embed=embed)
+        message = await channel.send(embed=embed)
+        await message.publish()
         await ctx.send(
             f"Информация о пулл-реквесте успешно отправлена в канал <#{CHANGELOG_CHANNEL_ID}>."
         )

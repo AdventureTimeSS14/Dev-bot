@@ -81,7 +81,8 @@ async def send_pull_request_to_disnake(pr, description, pr_title, pr_url, coauth
 
     try:
         # Отправляем сообщение в CHANGELOG
-        await changelog_channel.send(embed=embed)
+        message = await changelog_channel.send(embed=embed)
+        await message.publish()
         print(f"✅ Информация о замерженном PR #{pr_number} опубликована в CHANGELOG.")
     except disnake.Forbidden:
         print(f"❌ У бота нет прав для отправки сообщений в канал с ID {CHANGELOG_CHANNEL_ID}.")

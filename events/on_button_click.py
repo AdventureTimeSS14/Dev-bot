@@ -41,7 +41,7 @@ class BugReportModal(Modal):
                     title="📝 Новый отзыв/баг-репорт",
                     description= (
                         f"Сообщение от пользователя {inter.author.display_name} "
-                        f"({inter.author.mention}) ({inter.author.id}):"
+                        f"({inter.author.mention}) ({inter.author.id}):",
                     ),
                     color=disnake.Color.yellow()
                 )
@@ -49,7 +49,7 @@ class BugReportModal(Modal):
                 embed.set_footer(
                     text = (
                         f"Отправлено: {inter.created_at.strftime('%Y-%m-%d %H:%M:%S')} "
-                        f"от {inter.author.display_name}"
+                        f"от {inter.author.display_name}",
                     ),
                     icon_url=inter.author.avatar.url
                 )
@@ -61,7 +61,7 @@ class BugReportModal(Modal):
             await inter.response.send_message(
                 "Спасибо за ваше сообщение! Мы внимательно его рассмотрим "
                 "и постараемся улучшить сервис. 😊", 
-                ephemeral=True
+                ephemeral=True,
             )
 
         except Exception as e:
