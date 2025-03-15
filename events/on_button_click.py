@@ -11,8 +11,8 @@ class BugReportModal(Modal):
     def __init__(self):
         # Создаем текстовое поле для ввода сообщения с custom_id
         text_input = TextInput(
-            label="Подробности о сообщении", 
-            placeholder="Опишите баг, отзыв или предложение...", 
+            label="Подробности о сообщении",
+            placeholder="Опишите баг, отзыв или предложение...",
             style=disnake.TextInputStyle.long,
             custom_id="bug_report_details"
         )
@@ -20,23 +20,16 @@ class BugReportModal(Modal):
         # Инициализация модального окна с компонентом text_input
         super().__init__(title="🚨 Сообщение о баге/отзыв/предложение", components=[text_input])
 
-    async def callback(self, inter: disnake.MessageInteraction):
+    async def callback(self, inter: disnake.ModalInteraction):
         """
         Обрабатывает отправку модального окна с баг-репортом.
-
-        Аргументы:
-            inter (disnake.MessageInteraction): Взаимодействие с модальным окном.
         """
         try:
-            # Получаем введённый текст через text_inputs
             report_text = inter.text_values['bug_report_details']
-
-            # Указание канала для отправки сообщения о репорте/отзыва
             target_channel_id = 1333381720996843551
             target_channel = inter.bot.get_channel(target_channel_id)
 
             if target_channel:
-                # Создаем Embed для отправки
                 embed = disnake.Embed(
                     title="📝 Новый отзыв/баг-репорт",
                     description= (
@@ -54,10 +47,8 @@ class BugReportModal(Modal):
                     icon_url=inter.author.avatar.url
                 )
 
-                # Пересылаем сообщение в канал
                 await target_channel.send(embed=embed)
 
-            # Ответ пользователю с подтверждением
             await inter.response.send_message(
                 "Спасибо за ваше сообщение! Мы внимательно его рассмотрим "
                 "и постараемся улучшить сервис. 😊", 
@@ -65,7 +56,6 @@ class BugReportModal(Modal):
             )
 
         except Exception as e:
-            # Логирование ошибки (если происходит ошибка)
             print(f"Произошла ошибка при отправке сообщения: {e}")
             try:
                 await inter.response.send_message(

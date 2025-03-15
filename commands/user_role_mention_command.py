@@ -32,7 +32,7 @@ async def user_role_mention(ctx, *role_names: str):
         return
 
     # Получаем список пользователей с этой ролью
-    members_with_role = [member for member in role.members]
+    members_with_role = list(role.members)
 
     try:
         if members_with_role:
