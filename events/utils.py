@@ -1,9 +1,8 @@
-from datetime import datetime
-
 import disnake
 import requests
 
 from config import AUTHOR, GLOBAL_SESSION, REPOSITORIES
+
 
 async def fetch_github_data(url):
     """Делает GET-запрос и возвращает JSON-ответ."""
@@ -24,11 +23,11 @@ def get_pr_status(pr_data):
 
     if state == 'closed' and merged:
         return "Замерджен 💜", disnake.Color.purple()
-    elif state == 'closed' and not merged:
+    if state == 'closed' and not merged:
         return "Закрыт ❌", disnake.Color.red()
-    elif state == 'open' and draft:
+    if state == 'open' and draft:
         return "В драфте ⚙️", disnake.Color.darker_gray()
-    elif state == 'open':
+    if state == 'open':
         return "Открыт ✅", disnake.Color.green()
 
     return "Неизвестный статус ❓", disnake.Color.default()
