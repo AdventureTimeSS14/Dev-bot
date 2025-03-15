@@ -2,8 +2,11 @@
 # Автор [Schrödinger](https://github.com/Schrodinger71)
 
 [![Deploy Discord Bot](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/deploy.yml)
-[![Flake8 test](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml)
 [![Linter Python Code](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/python-linter.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/python-linter.yml)
+
+<!--
+[![Flake8 test](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml/badge.svg)](https://github.com/AdventureTimeSS14/Dev-bot/actions/workflows/flake8-linter.yml)
+-->
 
 Этот бот разработан командой Adventure Time SS14 в **образовательных целях** для изучения и тестирования возможностей Discord API и разработки ботов. **Он не предназначен для коммерческого использования.**
 
