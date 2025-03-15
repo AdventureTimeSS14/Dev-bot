@@ -59,7 +59,7 @@ async def tweak_team(
             if old_role < new_role
             else "Понижение в должности"
         )
-        action_description = f"{ctx.author.mention} {'повышает' if old_role < new_role else 'понижает'} {user.mention}." # pylint: disable=C0301
+        action_description = f"{ctx.author.mention}({ctx.author.display_name}) {'повышает' if old_role < new_role else 'понижает'} {user.mention}({user.display_name})." # pylint: disable=C0301
         color = new_role.color  # Цвет для Embed сообщения
 
         # Создаем Embed сообщение для лог-канала

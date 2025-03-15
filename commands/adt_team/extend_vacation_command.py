@@ -41,7 +41,10 @@ async def extend_vacation(
         # Создаем Embed для уведомления в админ-канале
         embed = disnake.Embed(
             title="Продление отпуска",
-            description=f"{ctx.author.mention} продлил отпуск для {user.mention}.",
+            description=(
+                f"{ctx.author.mention}({ctx.author.display_name}) "
+                f"продлил(а) отпуск для {user.mention}({user.display_name})."
+            ),
             color=disnake.Color.purple(),
         )
         embed.add_field(name="Пользователь", value=user.mention, inline=False)

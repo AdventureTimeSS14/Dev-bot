@@ -42,7 +42,10 @@ async def end_vacation(ctx, user: disnake.Member):
         # Создаем Embed для уведомления в админ-канал
         embed = disnake.Embed(
             title="Окончание отпуска",
-            description=f"{ctx.author.mention} завершил(а) отпуск для {user.mention}.",
+            description=(
+                f"{ctx.author.mention}({ctx.author.display_name}) "
+                f"завершил(а) отпуск для {user.mention}({user.display_name})."
+            ),
             color=disnake.Color.purple(),
         )
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)

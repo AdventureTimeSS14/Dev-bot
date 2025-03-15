@@ -62,7 +62,10 @@ async def new_team(ctx, user: disnake.Member, *roles: disnake.Role):
         if admin_channel:
             embed = disnake.Embed(
                 title="Назначение на должность",
-                description=f"{ctx.author.mention} назначает {user.mention}",
+                description=(
+                    f"{ctx.author.mention}({ctx.author.display_name}) "
+                    f"назначает {user.mention}({user.display_name})"
+                ),
                 color=role_position.color,
             )
             embed.add_field(

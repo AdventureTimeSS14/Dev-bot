@@ -131,7 +131,10 @@ async def remove_team(
     if len(removed_roles) == 2:
         embed = disnake.Embed(
             title="Снятие с должности",
-            description=f"{ctx.author.mention} снял с должности {user.mention}.",
+            description=(
+                f"{ctx.author.mention}({ctx.author.display_name}) "
+                f"снял(а) с должности {user.mention}({user.display_name})."
+            ),
             color=role_job.color,
         )
         embed.add_field(

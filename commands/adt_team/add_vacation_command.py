@@ -44,7 +44,10 @@ async def add_vacation(ctx, user: disnake.Member, end_date: str, reason: str):
         # Создаем Embed для уведомления в админ-канале
         embed = disnake.Embed(
             title="Выдача отпуска",
-            description=f"{ctx.author.mention} выдал(а) отпуск для {user.mention}.",
+            description=(
+                f"{ctx.author.mention}({ctx.author.display_name}) "
+                f"выдал(а) отпуск для {user.mention}({user.display_name})."
+            ),
             color=disnake.Color.purple(),
         )
         embed.add_field(name="Пользователь", value=user.mention, inline=False)
