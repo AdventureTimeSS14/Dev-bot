@@ -20,7 +20,7 @@ class BugReportModal(Modal):
         # Инициализация модального окна с компонентом text_input
         super().__init__(title="🚨 Сообщение о баге/отзыв/предложение", components=[text_input])
 
-    async def callback(self, inter: disnake.ModalInteraction):
+    async def callback(self, inter: disnake.ModalInteraction): # pylint: disable=W0221
         """
         Обрабатывает отправку модального окна с баг-репортом.
         """
