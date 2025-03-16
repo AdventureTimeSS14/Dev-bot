@@ -3,11 +3,11 @@ from disnake.ext import commands
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
-from config import ADMIN_TEAM, HEAD_ADT_TEAM
+from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN
 
 
 @bot.command(name="tweak_team")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def tweak_team(
     ctx: commands.Context,
     user: disnake.Member,
