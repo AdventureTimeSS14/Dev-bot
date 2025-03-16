@@ -9,8 +9,8 @@ import signal
 import sys
 
 from bot_init import bot
-from commands import (admin_help_command, echo_command, gpt_command,
-                      help_command, media_clear_command, ping_command,
+from commands import (admin_help_command, echo_command, general_commands,
+                      gpt_command, help_command, media_clear_command,
                       shutdown_command, status_command, uptime_command,
                       user_role_command, user_role_mention_command)
 from commands.adt_team import (add_role_command, add_vacation_command,
