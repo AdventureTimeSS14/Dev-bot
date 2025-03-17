@@ -7,6 +7,9 @@ from bot_init import bot
 
 # Класс для модального окна
 class NicknameModal(disnake.ui.Modal):
+    """
+        Класс модального окна для привязки аккаунта
+    """
     def __init__(self):
         components = [
             disnake.ui.TextInput(
@@ -19,11 +22,26 @@ class NicknameModal(disnake.ui.Modal):
         ]
         super().__init__(title="Привязка аккаунта SS14", components=components)
 
-    async def callback(self, inter: disnake.ModalInteraction):
+    async def callback(self, inter: disnake.ModalInteraction): # pylint: disable=W0221
+        """
+            Обработка ввода текста и сохранение данных в БД
+        """
         nickname = inter.text_values["nickname_input"]
         discord_id = inter.author.id
 
         # Сохранение данных в базу данных
+        # Чекаем сколько дис акку времени
+        # . . .
+        # get_creation_date(uuid) чекаем когда создан акк через API Визов
+        # . . .
+        # чекаем есть ли он у нас в бд, ПО ИДЕЕ должен быть если пытался присоединяться
+        # . . .
+        # проверяем привязан ли он уже, если уже привязан,
+        # то мне в тех канал отправлять, о такой попытке
+        # . . .
+        # Ну и мне в тех канал тоже можно, что если привязали
+        # . . .
+        # Запись в БД
         # . . .
         # . . .
 
@@ -39,8 +57,14 @@ class NicknameModal(disnake.ui.Modal):
 
 # Класс для кнопки
 class RegisterButton(disnake.ui.View):
+    """
+        Регистрация кнопки
+    """
     @disnake.ui.button(label="🔗 Привязать аккаунт", style=disnake.ButtonStyle.primary)
-    async def register(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def register(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # pylint: disable=W0613
+        """
+            Вызов модального окна
+        """
         await inter.response.send_modal(NicknameModal())
 
 
@@ -61,6 +85,16 @@ async def discord_auth_update():
             ),
             color=disnake.Color.blue(),
         )
-        embed.set_footer(text="Adventure Time SS14", icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png?ex=67d99fda&is=67d84e5a&hm=5843e1d7e0f726d77e4882f66e9fdadcabea8f9fd4f6f26212327e986f22ed5d&=&format=webp&quality=lossless&width=288&height=288")
+        embed.set_footer(
+            text="Adventure Time SS14",
+            icon_url=(
+                "https://media.discordapp.net/attachments/"
+                "1255118642442403986/1351231449470079046/icon"
+                "-256x256.png?ex=67d99fda&is=67d84e5a&hm=5843e1"
+                "d7e0f726d77e4882f66e9fdadcabea8f9fd4f6f26212327"
+                "e986f22ed5d&=&format=webp&quality=lossless&widt"
+                "h=288&height=288"
+            )
+        )
 
         await channel.send(embed=embed, view=RegisterButton())

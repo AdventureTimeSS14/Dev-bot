@@ -25,7 +25,7 @@ def fetch_player_data(user_name):
     """
     cursor.execute(query, (user_name,))
     result = cursor.fetchone()
-    
+
     if result:
         player_id, uuid, first_seen_time, last_seen_user_name, last_seen_time, last_seen_address, last_seen_hwid = result
 
@@ -38,10 +38,10 @@ def fetch_player_data(user_name):
         related_results = cursor.fetchall()
     else:
         related_results = []
-    
+
     cursor.close()
     conn.close()
-    
+
     return result, related_results
 
 
