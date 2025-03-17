@@ -13,6 +13,7 @@ from tasks.update_status_presence_task import update_status_presence
 from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
 from tasks.update_time_shutdows_task import update_time_shutdows
+from tasks.whitelist_application_task import update_whitelist_application
 
 
 async def start_task_if_not_running(task, task_name: str):
@@ -55,6 +56,7 @@ async def on_ready():
     await start_task_if_not_running(update_status_server_message_eddit, "update status server")
     await start_task_if_not_running(update_time_shutdows, "update time shutdows")
     await start_task_if_not_running(discord_auth_update, "Update Discord Auth")
+    await start_task_if_not_running(update_whitelist_application, "Update WhiteList Application Channel")
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 

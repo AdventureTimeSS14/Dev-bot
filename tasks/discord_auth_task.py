@@ -27,7 +27,7 @@ class NicknameModal(disnake.ui.Modal):
             Обработка ввода текста и сохранение данных в БД
         """
         nickname = inter.text_values["nickname_input"]
-        discord_id = inter.author.id
+        # discord_id = inter.author.id
 
         # Сохранение данных в базу данных
         # Чекаем сколько дис акку времени
