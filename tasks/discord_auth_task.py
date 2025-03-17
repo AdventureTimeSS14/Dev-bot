@@ -60,6 +60,9 @@ class RegisterButton(disnake.ui.View):
     """
         Регистрация кнопки
     """
+    def __init__(self):
+        super().__init__(timeout=None)
+
     @disnake.ui.button(label="🔗 Привязать аккаунт", style=disnake.ButtonStyle.primary)
     async def register(self, button: disnake.ui.Button, inter: disnake.MessageInteraction): # pylint: disable=W0613
         """
