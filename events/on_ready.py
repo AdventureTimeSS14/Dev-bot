@@ -6,6 +6,7 @@ from commands.github import check_workflows
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
 from tasks.check_new_commit_task import monitor_commits
+from tasks.discord_auth_task import discord_auth_update
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
 from tasks.update_status_presence_task import update_status_presence
@@ -53,6 +54,7 @@ async def on_ready():
     await start_task_if_not_running(update_status_presence, "update status presence")
     await start_task_if_not_running(update_status_server_message_eddit, "update status server")
     await start_task_if_not_running(update_time_shutdows, "update time shutdows")
+    await start_task_if_not_running(discord_auth_update, "Update Discord Auth")
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 
