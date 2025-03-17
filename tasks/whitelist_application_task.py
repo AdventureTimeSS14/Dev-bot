@@ -168,6 +168,16 @@ async def update_whitelist_application():
             ),
             color=disnake.Color.green(),
         )
-        embed.set_footer(text="Adventure Time SS14")
+        embed.set_footer(
+            text="Adventure Time SS14",
+            icon_url=(
+                "https://media.discordapp.net/attachments/"
+                "1255118642442403986/1351231449470079046/icon"
+                "-256x256.png?ex=67d99fda&is=67d84e5a&hm=5843e1"
+                "d7e0f726d77e4882f66e9fdadcabea8f9fd4f6f26212327"
+                "e986f22ed5d&=&format=webp&quality=lossless&widt"
+                "h=288&height=288"
+            )
+        )
 
         await channel.send(embed=embed, view=WhitelistApplicationButton())
