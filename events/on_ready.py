@@ -56,7 +56,7 @@ async def on_ready():
     await start_task_if_not_running(update_status_server_message_eddit, "update status server")
     await start_task_if_not_running(update_time_shutdows, "update time shutdows")
     await start_task_if_not_running(discord_auth_update, "Update Discord Auth")
-    await start_task_if_not_running(update_whitelist_application, "Update WhiteList Application Channel")
+    await start_task_if_not_running(update_whitelist_application, "Update WhiteList Application")
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 
