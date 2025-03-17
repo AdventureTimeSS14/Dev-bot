@@ -4,18 +4,13 @@ from disnake.ext import tasks
 
 from bot_init import bot
 
-# ID канала с заявками
-VOTE_CHANNEL_ID = 1351277093140303913
-# ID канала, где висит кнопка
-WL_CHANNEL_ID = 1351277164217110628
+VOTE_CHANNEL_ID = 1351277093140303913  # ID канала голосования
+WL_CHANNEL_ID = 1351277164217110628  # ID канала с кнопкой
+submitted_users = set()  # Хранит ID пользователей, подавших заявку
 
 
-# Класс модального окна
+# Форма подачи заявки на WL
 class WhitelistApplicationModal(disnake.ui.Modal):
-    """
-    Форма для подачи заявки на вайтлист.
-    """
-
     def __init__(self):
         components = [
             disnake.ui.TextInput(
@@ -26,35 +21,28 @@ class WhitelistApplicationModal(disnake.ui.Modal):
                 max_length=50,
             ),
             disnake.ui.TextInput(
-                label="2. Имя основного персонажа",
-                placeholder="Введите имя персонажа...",
-                custom_id="character_name",
-                style=TextInputStyle.short,
-                max_length=50,
-            ),
-            disnake.ui.TextInput(
-                label="3. Описание персонажа",
-                placeholder="Опишите вашего персонажа...",
-                custom_id="character_desc",
+                label="2. Имя и описание персонажа",
+                placeholder="Введите имя персонажа и его описание...",
+                custom_id="character_info",
                 style=TextInputStyle.paragraph,
-                max_length=500,
+                max_length=800,
             ),
             disnake.ui.TextInput(
-                label="4. Время на сервере (в часах)",
+                label="3. Время на сервере (в часах)",
                 placeholder="Укажите количество часов...",
                 custom_id="play_time",
                 style=TextInputStyle.short,
-                max_length=10,
+                max_length=30,
             ),
             disnake.ui.TextInput(
-                label="5. Предпочитаемые роли",
+                label="4. Предпочитаемые роли",
                 placeholder="Перечислите желаемые роли...",
                 custom_id="preferred_roles",
                 style=TextInputStyle.paragraph,
                 max_length=300,
             ),
             disnake.ui.TextInput(
-                label="6. Человек с WL, готовый поручиться",
+                label="5. Человек с WL, готовый поручиться",
                 placeholder="Напишите его Discord или оставьте пустым...",
                 custom_id="recommender",
                 style=TextInputStyle.short,
@@ -62,69 +50,79 @@ class WhitelistApplicationModal(disnake.ui.Modal):
                 max_length=100,
             ),
         ]
-
-        super().__init__(title="Заявка на вайтлист", components=components)
+        super().__init__(title="Заявка на WL", components=components)
 
     async def callback(self, inter: disnake.ModalInteraction):
         """
-        Обработка заявки и отправка её в канал голосования.
+        Отправка анкеты в канал голосования.
         """
-        vote_channel = bot.get_channel(VOTE_CHANNEL_ID)
-        if not vote_channel:
+        if inter.author.id in submitted_users:
             await inter.response.send_message(
-                "⚠ Ошибка: Канал для голосования не найден!",
+                "⚠️ Вы уже подали заявку! Повторная подача возможна только после перезапуска бота.",
                 ephemeral=True
             )
             return
 
-        # Формируем текст заявки
+        vote_channel = bot.get_channel(VOTE_CHANNEL_ID)
+        if not vote_channel:
+            await inter.response.send_message(
+                "⚠️ Ошибка: Канал для голосования не найден!",
+                ephemeral=True
+            )
+            return
+
+        # Добавляем пользователя в список уже подавших заявку
+        submitted_users.add(inter.author.id)
+
+        # Формируем эмбед с анкетой
         embed = disnake.Embed(
             title="📜 Новая заявка на WL",
-            color=disnake.Color.blue(),
+            description=(
+                f"🔗 **Пользователь:** {inter.author.mention}"
+                f"({inter.author})\n🆔 **Discord:** `{inter.author.id}`"
+            ),
+            color=disnake.Color.gold(),
             timestamp=inter.created_at,
         )
+
         embed.set_footer(
-            text=f"Заявку подал: {inter.author}",
+            text=f"Заявку подал: {inter.author}", 
             icon_url=inter.author.display_avatar.url
         )
 
-        # Добавляем поля в эмбед
         embed.add_field(
-            name="👤 Сикей",
-            value=inter.text_values["ckey"],
+            name="👤 **Сикей**", 
+            value=inter.text_values["ckey"], 
             inline=False
         )
+
         embed.add_field(
-            name="🎭 Имя персонажа",
-            value=inter.text_values["character_name"],
+            name="🎭 **Имя и описание персонажа**", 
+            value=inter.text_values["character_info"], 
             inline=False
         )
+
         embed.add_field(
-            name="📖 Описание персонажа",
-            value=inter.text_values["character_desc"],
+            name="⏳ **Время на сервере**", 
+            value=f"{inter.text_values['play_time']} часов", 
             inline=False
         )
+
         embed.add_field(
-            name="⏳ Время на сервере",
-            value=inter.text_values["play_time"] + " часов",
+            name="👾 **Предпочитаемые роли**", 
+            value=inter.text_values["preferred_roles"], 
             inline=False
         )
-        embed.add_field(
-            name="🔧 Предпочитаемые роли",
-            value=inter.text_values["preferred_roles"],
-            inline=False
-        )
+
         recommender = inter.text_values["recommender"] or "Нет рекомендаций"
         embed.add_field(
-            name="🤝 Рекомендации",
+            name="🤝 **Рекомендации**",
             value=recommender,
             inline=False
         )
 
         # Отправляем заявку в канал голосования
         message = await vote_channel.send(embed=embed)
-
-        # Добавляем реакции для голосования
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
@@ -135,12 +133,8 @@ class WhitelistApplicationModal(disnake.ui.Modal):
         )
 
 
-# Класс для кнопки
+# Кнопка подачи заявки
 class WhitelistApplicationButton(disnake.ui.View):
-    """
-    Кнопка подачи заявки.
-    """
-
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -152,7 +146,7 @@ class WhitelistApplicationButton(disnake.ui.View):
 @tasks.loop(hours=12)
 async def update_whitelist_application():
     """
-    Каждые 12 часов очищает канал и обновляет сообщение с кнопкой.
+    Обновляет сообщение с кнопкой каждые 12 часов.
     """
     channel = bot.get_channel(WL_CHANNEL_ID)
     if channel:
