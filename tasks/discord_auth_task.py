@@ -118,6 +118,8 @@ class NicknameModal(disnake.ui.Modal):
             )
             return
 
+        user_id = ""
+
         if len(player_data) == 4:  # Это значит, что данные пришли из таблицы player
             player_id, user_id, first_seen_time, last_seen_user_name = player_data
         if len(player_data) == 3:  # Это значит, что данные пришли из таблицы connection_log
