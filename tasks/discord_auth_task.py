@@ -1,18 +1,89 @@
 import disnake
+import psycopg2
 from disnake import TextInputStyle
 from disnake.ext import tasks
+from disnake.ui import TextInput
 
 from bot_init import bot
+from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from commands.misc.get_creation_date import get_creation_date
+
+TECH_CHANNEL_ID = 1351438736356937778  # ID техканала для логов
 
 
-# Класс для модального окна
+def fetch_player_data(user_name):
+    """
+        Функция поиска пользователя в БД
+    """
+    conn = psycopg2.connect(**DB_PARAMS)
+    cursor = conn.cursor()
+
+    query = """
+    SELECT player_id, user_id, first_seen_time, last_seen_user_name
+    FROM player
+    WHERE last_seen_user_name = %s
+    """
+    cursor.execute(query, (user_name,))
+    result = cursor.fetchone()
+
+    # Если не нашли в player, ищем в connection_log
+    if result is None:
+        query = """
+        SELECT connection_log_id, user_id, user_name
+        FROM connection_log
+        WHERE user_name = %s
+        """
+        cursor.execute(query, (user_name,))
+        result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return result
+
+def is_user_linked(user_id, discord_id):
+    """
+        Функция проверки привязан ли уже пользователь
+    """
+    conn = psycopg2.connect(**DB_PARAMS)
+    cursor = conn.cursor()
+
+    query = """
+    SELECT * FROM discord_user WHERE user_id = %s AND discord_id = %s
+    """
+    cursor.execute(query, (user_id, discord_id))
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return result is not None
+
+def link_user_to_discord(user_id, discord_id):
+    """
+        Функция записи данных в БД
+    """
+    conn = psycopg2.connect(**DB_PARAMS)
+    cursor = conn.cursor()
+
+    query = """
+    INSERT INTO discord_user (user_id, discord_id)
+    VALUES (%s, %s)
+    """
+    cursor.execute(query, (user_id, discord_id))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
 class NicknameModal(disnake.ui.Modal):
     """
-        Класс модального окна для привязки аккаунта
+        Класс модального окна
     """
     def __init__(self):
         components = [
-            disnake.ui.TextInput(
+            TextInput(
                 label="Введите ваш никнейм в игре",
                 placeholder="Ваш никнейм в SS14",
                 custom_id="nickname_input",
@@ -24,27 +95,62 @@ class NicknameModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction): # pylint: disable=W0221
         """
-            Обработка ввода текста и сохранение данных в БД
+            Действия при нажатии кнопки
         """
         nickname = inter.text_values["nickname_input"]
-        # discord_id = inter.author.id
+        discord_id = str(inter.author.id)
+        tech_channel = inter.bot.get_channel(TECH_CHANNEL_ID)
 
-        # Сохранение данных в базу данных
-        # Чекаем сколько дис акку времени
-        # . . .
-        # get_creation_date(uuid) чекаем когда создан акк через API Визов
-        # . . .
-        # чекаем есть ли он у нас в бд, ПО ИДЕЕ должен быть если пытался присоединяться
-        # . . .
-        # проверяем привязан ли он уже, если уже привязан,
-        # то мне в тех канал отправлять, о такой попытке
-        # . . .
-        # Ну и мне в тех канал тоже можно, что если привязали
-        # . . .
-        # Запись в БД
-        # . . .
-        # . . .
+        if tech_channel is None:
+            print("Ошибка: tech_channel не найден. Проверь ID или права доступа.")
+            return  # Прерываем выполнение
 
+        # Проверяем, есть ли пользователь в БД player
+        player_data = fetch_player_data(nickname)
+        if not player_data:
+            await inter.response.send_message(
+                "❌ Ваш аккаунт не найден в базе данных. Попробуйте позже!",
+                ephemeral=True,
+            )
+            await tech_channel.send(
+                f"⚠️ Пользователь <@{discord_id}> ({discord_id}) пытался "
+                f"привязать несуществующий аккаунт **{nickname}**."
+            )
+            return
+
+        if len(player_data) == 4:  # Это значит, что данные пришли из таблицы player
+            player_id, user_id, first_seen_time, last_seen_user_name = player_data
+        if len(player_data) == 3:  # Это значит, что данные пришли из таблицы connection_log
+            connection_log_id, user_id, user_name = player_data
+
+        # Проверяем, не привязан ли уже пользователь
+        if is_user_linked(user_id, discord_id):
+            await tech_channel.send(
+                f"⚠️ Пользователь <@{discord_id}> ({discord_id}) пытался "
+                f"повторно привязать аккаунт **{nickname}**."
+            )
+            await inter.response.send_message(
+                "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.",
+                ephemeral=True,
+            )
+            return
+
+        # Получаем дату создания аккаунта
+        creation_date = get_creation_date(user_id)
+
+        # Записываем привязку в БД
+        link_user_to_discord(user_id, discord_id)
+
+        # Отправляем лог в техканал
+        await tech_channel.send(
+            f"✅ **Привязка аккаунта**\n"
+            f"> **Никнейм:** {nickname}\n"
+            f"> **Discord ID:** {discord_id}\n"
+            f"> **SS14 ID:** `{user_id}`\n"
+            f"> **Дата создания аккаунта:** {creation_date}"
+        )
+
+        # Отправляем сообщение пользователю
         await inter.response.send_message(
             embed=disnake.Embed(
                 title="✅ Привязка завершена!",
