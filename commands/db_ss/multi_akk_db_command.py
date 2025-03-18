@@ -3,12 +3,12 @@ from datetime import datetime, timezone
 
 import disnake
 import psycopg2
-import requests
 from dateutil import parser
 
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.get_creation_date import get_creation_date
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 # SPONSOR_PATH = '/root/node_sponsors/data/' # моя спонсорка, не учитывать.
@@ -221,28 +221,6 @@ def format_hwid(hwid):
 #         print(f"Ошибка запроса IP информации: {e}")
 #         return 'Не удалось получить информацию'
 
-# используем апи визардов для отслеживание - когда была создана учётная запись
-def get_creation_date(uuid):
-    url = f"https://auth.spacestation14.com/api/query/userid?userid={uuid}"
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()  # Парсинг JSON
-        
-        player_date = data.get('createdTime', 'Дата создания не найдена')
-        date_obj = datetime.fromisoformat(player_date)
-        creation_date_unix = int(date_obj.timestamp())  # Преобразование в Unix-время
-        
-        return f'<t:{creation_date_unix}:f>'  # Форматирование в метку времени Discord
-    
-    except requests.exceptions.HTTPError as err:
-        return f"Ошибка при запросе API: {err}"
-    except requests.exceptions.RequestException as err:
-        return f"Ошибка соединения: {err}"
-    except ValueError:
-        return "Ошибка при разборе ответа API (неправильный формат JSON)"
-    except Exception as err:
-        return f"Произошла ошибка: {err}"
 
 @bot.command()
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
