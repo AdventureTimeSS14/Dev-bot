@@ -221,6 +221,25 @@ def format_hwid(hwid):
 #         print(f"Ошибка запроса IP информации: {e}")
 #         return 'Не удалось получить информацию'
 
+def get_discord_info_by_user_id(user_id: str):
+    """
+    Получает информацию о привязанном Discord-аккаунте по user_id.
+
+    :param user_id: ID игрока в базе.
+    :return: Кортеж (discord_id, discord_name) если найден, иначе None.
+    """
+    conn = psycopg2.connect(**DB_PARAMS)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT discord_id FROM discord_user WHERE user_id = %s", (user_id,))
+    discord_data = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if discord_data:
+        return discord_data[0]  # Возвращаем discord_id
+    return None
 
 @bot.command()
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
@@ -246,22 +265,36 @@ async def check_nick(ctx, *, user_name: str):
         
         hwid_message = format_hwid(last_seen_hwid) if last_seen_hwid else 'Неизвестно'
         
-        # # Получаем информацию о IP
-        # ip_info = get_ip_info(last_seen_address)
-        
         # Получаем дату создания аккаунта
         creation_date = get_creation_date(uuid)
         
+        # Проверяем привязку Discord-аккаунта
+        discord_id = get_discord_info_by_user_id(uuid)
+
+        if discord_id:
+            discord_member = await ctx.guild.fetch_member(int(discord_id)) if ctx.guild else None
+            discord_name = discord_member.name if discord_member else "Неизвестно"
+            discord_message = f'> 🟢 **Привязан Discord:** <@{discord_id}> ({discord_name}, ID: {discord_id})\n'
+        else:
+            discord_message = '> 🔴 **Discord-аккаунт не привязан.**\n'
+
+        global_whitelist_status, whitelist_roles = get_whitelist_roles(uuid)
+        global_whitelist_message = f'> **Присутствует в белом списке:** {global_whitelist_status}\n' if global_whitelist_status else ''
+
+        roles_message = (f'> **Имеет открытые роли Whitelist:**\n'
+                         f'```\n'
+                         f'{format_roles_table(whitelist_roles)}\n'
+                         '```') if whitelist_roles else ''
+
         related_accounts_str = ''
         if related_accounts:
             related_accounts_str = '> **Совпадение по аккаунтам:**\n'
-            count = 0  # Счётчик для ограничения до 30 совпадений
+            count = 0  
             for acc in related_accounts:
                 if count >= 30:
-                    break  # Прекратить цикл, если уже нашли 30 совпадений
+                    break  
 
                 related_user_name, related_address, related_hwid, related_last_seen_time = acc
-                # Пропустить если совпадает с текущими данными
                 if related_user_name == last_seen_user_name:
                     continue
                 related_last_seen_time_str = format_datetime(related_last_seen_time, 'short')
@@ -271,35 +304,18 @@ async def check_nick(ctx, *, user_name: str):
                     related_accounts_str += (f'> **{related_user_name}** [HWID] | Последний заход в игру: {related_last_seen_time_str}\n')
                 elif related_hwid == last_seen_hwid and related_address == last_seen_address:
                     related_accounts_str += (f'> **{related_user_name}** [IP, HWID] | Последний заход в игру: {related_last_seen_time_str}\n')
-                count += 1  # Увеличиваем счётчик
+                count += 1  
 
-        # # Check for sponsor status
-        # sponsor_status = get_sponsor_tier(uuid)
-        global_whitelist_status, whitelist_roles = get_whitelist_roles(uuid)
-        
-        # sponsor_message = f'> **Спонсорская привилегия:** {sponsor_status}\n' if sponsor_status else ''
-        global_whitelist_message = f'> **Присутствует в белом списке:** {global_whitelist_status}\n' if global_whitelist_status else ''
-        
-        # Форматирование ролей в таблицу с декоративной рамкой
-        roles_message = (f'> **Имеет открытые роли Whitelist:**\n'
-                         f'```\n'
-                         f'{format_roles_table(whitelist_roles)}\n'
-                         '```') if whitelist_roles else ''
-
-        # занчение после "f'> **UUID:** {uuid}\n\n'" можно подчистить. Если они не требуются. Но related_accounts_str используется для поиска совпадений.
         description = (f'> **Первый заход в игру:** {first_seen_time}\n'
                        f'> **Последний заход в игру:** {last_seen_time_formatted}\n'
                        f'> **Дата создания аккаунта:** {creation_date}\n\n'
-                    #    f'> **IP:** {last_seen_address}\n'
-                    #    f'> **Информация:** {ip_info}\n'
                        f'> **HWID:** {hwid_message}\n'
                        f'> **UUID:** {uuid}\n\n'
-                    #    f'{sponsor_message}'
+                       f'{discord_message}'
                        f'{global_whitelist_message}'
                        f'{roles_message}\n'
                        f'{related_accounts_str}')
 
-        
         embed = disnake.Embed(
             title=f'{last_seen_user_name} | ID игрока {player_id}',
             description=description,
