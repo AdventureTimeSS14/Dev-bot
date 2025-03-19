@@ -107,7 +107,7 @@ class WhitelistApplicationModal(disnake.ui.Modal):
 
         embed.add_field(
             name="⏳ **Время на сервере**",
-            value=f"{inter.text_values['play_time']} часов",
+            value=inter.text_values['play_time'],
             inline=False
         )
 
