@@ -1,7 +1,9 @@
 import logging
 import time
+import disnake
 
 from bot_init import bot
+from disnake.ext import commands
 from commands.github import check_workflows
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
