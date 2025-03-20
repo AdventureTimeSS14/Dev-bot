@@ -4,6 +4,7 @@ from disnake.ext import tasks
 
 from bot_init import bot
 
+WL_ROLE_ID = 1060239440930418828
 MESSAGE_WL_ID = 1352243736821895199
 VOTE_CHANNEL_ID = 1351277093140303913  # ID канала голосования
 WL_CHANNEL_ID = 1351277164217110628  # ID канала с кнопкой
@@ -69,6 +70,14 @@ class WhitelistApplicationModal(disnake.ui.Modal):
         """
         Отправка анкеты в канал голосования.
         """
+        # Проверяем, есть ли у участника роль White List
+        if disnake.utils.get(inter.author.roles, id=WL_ROLE_ID):
+            await inter.response.send_message(
+                "🎉 Вы уже в White List! Повторная подача заявки не требуется.",
+                ephemeral=True
+            )
+            return
+
         if inter.author.id in submitted_users:
             await inter.response.send_message(
                 "⚠️ Вы уже подали заявку! Повторная подача возможна только после перезапуска бота.",
