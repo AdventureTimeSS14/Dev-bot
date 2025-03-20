@@ -30,22 +30,22 @@ async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disna
     try:
         await user.add_roles(role)
 
-        # Создание Embed
-        embed = disnake.Embed(
-            title="✅ Добавление в White List",
-            description=f"**🎉 {user.mention} был принят в White List!**",
-            color=disnake.Color.green(),
-            timestamp=disnake.utils.utcnow()
-        )
-        embed.set_thumbnail(url=user.display_avatar.url)
-        embed.add_field(name="👾 Имя", value=f"{user.display_name}", inline=False)
-        embed.add_field(name="👤 Никнейм", value=f"`{user.name}`", inline=False)
-        embed.add_field(name="🆔 ID пользователя", value=f"`{user.id}`", inline=False)
-        embed.set_footer(text=f"Команду выполнил: {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
+        # # Создание Embed
+        # embed = disnake.Embed(
+        #     title="✅ Добавление в White List",
+        #     description=f"**🎉 {user.mention} был принят в White List!**",
+        #     color=disnake.Color.green(),
+        #     timestamp=disnake.utils.utcnow()
+        # )
+        # embed.set_thumbnail(url=user.display_avatar.url)
+        # embed.add_field(name="👾 Имя", value=f"{user.display_name}", inline=False)
+        # embed.add_field(name="👤 Никнейм", value=f"`{user.name}`", inline=False)
+        # embed.add_field(name="🆔 ID пользователя", value=f"`{user.id}`", inline=False)
+        # embed.set_footer(text=f"Команду выполнил: {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
 
-        # Отправка Embed в указанный канал
-        channel = interaction.guild.get_channel(CHANNEL_ID)
-        await channel.send(embed=embed)
+        # # Отправка Embed в указанный канал
+        # channel = interaction.guild.get_channel(CHANNEL_ID)
+        # await channel.send(embed=embed)
 
         vote_channel = interaction.guild.get_channel(VOTE_CHANNEL_ID)
         # Обновление заявки в голосовании
