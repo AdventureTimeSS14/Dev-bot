@@ -4,10 +4,20 @@ from disnake.ext import tasks
 
 from bot_init import bot
 
+MESSAGE_WL_ID = 1352243736821895199
 VOTE_CHANNEL_ID = 1351277093140303913  # ID канала голосования
 WL_CHANNEL_ID = 1351277164217110628  # ID канала с кнопкой
 submitted_users = set()  # Хранит ID пользователей, подавших заявку
 
+async def get_pinned_message(channel):
+    """
+    Получает закреплённое сообщение, если оно есть.
+    """
+    pinned_messages = await channel.pins()
+    for message in pinned_messages:
+        if message.author == channel.guild.me:
+            return message
+    return None
 
 # Форма подачи заявки на WL
 class WhitelistApplicationModal(disnake.ui.Modal):
@@ -159,7 +169,7 @@ async def update_whitelist_application():
     """
     channel = bot.get_channel(WL_CHANNEL_ID)
     if channel:
-        await channel.purge(limit=10)
+        # await channel.purge(limit=10)
         embed = disnake.Embed(
             title="📜 Подать заявку на WL",
             description=(
@@ -180,4 +190,25 @@ async def update_whitelist_application():
             )
         )
 
-        await channel.send(embed=embed, view=WhitelistApplicationButton())
+        message_id = MESSAGE_WL_ID
+
+        try:
+            if message_id:
+                old_message = await channel.fetch_message(message_id)
+                await old_message.edit(embed=embed, view=WhitelistApplicationButton())
+                print(f"✅ Сообщение обновлено (ID: {message_id})")
+                return
+        except disnake.NotFound:
+            print("❌ Старое сообщение не найдено. Создаём новое...")
+
+    # Если сообщение не найдено, ищем в закреплённых
+    old_message = await get_pinned_message(channel)
+    if old_message:
+        await old_message.edit(embed=embed, view=WhitelistApplicationButton())
+        print(f"✅ Используем закреплённое сообщение (ID: {old_message.id})")
+        return
+
+    # Если старого сообщения нет, отправляем новое
+    new_message = await channel.send(embed=embed, view=WhitelistApplicationButton())
+    await new_message.pin()  # Закрепляем его
+    print(f"✅ Отправлено новое сообщение (ID: {new_message.id})")

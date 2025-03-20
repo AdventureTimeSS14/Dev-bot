@@ -18,7 +18,7 @@ async def get_pinned_message(channel):
     """
     pinned_messages = await channel.pins()
     for message in pinned_messages:
-        if message.author == channel.guild.me:  # Ищем сообщение от бота
+        if message.author == channel.guild.me:
             return message
     return None
 
