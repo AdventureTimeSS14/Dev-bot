@@ -8,7 +8,7 @@ from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.get_creation_date import get_creation_date
 
-TECH_CHANNEL_ID = 1351438736356937778  # ID техканала для логов
+TECH_CHANNEL_ID = 1352227442730864650  # ID техканала для логов
 
 
 def fetch_player_data(user_name):
@@ -43,21 +43,25 @@ def fetch_player_data(user_name):
 
 def is_user_linked(user_id, discord_id):
     """
-        Функция проверки привязан ли уже пользователь
+    Проверяет, существует ли уже этот discord_id или user_id в базе.
+    Если один из них уже есть — нельзя привязывать, возвращаем True.
     """
     conn = psycopg2.connect(**DB_PARAMS)
     cursor = conn.cursor()
 
-    query = """
-    SELECT * FROM discord_user WHERE user_id = %s AND discord_id = %s
-    """
-    cursor.execute(query, (user_id, discord_id))
-    result = cursor.fetchone()
+    # Проверяем, существует ли уже discord_id в базе
+    cursor.execute("SELECT 1 FROM discord_user WHERE discord_id = %s", (discord_id,))
+    result_discord_id = cursor.fetchone()
+
+    # Проверяем, существует ли уже user_id в базе
+    cursor.execute("SELECT 1 FROM discord_user WHERE user_id = %s", (user_id,))
+    result_user_id = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
-    return result is not None
+    # Если нашли хотя бы один результат (discord_id или user_id), возвращаем True
+    return bool(result_discord_id or result_user_id)
 
 def link_user_to_discord(user_id, discord_id):
     """
@@ -125,11 +129,16 @@ class NicknameModal(disnake.ui.Modal):
         if len(player_data) == 3:  # Это значит, что данные пришли из таблицы connection_log
             connection_log_id, user_id, user_name = player_data
 
+        # Получаем объект пользователя Discord
+        discord_user = await bot.fetch_user(discord_id)
+        discord_creation_date = discord_user.created_at.strftime('%Y-%m-%d %H:%M:%S')
+
         # Проверяем, не привязан ли уже пользователь
         if is_user_linked(user_id, discord_id):
             await tech_channel.send(
                 f"⚠️ Пользователь <@{discord_id}> ({discord_id}) пытался "
-                f"повторно привязать аккаунт **{nickname}**."
+                f"повторно привязать аккаунт **{nickname}**. Дата создания Discord аккаунта "
+                f"{discord_creation_date}"
             )
             await inter.response.send_message(
                 "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.",
@@ -137,7 +146,7 @@ class NicknameModal(disnake.ui.Modal):
             )
             return
 
-        # Получаем дату создания аккаунта
+        # Получаем дату создания аккаунта ss14
         creation_date = get_creation_date(user_id)
 
         # Записываем привязку в БД
@@ -149,7 +158,8 @@ class NicknameModal(disnake.ui.Modal):
             f"> **Никнейм:** {nickname}\n"
             f"> **Discord ID:** {discord_id}\n"
             f"> **SS14 ID:** `{user_id}`\n"
-            f"> **Дата создания аккаунта:** {creation_date}"
+            f"> **Дата создания аккаунта SS14:** {creation_date}\n"
+            f"> **Дата создания аккаунта Discord:** {discord_creation_date}"
         )
 
         # Отправляем сообщение пользователю
