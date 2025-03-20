@@ -15,7 +15,7 @@ VOTE_CHANNEL_ID = 1351277093140303913
 @has_any_role_by_id(HEAD_ADT_TEAM)
 async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
-    Добавляет роль White List пользователю.
+    Добавляет роль White List пользователю и обновляет его заявку как одобренную.
     """
     role = disnake.utils.get(interaction.guild.roles, id=WL_ROLE_ID)
 
@@ -46,6 +46,29 @@ async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disna
         # Отправка Embed в указанный канал
         channel = interaction.guild.get_channel(CHANNEL_ID)
         await channel.send(embed=embed)
+
+        vote_channel = interaction.guild.get_channel(VOTE_CHANNEL_ID)
+        # Обновление заявки в голосовании
+        async for message in vote_channel.history(limit=100):
+            if message.embeds and str(user.id) in message.embeds[0].description:
+                old_embed = message.embeds[0]
+                old_embed.add_field(
+                    name="✅ **Одобрено**",
+                    value="Заявка была одобрена.",
+                    inline=False
+                )
+                old_embed.color = disnake.Color.green()
+                await message.edit(embed=old_embed)
+
+                try:
+                    await user.send(
+                        f"❌ Ваша заявка на вступление в White List была отклонена по результатам голосования."
+                    )
+                except disnake.Forbidden:
+                    await interaction.response.send_message(f"Не удалось отправить сообщение пользователю {user.mention}.")
+
+                await interaction.response.send_message(f"✅ Заявка пользователя {user.mention} была одобрена и обновлена в голосовании.")
+                break
 
         await interaction.response.send_message(f"✅ Роль `{role.name}` успешно добавлена для {user.mention}.")
 
