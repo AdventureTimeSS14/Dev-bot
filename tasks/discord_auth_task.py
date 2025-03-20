@@ -8,8 +8,19 @@ from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.get_creation_date import get_creation_date
 
+CHANNEL_AUTH_DISCORD_SS14_ID = 1351213738774237184
+AUTH_MESSAGE_ID = 1352243068220342362
 TECH_CHANNEL_ID = 1352227442730864650  # ID техканала для логов
 
+async def get_pinned_message(channel):
+    """
+    Получает закреплённое сообщение, если оно есть.
+    """
+    pinned_messages = await channel.pins()
+    for message in pinned_messages:
+        if message.author == channel.guild.me:  # Ищем сообщение от бота
+            return message
+    return None
 
 def fetch_player_data(user_name):
     """
@@ -192,12 +203,13 @@ class RegisterButton(disnake.ui.View):
 @tasks.loop(hours=12)
 async def discord_auth_update():
     """
-    Задача, выполняющаяся каждые 12 часов. Очищает канал от последних 10 сообщений
-    и отправляет сообщение с кнопкой для привязки аккаунта SS14.
+    Задача, выполняющаяся каждые 12 часов.
+    Редактирует сообщение и активирует кнопку привязки аккаунта
+    Если не находит его, то создаёт новое и закрепляет.
     """
-    channel = bot.get_channel(1351213738774237184)  # ID канала
+    channel = bot.get_channel(CHANNEL_AUTH_DISCORD_SS14_ID)  # ID канала
     if channel:
-        await channel.purge(limit=10)
+        # await channel.purge(limit=10) # удаление 10 сообщений
         embed = disnake.Embed(
             title="🔗 Привязка аккаунта SS14",
             description=(
@@ -218,4 +230,25 @@ async def discord_auth_update():
             )
         )
 
-        await channel.send(embed=embed, view=RegisterButton())
+        message_id = AUTH_MESSAGE_ID
+
+        try:
+            if message_id:
+                old_message = await channel.fetch_message(message_id)
+                await old_message.edit(embed=embed, view=RegisterButton())
+                print(f"✅ Сообщение обновлено (ID: {message_id})")
+                return
+        except disnake.NotFound:
+            print("❌ Старое сообщение не найдено. Создаём новое...")
+
+    # Если сообщение не найдено, ищем в закреплённых
+    old_message = await get_pinned_message(channel)
+    if old_message:
+        await old_message.edit(embed=embed, view=RegisterButton())
+        print(f"✅ Используем закреплённое сообщение (ID: {old_message.id})")
+        return
+
+    # Если старого сообщения нет, отправляем новое
+    new_message = await channel.send(embed=embed, view=RegisterButton())
+    await new_message.pin()  # Закрепляем его
+    print(f"✅ Отправлено новое сообщение (ID: {new_message.id})")
