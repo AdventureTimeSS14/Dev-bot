@@ -9,9 +9,9 @@ WL_ROLE_ID = 1060239440930418828
 # ID канала, куда будет отправляться сообщение
 CHANNEL_ID = 1351277093140303913
 
-@bot.slash_command(name="add_wl", description="Добавить роль White List указанному пользователю")
+@bot.slash_command(name="wl_add", description="Добавить роль White List указанному пользователю")
 @has_any_role_by_id(HEAD_ADT_TEAM)
-async def add_wl(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
+async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
     Добавляет роль White List пользователю.
     """
@@ -52,9 +52,9 @@ async def add_wl(interaction: disnake.ApplicationCommandInteraction, user: disna
     except disnake.HTTPException as e:
         await interaction.response.send_message(f"❌ Ошибка при добавлении роли: {e}", ephemeral=True)
 
-@bot.slash_command(name="del_wl", description="Удалить роль White List у указанного пользователя")
+@bot.slash_command(name="wl_del", description="Удалить роль White List у указанного пользователя")
 @has_any_role_by_id(HEAD_ADT_TEAM)
-async def del_wl(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
+async def wl_del(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
     Удаляет роль White List у пользователя.
     """
