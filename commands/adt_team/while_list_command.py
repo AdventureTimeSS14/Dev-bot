@@ -62,7 +62,7 @@ async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disna
 
                 try:
                     await user.send(
-                        f"❌ Ваша заявка на вступление в White List была отклонена по результатам голосования."
+                        f"✅ Ваша заявка на вступление в White List была одобрена по результатам голосования."
                     )
                 except disnake.Forbidden:
                     await interaction.response.send_message(f"Не удалось отправить сообщение пользователю {user.mention}.")
