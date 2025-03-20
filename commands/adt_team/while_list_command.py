@@ -9,6 +9,8 @@ WL_ROLE_ID = 1060239440930418828
 # ID канала, куда будет отправляться сообщение
 CHANNEL_ID = 1351277093140303913
 
+VOTE_CHANNEL_ID = 1351277093140303913
+
 @bot.slash_command(name="wl_add", description="Добавить роль White List указанному пользователю")
 @has_any_role_by_id(HEAD_ADT_TEAM)
 async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
@@ -94,3 +96,37 @@ async def wl_del(interaction: disnake.ApplicationCommandInteraction, user: disna
         await interaction.response.send_message(f"⚠️ У меня нет прав для удаления роли `{role.name}` у пользователя {user.mention}.", ephemeral=True)
     except disnake.HTTPException as e:
         await interaction.response.send_message(f"❌ Ошибка при удалении роли: {e}", ephemeral=True)
+
+@bot.slash_command(name="wl_deny", description="Отказ пользователю в WL")
+@has_any_role_by_id(HEAD_ADT_TEAM)
+async def wl_deny(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
+    """
+    Отказывает пользователю в принятии в White List, редактируя его последнюю заявку
+    """
+    vote_channel = interaction.guild.get_channel(VOTE_CHANNEL_ID)
+
+    async for message in vote_channel.history(limit=100):
+        if message.embeds and user.mention in message.embeds[0].description:
+            embed = message.embeds[0]
+
+            embed.add_field(
+                name="❌ **Отказ**",
+                value="Заявка была отклонена.",
+                inline=False
+            )
+
+            embed.color = disnake.Color.red()
+
+            await message.edit(embed=embed)
+
+            try:
+                await user.send(
+                    f"❌ Ваша заявка на вступление в White List была отклонена по результатам голосования."
+                )
+            except disnake.Forbidden:
+                await interaction.response.send_message(f"Не удалось отправить сообщение пользователю {user.mention}.")
+
+            await interaction.response.send_message(f"🚫 Заявка пользователя {user.mention} была отклонена и обновлена в голосовании.")
+            return
+
+    await interaction.response.send_message(f"⚠️ Не найдена заявка пользователя {user.mention} в голосовании.")
