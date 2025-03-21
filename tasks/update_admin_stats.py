@@ -1,7 +1,6 @@
-import re
 import disnake
 from disnake.ext import tasks
-from datetime import datetime, timedelta
+from datetime import datetime
 from bot_init import bot
 
 # ID каналов
@@ -29,6 +28,7 @@ async def count_admin_messages():
     # Определяем диапазон дат (текущий месяц)
     today = datetime.now()
     first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    month_year = today.strftime("%B %Y")  # Название месяца и год
 
     # Словарь для хранения количества сообщений
     admin_messages = {nick: 0 for nick in ADMIN_NICKS}
@@ -49,15 +49,16 @@ async def count_admin_messages():
                         admin_messages[admin_nick] += 1
                         break
 
-    # Формируем эмбед с топом (не более 25 полей)
-    sorted_admins = sorted(admin_messages.items(), key=lambda x: x[1], reverse=True)[:25]
+    # Формируем текст для описания в эмбеде
+    sorted_admins = sorted(admin_messages.items(), key=lambda x: x[1], reverse=True)
+    leaderboard_text = "\n".join(f"**{i+1}. {admin}** — {count} ахелпов" for i, (admin, count) in enumerate(sorted_admins))
+
+    # Формируем эмбед
     embed = disnake.Embed(
-        title="Топ активных админов за месяц",
-        description="Рейтинг админов по количеству найденных сообщений:",
+        title=f"Топ активных админов за {month_year}",
+        description=f"📊 **Рейтинг админов по количеству найденных ахелпов:**\n\n{leaderboard_text}",
         color=disnake.Color.green()
     )
-    for i, (admin, count) in enumerate(sorted_admins, start=1):
-        embed.add_field(name=f"{i}. {admin}", value=f"Найдено сообщений: {count}", inline=False)
 
     # Получаем сообщение с эмбедом и редактируем его
     if EMBED_MESSAGE_ID:

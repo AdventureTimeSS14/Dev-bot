@@ -236,7 +236,7 @@ async def discord_auth_update():
             if message_id:
                 old_message = await channel.fetch_message(message_id)
                 await old_message.edit(embed=embed, view=RegisterButton())
-                print(f"✅ Сообщение обновлено (ID: {message_id})")
+                print(f"✅ Сообщение обновлено Update Discord Auth (ID: {message_id})")
                 return
         except disnake.NotFound:
             print("❌ Старое сообщение не найдено. Создаём новое...")
@@ -245,10 +245,10 @@ async def discord_auth_update():
     old_message = await get_pinned_message(channel)
     if old_message:
         await old_message.edit(embed=embed, view=RegisterButton())
-        print(f"✅ Используем закреплённое сообщение (ID: {old_message.id})")
+        print(f"✅ Используем закреплённое сообщение Update Discord Auth (ID: {old_message.id})")
         return
 
     # Если старого сообщения нет, отправляем новое
     new_message = await channel.send(embed=embed, view=RegisterButton())
     await new_message.pin()  # Закрепляем его
-    print(f"✅ Отправлено новое сообщение (ID: {new_message.id})")
+    print(f"✅ Отправлено новое сообщение Update Discord Auth (ID: {new_message.id})")

@@ -205,19 +205,19 @@ async def update_whitelist_application():
             if message_id:
                 old_message = await channel.fetch_message(message_id)
                 await old_message.edit(embed=embed, view=WhitelistApplicationButton())
-                print(f"✅ Сообщение обновлено (ID: {message_id})")
+                print(f"✅ Сообщение обновлено Update WhiteList Application (ID: {message_id})")
                 return
         except disnake.NotFound:
-            print("❌ Старое сообщение не найдено. Создаём новое...")
+            print("❌ Старое сообщение не найдено. Создаём новое... Update WhiteList Application")
 
     # Если сообщение не найдено, ищем в закреплённых
     old_message = await get_pinned_message(channel)
     if old_message:
         await old_message.edit(embed=embed, view=WhitelistApplicationButton())
-        print(f"✅ Используем закреплённое сообщение (ID: {old_message.id})")
+        print(f"✅ Используем закреплённое сообщение Update WhiteList Application (ID: {old_message.id})")
         return
 
     # Если старого сообщения нет, отправляем новое
     new_message = await channel.send(embed=embed, view=WhitelistApplicationButton())
     await new_message.pin()  # Закрепляем его
-    print(f"✅ Отправлено новое сообщение (ID: {new_message.id})")
+    print(f"✅ Отправлено новое сообщение Update WhiteList Application (ID: {new_message.id})")
