@@ -8,3 +8,11 @@ DB_PARAMS = {
     'host': DB_HOST,
     'port': DB_PORT
 }
+
+DB_PARAMS_SPONSOR = {
+    'database': 'sponsors',
+    'user': DB_USER,
+    'password': DB_PASSWORD,
+    'host': DB_HOST,
+    'port': DB_PORT
+}

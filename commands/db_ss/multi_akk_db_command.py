@@ -4,9 +4,11 @@ from datetime import datetime, timezone
 import disnake
 import psycopg2
 from dateutil import parser
+# import requests
+# from bs4 import BeautifulSoup
 
 from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS, DB_PARAMS_SPONSOR
 from commands.misc.check_roles import has_any_role_by_id
 from commands.misc.get_creation_date import get_creation_date
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
@@ -44,6 +46,26 @@ def fetch_player_data(user_name):
 
     return result, related_results
 
+def fetch_sponsor_data(user_name):
+    """
+    Получает данные спонсора по никнейму из таблицы sponsors.
+    """
+    conn = psycopg2.connect(**DB_PARAMS_SPONSOR)
+    cursor = conn.cursor()
+
+    # Запрос для получения данных спонсора
+    query = """
+    SELECT user_id, player_name, tier, ooccolor, have_priority_join, allowed_markings, extra_slots, expire_date, allow_job
+    FROM sponsors
+    WHERE player_name = %s
+    """
+    cursor.execute(query, (user_name,))
+    result = cursor.fetchone()  # Получаем первую запись (если есть)
+
+    cursor.close()
+    conn.close()
+
+    return result
 
 # нужно для конвертации времени с базы данных
 def datetime_to_unix_timestamp(dt):
@@ -245,7 +267,8 @@ def get_discord_info_by_user_id(user_id: str):
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 async def check_nick(ctx, *, user_name: str):
     data, related_accounts = fetch_player_data(user_name)
-    
+    data_sponsor = fetch_sponsor_data(user_name)  
+
     if data:
         player_id, uuid, first_seen_time_str, last_seen_user_name, last_seen_time_str, last_seen_address, last_seen_hwid = data
 
@@ -306,12 +329,32 @@ async def check_nick(ctx, *, user_name: str):
                     related_accounts_str += (f'> **{related_user_name}** [IP, HWID] | Последний заход в игру: {related_last_seen_time_str}\n')
                 count += 1  
 
+        # Добавляем информацию о спонсоре, если она есть
+        sponsor_message = ''
+        if data_sponsor:
+            user_id, player_name, tier, ooccolor, have_priority_join, allowed_markings, extra_slots, expire_date, allow_job = data_sponsor
+            sponsor_message = (
+                f'\n> **🎖️ Спонсор:** Да\n'
+                f'> **Тиер:** {tier}\n'
+                f'> **Цвет OOC:** {ooccolor}\n'
+                f'> **Приоритетный вход:** {"Да" if have_priority_join else "Нет"}\n'
+                f'> **Разрешённые маркинги:** {len(allowed_markings) if allowed_markings else "Нет"}\n'
+                f'> **Extra slots:** {extra_slots}\n'
+                f'> **Дата истечения:** {expire_date}\n'
+                f'> **Игнор времени должностей:** {allow_job}\n\n'
+            )
+        else:
+            sponsor_message = (
+                f'\n> **🎖️ Спонсор:** Нет\n'
+            )
+
         description = (f'> **Первый заход в игру:** {first_seen_time}\n'
                        f'> **Последний заход в игру:** {last_seen_time_formatted}\n'
                        f'> **Дата создания аккаунта:** {creation_date}\n\n'
                        f'> **HWID:** {hwid_message}\n'
                        f'> **UUID:** {uuid}\n\n'
                        f'{discord_message}'
+                       f'{sponsor_message}'
                        f'{global_whitelist_message}'
                        f'{roles_message}\n'
                        f'{related_accounts_str}')
@@ -333,7 +376,6 @@ import os
 @has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 async def check_nick_file(ctx, *, user_name: str):
     data, related_accounts = fetch_player_data(user_name)
-    
     if data:
         player_id, uuid, first_seen_time_str, last_seen_user_name, last_seen_time_str, last_seen_address, last_seen_hwid = data
 
