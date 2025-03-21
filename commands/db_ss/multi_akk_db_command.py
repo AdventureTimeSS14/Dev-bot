@@ -4,14 +4,16 @@ from datetime import datetime, timezone
 import disnake
 import psycopg2
 from dateutil import parser
-# import requests
-# from bs4 import BeautifulSoup
 
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS, DB_PARAMS_SPONSOR
 from commands.misc.check_roles import has_any_role_by_id
 from commands.misc.get_creation_date import get_creation_date
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+
+# import requests
+# from bs4 import BeautifulSoup
+
 
 # SPONSOR_PATH = '/root/node_sponsors/data/' # моя спонсорка, не учитывать.
 

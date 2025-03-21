@@ -1,8 +1,9 @@
 import disnake
 from disnake.ext import commands
+
+from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import HEAD_ADT_TEAM
-from bot_init import bot
 
 # ID роли, которую будем добавлять или удалять
 WL_ROLE_ID = 1060239440930418828

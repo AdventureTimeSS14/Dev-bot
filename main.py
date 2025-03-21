@@ -23,6 +23,7 @@ from commands.db_ss import (admin_command, admins_command, banlist_command,
                             permissions_command, player_notes_command,
                             player_time_command, profiles_command,
                             uploads_command)
+from commands.db_ss.discord import discord_command
 from commands.dbCommand import help_command, info_command, status_command
 from commands.github import (achang_command, branch_command, check_workflows,
                              forks_command, git_cancel_invite_command,

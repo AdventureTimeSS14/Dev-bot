@@ -1,9 +1,10 @@
 import logging
 import time
+
 import disnake
+from disnake.ext import commands
 
 from bot_init import bot
-from disnake.ext import commands
 from commands.github import check_workflows
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
@@ -11,12 +12,12 @@ from tasks.check_new_commit_task import monitor_commits
 from tasks.discord_auth_task import discord_auth_update
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
+from tasks.update_admin_stats import update_admin_stats
 from tasks.update_status_presence_task import update_status_presence
 from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
 from tasks.update_time_shutdows_task import update_time_shutdows
 from tasks.whitelist_application_task import update_whitelist_application
-from tasks.update_admin_stats import update_admin_stats
 
 
 async def start_task_if_not_running(task, task_name: str):
