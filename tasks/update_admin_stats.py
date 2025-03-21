@@ -4,7 +4,8 @@ from datetime import datetime
 from bot_init import bot
 
 # ID каналов
-LOG_CHANNEL_ID = 1041654367712976966  # Канал логов
+LOG_CHANNEL_ID = 1041654367712976966  # Канал логов ахелпов
+BAN_CHANNEL_ID = 1291023511607054387  # Канал логов банов
 STATIC_ADMIN_CHANNEL_ID = 1352637128961556580  # Канал для вывода статистики
 EMBED_MESSAGE_ID = 1352638882310656051
 
@@ -17,11 +18,12 @@ ADMIN_NICKS = [
 ]
 
 # Функция для поиска сообщений админов и обновления эмбеда
-async def count_admin_messages():
+async def count_admin_actions():
     global EMBED_MESSAGE_ID
     channel_static_admin = bot.get_channel(STATIC_ADMIN_CHANNEL_ID)
-    channel = bot.get_channel(LOG_CHANNEL_ID)
-    if not channel or not channel_static_admin:
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
+    ban_channel = bot.get_channel(BAN_CHANNEL_ID)
+    if not log_channel or not ban_channel or not channel_static_admin:
         print("Каналы не найдены!")
         return
 
@@ -30,34 +32,60 @@ async def count_admin_messages():
     first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     month_year = today.strftime("%B %Y")  # Название месяца и год
 
-    # Словарь для хранения количества сообщений
-    admin_messages = {nick: 0 for nick in ADMIN_NICKS}
+    # Словарь для хранения количества ахелпов и банов
+    admin_actions = {nick: {"ахелпы": 0, "баны": 0} for nick in ADMIN_NICKS}
 
-    # Поиск эмбедов по нику
-    async for message in channel.history(limit=4000, after=first_day_of_month):
+    # Подсчёт ахелпов
+    async for message in log_channel.history(limit=4000, after=first_day_of_month):
         for embed in message.embeds:
-            # Проверяем заголовок, описание и поля эмбеда
             for admin_nick in ADMIN_NICKS:
                 if (embed.title and admin_nick.lower() in embed.title.lower()) or \
                    (embed.description and admin_nick.lower() in embed.description.lower()):
-                    admin_messages[admin_nick] += 1
+                    admin_actions[admin_nick]["ахелпы"] += 1
                     continue
-
-                # Проверяем поля эмбеда
                 for field in embed.fields:
                     if admin_nick.lower() in field.name.lower() or admin_nick.lower() in field.value.lower():
-                        admin_messages[admin_nick] += 1
+                        admin_actions[admin_nick]["ахелпы"] += 1
+                        break
+
+    # Подсчёт банов
+    async for message in ban_channel.history(limit=4000, after=first_day_of_month):
+        for embed in message.embeds:
+            for admin_nick in ADMIN_NICKS:
+                if (embed.title and admin_nick.lower() in embed.title.lower()) or \
+                   (embed.description and admin_nick.lower() in embed.description.lower()):
+                    admin_actions[admin_nick]["баны"] += 1
+                    continue
+                for field in embed.fields:
+                    if admin_nick.lower() in field.name.lower() or admin_nick.lower() in field.value.lower():
+                        admin_actions[admin_nick]["баны"] += 1
                         break
 
     # Формируем текст для описания в эмбеде
-    sorted_admins = sorted(admin_messages.items(), key=lambda x: x[1], reverse=True)
-    leaderboard_text = "\n".join(f"**{i+1}. {admin}** — {count} ахелпов" for i, (admin, count) in enumerate(sorted_admins))
+    sorted_admins = sorted(admin_actions.items(), key=lambda x: (x[1]["ахелпы"], x[1]["баны"]), reverse=True)
+    leaderboard_text = "\n".join(
+        f"**{i+1}. {admin}**{data['ахелпы']} ахелпы | {data['баны']} баны" 
+        for i, (admin, data) in enumerate(sorted_admins)
+    )
 
     # Формируем эмбед
     embed = disnake.Embed(
         title=f"Топ активных админов за {month_year}",
-        description=f"📊 **Рейтинг админов по количеству найденных ахелпов:**\n\n{leaderboard_text}",
-        color=disnake.Color.green()
+        description=f"📊 **Рейтинг админов по ахелпам и банам:**\n\n{leaderboard_text}",
+        color=disnake.Color.red()
+    )
+
+    # Устанавливаем подпись (футер)
+    embed.set_footer(
+        text="Adventure Time SS14 | Точность 100% не гарантируется",
+        icon_url=(
+            "https://media.discordapp.net/attachments/"
+            "1255118642442403986/1351231449470079046/icon"
+            "-256x256.png?ex=67d99fda&is=67d84e5a&hm=5843e1"
+            "d7e0f726d77e4882f66e9fdadcabea8f9fd4f6f26212327"
+            "e986f22ed5d&=&format=webp&quality=lossless&widt"
+            "h=288&height=288"
+        )
     )
 
     # Получаем сообщение с эмбедом и редактируем его
@@ -76,4 +104,4 @@ async def count_admin_messages():
 # Запуск задачи на обновление каждые 2 часа
 @tasks.loop(hours=2)
 async def update_admin_stats():
-    await count_admin_messages()
+    await count_admin_actions()
