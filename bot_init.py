@@ -7,8 +7,8 @@ import disnake
 from disnake.ext import commands
 
 bot = commands.Bot(
-    command_prefix="&", 
-    help_command=None, 
+    command_prefix="&",
+    help_command=None,
     intents=disnake.Intents.all(),
     test_guilds=[901772674865455115]
 )
