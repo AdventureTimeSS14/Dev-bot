@@ -61,8 +61,13 @@ async def count_admin_actions():
 
     # Формируем текст для эмбеда в виде таблицы
     sorted_admins = sorted(admin_actions.items(), key=lambda x: (x[1]["ахелпы"], x[1]["баны"]), reverse=True)
-    leaderboard_text = "\n".join(f"`{i+1:>2}.` **{admin}** | ахелпы {data['ахелпы']} | баны {data['баны']}"
-                                   for i, (admin, data) in enumerate(sorted_admins))
+    # Находим максимальную длину ника
+    max_nick_length = max(len(admin) for admin in admin_actions.keys())
+    # Формируем текст для лидерборда
+    leaderboard_text = "```\n" + "\n".join(
+        f"{i+1:>2}. {admin:<{max_nick_length}} | ахелпы {data['ахелпы']:>3} | баны {data['баны']:>3}"
+        for i, (admin, data) in enumerate(sorted_admins)
+    ) + "\n```"
 
     # Формируем эмбед
     embed = disnake.Embed(
@@ -73,7 +78,7 @@ async def count_admin_actions():
 
     # Устанавливаем подпись (футер)
     embed.set_footer(
-        text="Adventure Time SS14 | Данные могут отличаться", 
+        text="Adventure Time SS14 MRP Server | Данные могут отличаться, точность не 100%", 
         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
     )
 
