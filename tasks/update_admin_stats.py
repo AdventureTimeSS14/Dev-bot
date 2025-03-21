@@ -39,8 +39,7 @@ async def count_admin_actions():
     async for message in log_channel.history(limit=4000, after=first_day_of_month):
         for embed in message.embeds:
             for admin_nick in ADMIN_NICKS:
-                if (embed.title and admin_nick.lower() in embed.title.lower()) or \
-                   (embed.description and admin_nick.lower() in embed.description.lower()):
+                if any(admin_nick.lower() in (getattr(embed, attr, "") or "").lower() for attr in ["title", "description"]):
                     admin_actions[admin_nick]["ахелпы"] += 1
                     continue
                 for field in embed.fields:
@@ -52,8 +51,7 @@ async def count_admin_actions():
     async for message in ban_channel.history(limit=4000, after=first_day_of_month):
         for embed in message.embeds:
             for admin_nick in ADMIN_NICKS:
-                if (embed.title and admin_nick.lower() in embed.title.lower()) or \
-                   (embed.description and admin_nick.lower() in embed.description.lower()):
+                if any(admin_nick.lower() in (getattr(embed, attr, "") or "").lower() for attr in ["title", "description"]):
                     admin_actions[admin_nick]["баны"] += 1
                     continue
                 for field in embed.fields:
@@ -61,31 +59,22 @@ async def count_admin_actions():
                         admin_actions[admin_nick]["баны"] += 1
                         break
 
-    # Формируем текст для описания в эмбеде
+    # Формируем текст для эмбеда в виде таблицы
     sorted_admins = sorted(admin_actions.items(), key=lambda x: (x[1]["ахелпы"], x[1]["баны"]), reverse=True)
-    leaderboard_text = "\n".join(
-        f"**{i+1}. {admin}**{data['ахелпы']} ахелпы | {data['баны']} баны" 
-        for i, (admin, data) in enumerate(sorted_admins)
-    )
+    leaderboard_text = "\n".join(f"`{i+1:>2}.` **{admin}** | ахелпы {data['ахелпы']} | баны {data['баны']}"
+                                   for i, (admin, data) in enumerate(sorted_admins))
 
     # Формируем эмбед
     embed = disnake.Embed(
-        title=f"Топ активных админов за {month_year}",
-        description=f"📊 **Рейтинг админов по ахелпам и банам:**\n\n{leaderboard_text}",
+        title=f"📊 Топ админов за {month_year}",
+        description=f"**Рейтинг по ахелпам 🆘 и банам 🔨:**\n\n{leaderboard_text}",
         color=disnake.Color.red()
     )
 
     # Устанавливаем подпись (футер)
     embed.set_footer(
-        text="Adventure Time SS14 | Точность 100% не гарантируется",
-        icon_url=(
-            "https://media.discordapp.net/attachments/"
-            "1255118642442403986/1351231449470079046/icon"
-            "-256x256.png?ex=67d99fda&is=67d84e5a&hm=5843e1"
-            "d7e0f726d77e4882f66e9fdadcabea8f9fd4f6f26212327"
-            "e986f22ed5d&=&format=webp&quality=lossless&widt"
-            "h=288&height=288"
-        )
+        text="Adventure Time SS14 | Данные могут отличаться", 
+        icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
     )
 
     # Получаем сообщение с эмбедом и редактируем его
