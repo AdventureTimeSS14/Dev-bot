@@ -127,3 +127,41 @@ async def uploads(ctx, server: str = "mrp"):
 
     view = UploadsView(ctx, uploads, server)
     await ctx.send(embed=view.get_page_embed(), view=view)
+
+@bot.command(name="search")
+async def search(ctx, *, user_name: str):
+    """
+    Поиск эмбедов по нику и вывод количества найденных результатов.
+    """
+    channel = bot.get_channel(1041654367712976966)
+    if not channel:
+        await ctx.send("Канал логов не найден!")
+        return
+
+    print(f"Поиск по нику: {user_name}")  # Логирование
+    print(f"Канал: {channel.name}")  # Логирование
+
+    # Счётчик найденных эмбедов
+    embed_count = 0
+
+    # Поиск эмбедов по нику
+    async for message in channel.history(limit=4000):  # Проверяем только последние 500 сообщений
+        for embed in message.embeds:
+            # Проверяем заголовок, описание и поля эмбеда
+            if (embed.title and user_name.lower() in embed.title.lower()) or \
+               (embed.description and user_name.lower() in embed.description.lower()):
+                embed_count += 1
+                print(f"Найден эмбед: {embed.title}")  # Логирование
+                continue
+
+            # Проверяем поля эмбеда
+            for field in embed.fields:
+                if user_name.lower() in field.name.lower() or user_name.lower() in field.value.lower():
+                    embed_count += 1
+                    print(f"Найден эмбед: {field.name}")  # Логирование
+                    break
+
+    print(f"Найдено эмбедов: {embed_count}")  # Логирование
+
+    # Отправляем результат
+    await ctx.send(f"🔍 Найдено эмбедов с ником **{user_name}**: **{embed_count}**")

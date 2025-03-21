@@ -6,9 +6,12 @@
 import disnake
 from disnake.ext import commands
 
+intents = disnake.Intents.all()
+intents.message_content = True
+
 bot = commands.Bot(
     command_prefix="&",
     help_command=None,
-    intents=disnake.Intents.all(),
+    intents=intents,
     test_guilds=[901772674865455115]
 )
