@@ -450,3 +450,49 @@ async def new_team(
             embed.set_author(name=inter.author.name, icon_url=inter.author.avatar.url)
 
             await admin_channel.send(embed=embed)
+
+@bot.slash_command(
+    name="contribute",
+    description="Добавляет роль контрибьютера указанному пользователю."
+)
+@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+async def contribution_add_slash(
+    inter: disnake.ApplicationCommandInteraction,
+    user: disnake.Member = Option(
+        name="user",
+        description="Пользователь, которому нужно выдать роль контрибьютера.",
+        required=True
+    ),
+):
+    """
+        Команда для назначения пользователя на должность контрибьютера.
+    """
+    # Получаем роль отпуска
+    role_contribute = inter.guild.get_role(1348226466227163176)
+    if not role_contribute:
+        await inter.response.send_message("❌ Ошибка: Роль Контрибьютера не найдена на сервере.")
+        return
+
+    # Проверяем, есть ли у пользователя уже роль отпуска
+    if role_contribute in user.roles:
+        await inter.response.send_message(
+            f"❌ {user.mention} уже имеет роль {role_contribute.name}."
+        )
+        return
+
+    try:
+        # Добавляем роль контрибьюта пользователю
+        await user.add_roles(role_contribute)
+        await inter.response.send_message(
+            f"✅ Роль {role_contribute.name} успешно добавлена {user.mention}."
+        )
+
+    except disnake.Forbidden:
+        await inter.response.send_message(
+            "⚠️ Ошибка: У бота недостаточно прав для добавления роли."
+        )
+    except disnake.HTTPException as e:
+        await inter.response.send_message(f"❌ Ошибка: Не удалось добавить роль. Подробнее: {e}")
+    except Exception as e:
+        print(f"Неожиданная ошибка: {e}")
+        await inter.response.send_message("❌ Произошла непредвиденная ошибка.")

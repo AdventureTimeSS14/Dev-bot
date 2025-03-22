@@ -76,6 +76,11 @@ async def on_ready():
         )
     else:
         print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
+        
+    # await bot.sync_commands()
+    # await bot.command_sync_flags()
+    # await bot._sync_application_commands()
+    # await bot.tree.sync()
 
     # Запуск задачи для автоматического завершения работы через определённое время
     bot.loop.create_task(shutdown_after_time())

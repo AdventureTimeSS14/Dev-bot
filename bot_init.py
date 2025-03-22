@@ -13,5 +13,6 @@ bot = commands.Bot(
     command_prefix="&",
     help_command=None,
     intents=intents,
-    test_guilds=[901772674865455115]
+    test_guilds=[901772674865455115],
+    sync_commands=True,
 )
