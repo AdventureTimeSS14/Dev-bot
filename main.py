@@ -16,8 +16,9 @@ from commands import (admin_help_command, echo_command, general_commands,
 from commands.adt_team import (add_role_command, add_vacation_command,
                                end_vacation_command, extend_vacation_command,
                                new_team_command, remove_role_command,
-                               remove_team_command, team_help_command,
-                               tweak_team_command, while_list_command)
+                               remove_team_command, slash_team_command,
+                               team_help_command, tweak_team_command,
+                               while_list_command)
 from commands.db_ss import (admin_command, admins_command, banlist_command,
                             multi_akk_db_command, pardon_command,
                             permissions_command, player_notes_command,

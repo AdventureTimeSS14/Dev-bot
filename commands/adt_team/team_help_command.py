@@ -7,32 +7,32 @@ from config import ADMIN_TEAM
 
 commands_info = {
     "Основные команды": {
-        "&new_team": {
+        "&new_team или /team_new": {
             "description": "Добавляет сотрудника в отдел и отправляет сообщение в 🌀админ-состав.",
             "example": '&new_team @User Администрация "Главный Администратор"',
             "syntax": "&new_team <пользователь> <роль отдела> <роль должности>",
         },
-        "&remove_team": {
+        "&remove_team или /team_remove": {
             "description": "Удаляет сотрудника из отдела и отправляет сообщение в 🌀админ-состав.",
             "example": '&remove_team @User Администрация "Главный Администратор" "Причина"',
             "syntax": "&remove_team <пользователь> <роль отдела> <роль должности> <причина>",
         },
-        "&tweak_team": {
+        "&tweak_team или /team_tweak": {
             "description": "Изменяет роль сотрудника и отправляет сообщение в 🌀админ-состав.",
             "example": '&tweak_team @User "Старшая роль" "Новая роль" "Причина"',
             "syntax": "&tweak_team <пользователь> <старая роль> <новая роль> <причина>",
         },
-        "&add_vacation": {
+        "&add_vacation или /team_add_vacation": {
             "description": "Выдает роль отпуска пользователю и отправляет сообщение в 🌀админ-состав.", # pylint: disable=C0301
             "example": '&add_vacation @User 22.02.2024 "Отпуск"',
             "syntax": "&add_vacation <пользователь> <срок DD.MM.YYYY> <причина>",
         },
-        "&end_vacation": {
+        "&end_vacation или /team_end_vacation": {
             "description": "Удаляет роль отпуска и отправляет сообщение в 🌀админ-состав.",
             "example": "&end_vacation @User",
             "syntax": "&end_vacation <пользователь>",
         }, # pylint: disable=C0301
-        "&extend_vacation": {  # Новая команда для продления отпуска
+        "&extend_vacation или /team_extend_vacation": {  # Новая команда для продления отпуска
             "description": "Продлевает срок отпуска пользователю, обновляя дату окончания отпуска и причину.", # pylint: disable=C0301
             "example": '&extend_vacation @User 30.12.2024 "Необходимость дополнительных выходных"',
             "syntax": "&extend_vacation <пользователь> <новый срок DD.MM.YYYY> <причина>",
