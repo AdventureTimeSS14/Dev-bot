@@ -1,5 +1,5 @@
-import asyncio
 import datetime
+
 
 import disnake
 from disnake.ext import commands
@@ -73,65 +73,6 @@ async def on_command_error(ctx, error):
         await ctx.send(f"❌ Произошла ошибка: {error}",
                        view=view
         )
-
-@bot.event
-async def on_application_command(ctx: disnake.ApplicationCommandInteraction):
-    """
-    Логирует выполнение слэш-команды.
-    """
-    # Логируем команду в фоновом режиме
-    bot.loop.create_task(log_command(ctx))
-
-async def log_command(ctx: disnake.ApplicationCommandInteraction):
-    """
-    Логирует выполнение команды в канал в фоновом режиме.
-    """
-    # Получаем канал для логирования
-    channel = bot.get_channel(LOG_CHANNEL_ID)
-
-    # Проверяем, существует ли канал
-    if not channel:
-        print(f"❌ Лог-канал с ID {LOG_CHANNEL_ID} не найден.")
-        return
-
-    # Получаем текущее время
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # Определяем, был ли вызов команды в ЛС или в канале сервера
-    if isinstance(ctx.channel, disnake.DMChannel):
-        channel_info = "ЛС с пользователем"
-        message_link = f"https://discord.com/channels/@me/{ctx.channel.id}/{ctx.id}"
-    else:
-        channel_info = f"Канал {ctx.channel.name} в {ctx.guild.name}"
-        message_link = f"https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.id}"
-
-    # Формируем сообщение для логирования
-    log_message = format_command_log_message_slash(ctx, current_time, channel_info, message_link)
-
-    # Отправляем лог-сообщение в канал
-    try:
-        await channel.send(log_message)
-        print(f"✅ Логирование прошло успешно: {log_message}")
-    except Exception as e:
-        print(f"❌ Ошибка при отправке лог-сообщения в канал: {e}")
-
-def format_command_log_message_slash(ctx, current_time, channel_info, message_link):
-    """
-    Форматирует сообщение для логирования информации о выполненной команде.
-
-    :param ctx: Контекст команды.
-    :param current_time: Время выполнения команды.
-    :param channel_info: Информация о канале, в котором была выполнена команда.
-    :param message_link: Ссылка на сообщение с командой.
-    :return: Отформатированное сообщение для логирования.
-    """
-    return (
-        f"🎯 **Команда SLASH выполнена:** `/`{ctx.data['name']}\n"
-        f"🙋 **Пользователь:** {ctx.author} (ID: {ctx.author.id})\n"
-        f"📄 **Канал:** {channel_info}\n"
-        f"⏰ **Время:** {current_time}\n"
-        f"🔗 **Ссылка на сообщение:** [Перейти к сообщению]({message_link})\n_ _"
-    )
 
 
 def format_command_log_message(ctx, current_time, channel_info, message_link):
