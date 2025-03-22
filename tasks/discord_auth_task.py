@@ -59,6 +59,7 @@ class NicknameModal(disnake.ui.Modal):
             try:
                 user = await inter.bot.fetch_user(discord_id)
                 await user.send("❌ Ваш аккаунт не найден в базе данных. Попробуйте позже!")
+                await inter.send("❌ Ваш аккаунт не найден в базе данных. Попробуйте позже!", ephemeral=True)
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
             
@@ -81,6 +82,7 @@ class NicknameModal(disnake.ui.Modal):
         if is_user_linked(user_id, discord_id):
             try:
                 await discord_user.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.")
+                await inter.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.", ephemeral=True)
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
             
@@ -111,6 +113,14 @@ class NicknameModal(disnake.ui.Modal):
                     description=f"Ваш никнейм **{nickname}** успешно привязан.",
                     color=disnake.Color.green(),
                 )
+            )
+            await inter.send(
+                embed=disnake.Embed(
+                    title="✅ Привязка завершена!",
+                    description=f"Ваш никнейм **{nickname}** успешно привязан.",
+                    color=disnake.Color.green(),
+                ),
+                ephemeral=True
             )
         except disnake.Forbidden:
             print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
