@@ -5,6 +5,7 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
 
+
 @bot.slash_command(
     name="team_add_vacation",
     description="Выдача отпуска пользователю с указанием срока и причины."
