@@ -12,9 +12,9 @@ from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def team_add_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, которому выдать отпуск", required=True),
-    end_date: str = Option(name="Дата окончания", description="Дата окончания отпуска (например, 01.04.2025)", required=True),
-    reason: str = Option(name="Причина", description="Причина отпуска", required=True)
+    user: disnake.Member = Option(name="user", description="Пользователь, которому выдать отпуск", required=True),
+    end_date: str = Option(name="end_date", description="Дата окончания отпуска (например, 01.04.2025)", required=True),
+    reason: str = Option(name="reason", description="Причина отпуска", required=True)
 ):
     """
     Выдача отпуска пользователю. Добавляется роль отпуска с указанием срока и причины.
@@ -82,7 +82,7 @@ async def team_add_vacation_slash(
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def team_end_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, у которого завершить отпуск")
+    user: disnake.Member = Option(name="user", description="Пользователь, у которого завершить отпуск")
 ):
     """
     Завершает отпуск указанного пользователя, удаляя роль отпуска.
@@ -144,9 +144,9 @@ async def team_end_vacation_slash(
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def team_extend_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, которому продлеваем отпуск", required=True),
-    new_end_date: str = Option(name="Новая дата окончания", description="Новая дата окончания отпуска", required=True),
-    reason: str = Option(name="Причина", description="Причина продления отпуска", required=True)
+    user: disnake.Member = Option(name="user", description="Пользователь, которому продлеваем отпуск", required=True),
+    new_end_date: str = Option(name="new_end_date", description="Новая дата окончания отпуска", required=True),
+    reason: str = Option(name="reason", description="Причина продления отпуска", required=True)
 ):
     """
     Продление отпуска пользователю. Обновляется срок отпуска и причина.
@@ -212,10 +212,10 @@ async def team_extend_vacation_slash(
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def tweak_team_slash(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, которому меняем роль", required=True),
-    old_role: disnake.Role = Option(name="Старая должность", description="Роль, которую нужно удалить", required=True),
-    new_role: disnake.Role = Option(name="Новая должность", description="Роль, которую нужно добавить", required=True),
-    reason: str = Option(name="Причина", description="Причина изменения роли (не менее 5 символов)", required=True)
+    user: disnake.Member = Option(name="user", description="Пользователь, которому меняем роль", required=True),
+    old_role: disnake.Role = Option(name="old_role", description="Роль, которую нужно удалить", required=True),
+    new_role: disnake.Role = Option(name="new_role", description="Роль, которую нужно добавить", required=True),
+    reason: str = Option(name="reason", description="Причина изменения роли (не менее 5 символов)", required=True)
 ):
     """
     Изменение роли пользователя. Позволяет заменить одну роль на другую с указанием причины.
@@ -346,10 +346,10 @@ async def send_results(inter, removed_roles, errors):
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def team_remove_slash(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, которого нужно снять с должности", required=True),
-    role_dep: disnake.Role = Option(name="Роль департамента", description="Роль отдела, которую нужно удалить", required=True),
-    role_job: disnake.Role = Option(name="Роль должности", description="Роль должности, которую нужно удалить", required=True),
-    reason: str = Option(name="Причина", description="Причина снятия с должности (не менее 5 символов)", required=True)
+    user: disnake.Member = Option(name="user", description="Пользователь, которого нужно снять с должности", required=True),
+    role_dep: disnake.Role = Option(name="role_dep", description="Роль отдела, которую нужно удалить", required=True),
+    role_job: disnake.Role = Option(name="role_job", description="Роль должности, которую нужно удалить", required=True),
+    reason: str = Option(name="reason", description="Причина снятия с должности (не менее 5 символов)", required=True)
 ):
     """
     Команда для снятия сотрудника с должности. Удаляет роли отдела и должности.
@@ -393,9 +393,9 @@ async def team_remove_slash(
 @has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
 async def new_team(
     inter: disnake.ApplicationCommandInteraction,
-    user: disnake.Member = Option(name="Пользователь", description="Пользователь, которого нужно назначить", required=True),
-    role_department: disnake.Role = Option(name="Роль департамента", description="Роль отдела", required=True),
-    role_position: disnake.Role = Option(name="Роль должности", description="Роль должности", required=True)
+    user: disnake.Member = Option(name="user", description="Пользователь, которого нужно назначить", required=True),
+    role_department: disnake.Role = Option(name="role_department", description="Роль отдела", required=True),
+    role_position: disnake.Role = Option(name="role_position", description="Роль должности", required=True)
 ):
     """
     Команда для назначения пользователя на новую должность.
