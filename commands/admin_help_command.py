@@ -68,7 +68,7 @@ ADMIN_COMMANDS = [
     {
         "name": "🚹 &profile_id <profile_id>",
         "description": "Выводит подробную ифнформацию о персонаже по id профиля.",
-    }
+    },
     {
         "name": "🎃 &admin <NickName>",
         "description": "Показывает имеет ли данный пользователь права на mrp & dev сервере.",
