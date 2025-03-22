@@ -82,5 +82,17 @@ async def help_command(ctx):
     )
     embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
 
+    # Добавляем изображение икону : D
+    embed.set_thumbnail(
+        url=(
+            "https://media.discordapp.net/attachme"
+            "nts/1255118642442403986/135308226898126"
+            "4555/229_20250311204105.png?ex=67e05b8f&i"
+            "s=67df0a0f&hm=d516adce879449d2f3268ca0881aa"
+            "c9fed48ef23530d2953afaf74b9ff503779&=&form"
+            "at=webp&quality=lossless&width=281&height=394"
+        )
+    )
+
     # Отправляем embed-сообщение
     await ctx.send(embed=embed, components=[action_row_button_help, action_row_bug_report])
