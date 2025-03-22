@@ -394,8 +394,8 @@ async def team_remove_slash(
 async def new_team(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которого нужно назначить", required=True),
-    role_department: disnake.Role = Option(name="role_department", description="Роль отдела", required=True),
-    role_position: disnake.Role = Option(name="role_position", description="Роль должности", required=True)
+    role_department: disnake.Role = Option(name="role_dep", description="Роль отдела", required=True),
+    role_position: disnake.Role = Option(name="role_job", description="Роль должности", required=True)
 ):
     """
     Команда для назначения пользователя на новую должность.
