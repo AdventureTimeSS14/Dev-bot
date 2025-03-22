@@ -127,3 +127,60 @@ async def profiles(ctx, *, nick_name: str):
 
     view = ProfilesView(ctx, profiles, nick_name)
     await ctx.send(embed=view.get_page_embed(), view=view)
+
+def fetch_profiles_by_id(profile_id):
+    conn = psycopg2.connect(**DB_PARAMS)
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        p.profile_id, p.slot, p.char_name, p.age, p.sex, p.hair_name, p.hair_color, 
+        p.facial_hair_name, p.facial_hair_color, p.eye_color, p.skin_color, p.pref_unavailable, 
+        p.preference_id, p.gender, p.species, p.markings, p.flavor_text, p.voice, p.erpstatus, 
+        p.spawn_priority, p.bark_pitch, p.bark_proto, p.high_bark_var, p.low_bark_var
+    FROM profile p
+    WHERE p.profile_id = %s
+    """
+    cursor.execute(query, (profile_id,))
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return result
+
+@bot.command()
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+async def profile_id(ctx, *, profile_id: str):
+    """
+    Получает информацию о персонаже по ID профиля.
+    Использование: &profile_id <profile_id>
+    """
+    # Получаем данные о профиле
+    profile_data = fetch_profiles_by_id(profile_id)
+
+    if not profile_data:
+        await ctx.send(f"❌ Профиль с ID {profile_id} не найден.")
+        return
+
+    # Создаем Embed объект
+    embed = disnake.Embed(title=f"Профиль: {profile_data[2]}", color=disnake.Color.blue())
+
+    # Добавляем поля в Embed с эмодзи
+    embed.add_field(name="🔑 Профиль ID", value=str(profile_data[0]), inline=True)
+    embed.add_field(name="🧳 Слот", value=str(profile_data[1]), inline=True)
+    embed.add_field(name="👤 Имя персонажа", value=profile_data[2], inline=True)
+    embed.add_field(name="🎂 Возраст", value=str(profile_data[3]), inline=True)
+    embed.add_field(name="🚻 Пол", value=profile_data[4], inline=True)
+    embed.add_field(name="🌐 Гендер", value=profile_data[13], inline=True)
+    embed.add_field(name="💇 Название причёски", value=profile_data[5], inline=True)
+    embed.add_field(name="🎨 Цвет волос", value=profile_data[6], inline=True)
+    embed.add_field(name="👁️ Цвет глаз", value=profile_data[9], inline=True)
+    embed.add_field(name="🎭 Цвет кожи", value=profile_data[10], inline=True)
+    embed.add_field(name="👽 Раса", value=profile_data[14], inline=True)
+    embed.add_field(name="🎨 Маркинги", value=profile_data[15] if profile_data[15] else "Нет", inline=True)
+    embed.add_field(name="📝 Описание", value=profile_data[16] if profile_data[16] else "Нет", inline=True)
+    embed.add_field(name="🎙️ Голос", value=profile_data[17] if profile_data[17] else "Не указан", inline=True)
+
+    # Отправляем Embed в чат
+    await ctx.send(embed=embed)
