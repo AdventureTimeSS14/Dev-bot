@@ -12,6 +12,8 @@ CHANNEL_ID = 1351277093140303913
 
 VOTE_CHANNEL_ID = 1351277093140303913
 
+MRP_CHANNEL_ID = 1060236040377466920
+
 @bot.slash_command(name="wl_add", description="Добавить роль White List указанному пользователю")
 @has_any_role_by_id(HEAD_ADT_TEAM)
 async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
@@ -125,8 +127,10 @@ async def wl_del(interaction: disnake.ApplicationCommandInteraction, user: disna
 @has_any_role_by_id(HEAD_ADT_TEAM)
 async def wl_deny(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
-    Отказывает пользователю в принятии в White List, редактируя его последнюю заявку
+    Отказывает пользователю в принятии в White List, редактируя его последнюю заявку.
     """
+    await interaction.response.defer()  # ✅ Откладываем ответ, чтобы избежать таймаута
+
     vote_channel = interaction.guild.get_channel(VOTE_CHANNEL_ID)
 
     async for message in vote_channel.history(limit=100):
@@ -138,7 +142,6 @@ async def wl_deny(interaction: disnake.ApplicationCommandInteraction, user: disn
                 value="Заявка была отклонена.",
                 inline=False
             )
-
             embed.color = disnake.Color.red()
 
             await message.edit(embed=embed)
@@ -147,10 +150,18 @@ async def wl_deny(interaction: disnake.ApplicationCommandInteraction, user: disn
                 await user.send(
                     f"❌ Ваша заявка на вступление в White List была отклонена по результатам голосования."
                 )
+                channel_mrp = interaction.guild.get_channel(MRP_CHANNEL_ID)
+                await channel_mrp.send(f"❌ {user.mention} Ваша заявка на вступление в WL была отклонена.")
             except disnake.Forbidden:
-                await interaction.response.send_message(f"Не удалось отправить сообщение пользователю {user.mention}.")
+                pass  # Не обрываем выполнение, если сообщение пользователю не отправилось
 
-            await interaction.response.send_message(f"🚫 Заявка пользователя {user.mention} была отклонена и обновлена в голосовании.")
+            # ✅ Теперь можно отправить сообщение, так как defer() уже был вызван
+            await interaction.edit_original_response(
+                f"🚫 Заявка пользователя {user.mention} была отклонена и обновлена в голосовании."
+            )
             return
 
-    await interaction.response.send_message(f"⚠️ Не найдена заявка пользователя {user.mention} в голосовании.")
+    # Если заявка не найдена
+    await interaction.edit_original_response(
+        f"⚠️ Не найдена заявка пользователя {user.mention} в голосовании."
+    )
