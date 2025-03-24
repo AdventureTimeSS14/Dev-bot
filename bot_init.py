@@ -8,6 +8,7 @@ from disnake.ext import commands
 
 intents = disnake.Intents.all()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(
     command_prefix="&",
