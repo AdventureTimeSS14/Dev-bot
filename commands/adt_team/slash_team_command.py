@@ -1,8 +1,9 @@
 import disnake
 from disnake import Option
-
+from datetime import date
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
+from commands.dbCommand.get_db_connection import get_db_connection
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
 
 
@@ -20,6 +21,28 @@ async def team_add_vacation_slash(
     """
     Выдача отпуска пользователю. Добавляется роль отпуска с указанием срока и причины.
     """
+
+    try:
+        # Очистка и проверка формата даты
+        end_date = end_date.strip('"\' ')
+        day, month, year = map(int, end_date.split('.'))
+        vacation_end = date(year, month, day) 
+
+        # Проверяем, что дата не в прошлом
+        if vacation_end < date.today():
+            await inter.response.send_message("❌ Ошибка: Дата окончания отпуска не может быть в прошлом.")
+            return
+        
+        # Форматируем для SQL
+        sql_date = vacation_end.strftime('%Y-%m-%d')
+
+    except ValueError:
+        await inter.response.send_message("❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
+        return
+    except Exception as e:
+        await inter.response.send_message(f"❌ Критическая ошибка: {str(e)}")
+        print(f"[add_vacation] Ошибка парсинга даты: {str(e)}")
+        return
 
     # Получаем роль отпуска
     role_vacation = inter.guild.get_role(VACATION_ROLE)
@@ -40,7 +63,21 @@ async def team_add_vacation_slash(
         await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
         return
 
+    conn = None
+    cursor = None
+
     try:
+        # Подключение к БД (без await, так как mariadb синхронный)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Вставка данных
+        cursor.execute(
+            "INSERT INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (%s, %s, %s)",
+            (user.id, sql_date, reason)
+        )
+        conn.commit()
+
         # Добавляем роль отпуска пользователю
         await user.add_roles(role_vacation)
         await inter.response.send_message(
@@ -51,8 +88,8 @@ async def team_add_vacation_slash(
         embed = disnake.Embed(
             title="Выдача отпуска",
             description=(
-                f"{inter.author.mention}({inter.author.display_name}) "
-                f"выдал(а) отпуск для {user.mention}({user.display_name})."
+                f"{inter.author.mention}({inter.author.name}) "
+                f"выдал(а) отпуск для {user.mention}({user.name})."
             ),
             color=disnake.Color.purple(),
         )
@@ -74,6 +111,11 @@ async def team_add_vacation_slash(
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
         await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 @bot.slash_command(
@@ -106,7 +148,17 @@ async def team_end_vacation_slash(
         await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
         return
 
+    conn = None
+    cursor = None
+
     try:
+        # Подключение к базе данных
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Удаление записи из БД
+        cursor.execute("DELETE FROM vacation_team WHERE discord_id = %s", (user.id,))
+        conn.commit()
+        
         # Удаляем роль отпуска у пользователя
         await user.remove_roles(role_vacation)
         await inter.response.send_message(
@@ -117,8 +169,8 @@ async def team_end_vacation_slash(
         embed = disnake.Embed(
             title="Окончание отпуска",
             description=(
-                f"{inter.author.mention}({inter.author.display_name}) "
-                f"завершил(а) отпуск для {user.mention}({user.display_name})."
+                f"{inter.author.mention}({inter.author.name}) "
+                f"завершил(а) отпуск для {user.mention}({user.name})."
             ),
             color=disnake.Color.purple(),
         )
@@ -136,6 +188,11 @@ async def team_end_vacation_slash(
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
         await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 @bot.slash_command(
@@ -152,6 +209,27 @@ async def team_extend_vacation_slash(
     """
     Продление отпуска пользователю. Обновляется срок отпуска и причина.
     """
+    try:
+        # Очистка и проверка формата даты
+        new_end_date = new_end_date.strip('"\' ')
+        day, month, year = map(int, new_end_date.split('.'))
+        vacation_end = date(year, month, day)
+
+        # Проверяем, что дата не в прошлом
+        if vacation_end < date.today():
+            await inter.response.send_message("❌ Ошибка: Новая дата окончания отпуска не может быть в прошлом.")
+            return
+
+        # Форматируем для SQL
+        sql_date = vacation_end.strftime('%Y-%m-%d')
+
+    except ValueError:
+        await inter.response.send_message("❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
+        return
+    except Exception as e:
+        await inter.response.send_message(f"❌ Критическая ошибка: {str(e)}")
+        print(f"[extend_vacation] Ошибка парсинга даты: {str(e)}")
+        return
 
     # Получаем роль отпуска
     role_vacation = inter.guild.get_role(VACATION_ROLE)
@@ -173,13 +251,25 @@ async def team_extend_vacation_slash(
         await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
         return
 
+    conn = None
+    cursor = None
+
     try:
+        # Подключение к базе данных
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Обновление записи в БД
+        cursor.execute("UPDATE vacation_team SET data_end_vacation = %s, reason = %s WHERE discord_id = %s",
+                       (sql_date, reason, user.id))
+        conn.commit()
+
         # Создаем Embed для уведомления в админ-канале
         embed = disnake.Embed(
             title="Продление отпуска",
             description=(
-                f"{inter.author.mention} ({inter.author.display_name}) "
-                f"продлил(а) отпуск для {user.mention} ({user.display_name})."
+                f"{inter.author.mention} ({inter.author.name}) "
+                f"продлил(а) отпуск для {user.mention} ({user.name})."
             ),
             color=disnake.Color.purple(),
         )
@@ -204,6 +294,12 @@ async def team_extend_vacation_slash(
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
         await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 
 @bot.slash_command(
