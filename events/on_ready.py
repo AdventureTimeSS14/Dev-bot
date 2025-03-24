@@ -18,6 +18,7 @@ from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
 from tasks.update_time_shutdows_task import update_time_shutdows
 from tasks.whitelist_application_task import update_whitelist_application
+from tasks.check_end_vacation_task import check_end_vacation
 
 
 async def start_task_if_not_running(task, task_name: str):
@@ -62,6 +63,7 @@ async def on_ready():
     await start_task_if_not_running(discord_auth_update, "Update Discord Auth")
     await start_task_if_not_running(update_whitelist_application, "Update WhiteList Application")
     await start_task_if_not_running(update_admin_stats, "Update Admin Stats")
+    await start_task_if_not_running(check_end_vacation, "Check End Vacation")
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 
