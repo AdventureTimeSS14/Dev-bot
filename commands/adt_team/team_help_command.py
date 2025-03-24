@@ -49,6 +49,11 @@ commands_info = {
             "example": "&remove_role @User Отпускник Хост Разработчик",
             "syntax": "&remove_role <пользователь> <роль/роли>",
         },
+        "&show_vacation": {
+            "description": "Показ всех пользователей в отпуске из БД",
+            "example": "&show_vacation",
+            "syntax": "&show_vacation",
+        },
     },
     "Примечания": [
         "1. При написании ролей из нескольких слов используйте двойные кавычки.",

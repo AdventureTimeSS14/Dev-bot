@@ -4,7 +4,8 @@ import mariadb
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
 from commands.misc.check_roles import has_any_role_by_id
-from config import DATABASE, HOST, LOG_CHANNEL_ID, PORT, USER, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import (DATABASE, HOST, LOG_CHANNEL_ID, PORT, USER,
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 COLOR = disnake.Color.dark_purple()
 

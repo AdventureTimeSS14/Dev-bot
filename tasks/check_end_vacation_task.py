@@ -1,14 +1,18 @@
+from datetime import datetime
+
 import disnake
 from disnake.ext import tasks
-from datetime import datetime
+from pytz import timezone
+
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
-from config import VACATION_ROLE, ADMIN_TEAM
-from pytz import timezone
+from config import ADMIN_TEAM, VACATION_ROLE, LOG_CHANNEL_ID
+
 
 @tasks.loop(hours=2)  # Запускается каждые 2 часа
 async def check_end_vacation():
     # Получаем текущее время в МСК
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
     moscow = timezone('Europe/Moscow')
     current_time = datetime.now(moscow)
     
@@ -29,6 +33,7 @@ async def check_end_vacation():
 
         if not users_to_end_vacation:
             print("❌ Нет пользователей с завершившимся отпуском.")
+            await log_channel.send("❌ Нет пользователей с завершившимся отпуском.")
             return
 
         guild = bot.get_guild(901772674865455115)
@@ -50,6 +55,7 @@ async def check_end_vacation():
 
         # Проходим по всем пользователям, чьи отпуска завершились
         for user_id, data_end_vacation in users_to_end_vacation:
+            await log_channel.send(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
             print(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
 
             # Проверяем, прошла ли дата окончания отпуска или наступила
