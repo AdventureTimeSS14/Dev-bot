@@ -349,8 +349,8 @@ async def tweak_team_slash(
         # Определяем тип действия: повышение или понижение
         action = "Повышение в должности" if old_role < new_role else "Понижение в должности"
         action_description = (
-            f"{inter.author.mention} ({inter.author.display_name}) "
-            f"{'повысил(а)' if old_role < new_role else 'понизил(а)'} {user.mention} ({user.display_name})."
+            f"{inter.author.mention} ({inter.author.name}) "
+            f"{'повысил(а)' if old_role < new_role else 'понизил(а)'} {user.mention} ({user.name})."
         )
         color = new_role.color  # Цвет Embed сообщения
 
@@ -474,7 +474,7 @@ async def team_remove_slash(
     if len(removed_roles) == 2:
         embed = disnake.Embed(
             title="Снятие с должности",
-            description=f"{inter.author.mention} снял(а) с должности {user.mention}.",
+            description=f"{inter.author.mention} ({inter.author.name}) снял(а) с должности {user.mention} ({user.name}).",
             color=role_job.color,
         )
         embed.add_field(name="Отдел:", value=f"**{role_dep.name}**", inline=False)
@@ -541,7 +541,7 @@ async def new_team(
         if admin_channel:
             embed = disnake.Embed(
                 title="Назначение на должность",
-                description=f"{inter.author.mention} назначает {user.mention} на новую должность.",
+                description=f"{inter.author.mention} ({inter.author.name}) назначает {user.mention} ({user.name}) на новую должность.",
                 color=role_position.color,
             )
             embed.add_field(name="Отдел", value=f"**{role_department.name}**", inline=False)

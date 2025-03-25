@@ -132,8 +132,8 @@ async def remove_team(
         embed = disnake.Embed(
             title="Снятие с должности",
             description=(
-                f"{ctx.author.mention}({ctx.author.display_name}) "
-                f"снял(а) с должности {user.mention}({user.display_name})."
+                f"{ctx.author.mention} ({ctx.author.name}) "
+                f"снял(а) с должности {user.mention} ({user.name})."
             ),
             color=role_job.color,
         )

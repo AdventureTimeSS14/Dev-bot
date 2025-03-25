@@ -63,8 +63,8 @@ async def new_team(ctx, user: disnake.Member, *roles: disnake.Role):
             embed = disnake.Embed(
                 title="Назначение на должность",
                 description=(
-                    f"{ctx.author.mention}({ctx.author.display_name}) "
-                    f"назначает {user.mention}({user.display_name})"
+                    f"{ctx.author.mention} ({ctx.author.name}) "
+                    f"назначает {user.mention} ({user.name})"
                 ),
                 color=role_position.color,
             )
