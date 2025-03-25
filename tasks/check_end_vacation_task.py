@@ -59,7 +59,7 @@ async def check_end_vacation():
             print(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
 
             # Проверяем, прошла ли дата окончания отпуска или наступила
-            if data_end_vacation < current_date or (data_end_vacation == current_date and current_hour >= 13):
+            if data_end_vacation < current_date or (data_end_vacation == current_date and current_hour >= 11):
                 print(f"✅ Отпуск для пользователя {user_id} завершён: дата {data_end_vacation}, текущее время {current_time}")
 
                 try:
