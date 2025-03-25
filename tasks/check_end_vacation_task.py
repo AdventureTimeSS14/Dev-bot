@@ -72,18 +72,22 @@ async def check_end_vacation():
                     print(f"❌ Ошибка при запросе пользователя {user_id}: {e}")
                     continue
 
-                # Удаляем роль отпуска у пользователя
-                await member.remove_roles(vacation_role)  # Теперь мы работаем с объектом Member
+                # Удаляем запись из базы данных
+                cursor.execute("DELETE FROM vacation_team WHERE discord_id = %s", (user_id,))
+                conn.commit()
+
+                if vacation_role in member.roles:
+                    await member.remove_roles(vacation_role)
+                    print(f"Роль {vacation_role.name} удалена у {member.display_name}")
+                else:
+                    print(f"У {member.display_name} нет роли {vacation_role.name}, пропускаем")
+                    continue
 
                 # Отправляем ЛС пользователю, что его отпуск завершен
                 try:
                     await member.send("Ваш отпуск завершен. Роль отпуска была снята.")
                 except disnake.Forbidden:
                     print(f"⚠️ Не удалось отправить сообщение пользователю {member.name}.")
-
-                # Удаляем запись из базы данных
-                cursor.execute("DELETE FROM vacation_team WHERE discord_id = %s", (user_id,))
-                conn.commit()
 
                 # Создаем Embed для уведомления в админ-канал
                 embed = disnake.Embed(
