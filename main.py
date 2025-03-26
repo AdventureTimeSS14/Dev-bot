@@ -48,7 +48,7 @@ from events import (on_button_click, on_command, on_error, on_message,
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.INFO,  # Уровень логирования
+    level=logging.ERROR,  # Уровень логирования
     format="%(asctime)s - %(levelname)s - %(message)s",  # Формат сообщений
     handlers=[
         logging.FileHandler("bot_logs.log"),  # Логирование в файл
