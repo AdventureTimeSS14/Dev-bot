@@ -74,7 +74,7 @@ async def post_server_ban(ctx, nickName: str, reason: str, time: str):
         response = requests.post(url, json=post_data, headers=headers, timeout=5)
         response.raise_for_status()
 
-        await ctx.send(f"✅ Бан успешно выдан! Ответ сервера: ```{response.text}```")
+        await ctx.send(f"✅ Запрос на Бан успешно отправлен!")
 
     except requests.exceptions.Timeout:
         await ctx.send("🕒 Сервер не ответил за 5 секунд. Попробуйте позже.")
