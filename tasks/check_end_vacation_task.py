@@ -6,7 +6,7 @@ from pytz import timezone
 
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
-from config import ADMIN_TEAM, VACATION_ROLE, LOG_CHANNEL_ID
+from config import ADMIN_TEAM, LOG_CHANNEL_ID, VACATION_ROLE
 
 
 @tasks.loop(hours=2)  # Запускается каждые 2 часа

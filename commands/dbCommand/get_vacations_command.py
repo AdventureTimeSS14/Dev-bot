@@ -1,8 +1,10 @@
 import disnake
 from disnake.ext import commands
-from commands.dbCommand.get_db_connection import get_db_connection
-from bot_init import bot
 from disnake.ui import Button, View
+
+from bot_init import bot
+from commands.dbCommand.get_db_connection import get_db_connection
+
 
 @bot.command(name="show_vacation", description="Показать информацию о всех отпусках.")
 async def show_vacation(ctx):

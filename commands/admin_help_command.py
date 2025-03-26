@@ -48,6 +48,10 @@ ADMIN_COMMANDS = [
         "description": "Выводит список банов игрока.",
     },
     {
+        "name": "🔨 &ban <NickName> <Reason> <Minutes>",
+        "description": "Пост запрос на серверный бан на МРП сервере. 0 - для пермабана.",
+    },
+    {
         "name": "🔓 &pardon <ban_id>",
         "description": (
             "Разбанивает пользователя по id его серверного бана.(не путать с "

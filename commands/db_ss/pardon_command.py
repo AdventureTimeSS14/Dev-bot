@@ -8,45 +8,7 @@ from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
-
-
-# Функция для получения user_id по discord_id
-def get_user_id_by_discord_id(discord_id: str):
-    """
-    Ищет user_id по discord_id в таблице discord_user.
-
-    :param discord_id: Идентификатор Discord пользователя.
-    :return: user_id, если найден, иначе None.
-    """
-    conn = psycopg2.connect(**DB_PARAMS)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT user_id FROM discord_user WHERE discord_id = %s", (discord_id,))
-    result = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    return result[0] if result else None
-
-# Функция проверки, является ли user_id администратором
-def is_admin(user_id: int):
-    """
-    Проверяет, является ли user_id администратором.
-
-    :param user_id: ID пользователя в игре.
-    :return: True, если пользователь администратор, иначе False.
-    """
-    conn = psycopg2.connect(**DB_PARAMS)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT 1 FROM admin WHERE user_id = %s", (user_id,))
-    result = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    return result is not None
+from modules.utils import get_user_id_by_discord_id, is_admin
 
 
 def pardon_ban(ban_id, admin_user_id):
