@@ -75,6 +75,7 @@ ADDRESS_DEV = "5.180.174.139"
 ADDRESS_MRP = "193.164.18.155"
 
 AUTHOR = "AdventureTimeSS14"
+REPO_NAME = "Dev-bot"
 SECOND_UPDATE_CHANGELOG = 30  # Частота обновлений изменений в журнале
 
 # Инициализация сессии для запросов

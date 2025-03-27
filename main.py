@@ -35,7 +35,7 @@ from commands.github import (achang_command, branch_command, check_workflows,
                              git_team_command, github_processor,
                              milestones_command, pr_changelog_send,
                              publish_command, publish_status_command,
-                             review_command)
+                             review_command, bot_branch_command)
 from commands.misc.shutdows_deff import \
     shutdown_def  # Для выполнения завершающих операций
 from commands.post_admin import (admin_info_command, admin_presets_command,
