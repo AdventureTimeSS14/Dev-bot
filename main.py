@@ -28,20 +28,21 @@ from commands.db_ss.discord import discord_command
 from commands.dbCommand import (get_vacations_command, help_command,
                                 info_command, status_command)
 from commands.github import (achang_command, branch_command, check_workflows,
-                             forks_command, git_cancel_invite_command,
-                             git_help_command, git_invite_command,
-                             git_logininfo_command,
+                             deploy_command, forks_command,
+                             git_cancel_invite_command, git_help_command,
+                             git_invite_command, git_logininfo_command,
                              git_pending_invites_command, git_repoinfo_command,
                              git_team_command, github_processor,
                              milestones_command, pr_changelog_send,
                              publish_command, publish_status_command,
-                             review_command, deploy_command)
+                             review_command)
 from commands.misc.shutdows_deff import \
     shutdown_def  # Для выполнения завершающих операций
 from commands.post_admin import (admin_info_command, admin_presets_command,
                                  bunker_command, game_rules_command,
-                                 playtime_command, restart_command,
-                                 server_ban_command, update_command)
+                                 kick_command, playtime_command,
+                                 restart_command, server_ban_command,
+                                 update_command)
 from config import DISCORD_KEY
 from events import (on_button_click, on_command, on_error, on_message,
                     on_ready, update_status)

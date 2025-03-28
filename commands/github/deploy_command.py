@@ -1,9 +1,10 @@
 import base64
+
 import requests
-from config import GITHUB, AUTHOR, REPO_NAME, SERVER_ADMIN_POST
+
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
-
+from config import AUTHOR, GITHUB, REPO_NAME, SERVER_ADMIN_POST
 
 FILE_PATH = ".github/workflows/deploy.yml"
 BRANCH = "main"
