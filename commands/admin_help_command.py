@@ -36,6 +36,10 @@ ADMIN_COMMANDS = [
         "description": "Выводит информацию о текущем раунде и перечисляет игроков на сервере.",
     },
     {
+        "name": "👢 &kick <NickName> <Reason>",
+        "description": "Отправляет Пост запрос на Кик указанного пользователя.",
+    },
+    {
         "name": "📝 &player_notes <NickName>",
         "description": "Выводит список всех заметок игрока.",
     },
