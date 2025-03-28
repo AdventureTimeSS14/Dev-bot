@@ -16,7 +16,7 @@ ADMIN_NICKS = [
     "Pangaari", "Mina0", "kiwi_fruit", "Syrel", "Legion_159", "Estrie", "RevengenRat", "LightSurvivor", "meesooruu", 
     "Mr_NIkolos", "saint_madman", "SuperUltraGigachad", "KriTs", "Xalem", "Green_Lama", "Pushnidze", "Jmurik01", 
     "Korpraali", "Doc7", "Dark_Plague111", "maksim21612", "Daxim", "vadi_al", "moon_so_red", "WaRz", "Prunt", 
-    "Shtrudel1", "Carneline", "Lokotyasha", "KOT_PILOT558", "QFci", "0Kermit0"
+    "Shtrudel1", "Carneline", "Lokotyasha", "KOT_PILOT558", "QFci", "0Kermit0", "Kazbalger"
 ]
 
 # Функция для поиска сообщений админов и обновления эмбеда
