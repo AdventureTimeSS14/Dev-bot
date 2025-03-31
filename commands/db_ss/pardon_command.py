@@ -8,7 +8,7 @@ from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
-from modules.utils import get_user_id_by_discord_id, is_admin
+from modules.database_manager_class import get_user_id_by_discord_id, is_admin
 
 
 def pardon_ban(ban_id, admin_user_id):

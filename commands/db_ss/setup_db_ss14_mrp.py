@@ -9,6 +9,14 @@ DB_PARAMS = {
     'port': DB_PORT
 }
 
+DB_PARAMS_DEV = {
+    'database': 'ss14_dev',
+    'user': DB_USER,
+    'password': DB_PASSWORD,
+    'host': DB_HOST,
+    'port': DB_PORT
+}
+
 DB_PARAMS_SPONSOR = {
     'database': 'sponsors',
     'user': DB_USER,

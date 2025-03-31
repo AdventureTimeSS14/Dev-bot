@@ -5,7 +5,7 @@ from disnake.ui import TextInput
 
 from bot_init import bot
 from modules.get_creation_date import get_creation_date
-from modules.utils import (fetch_player_data, is_user_linked,
+from modules.database_manager_class import (fetch_player_data, is_user_linked,
                            link_user_to_discord)
 
 CHANNEL_AUTH_DISCORD_SS14_ID = 1351213738774237184
