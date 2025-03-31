@@ -3,9 +3,7 @@ from disnake import TextInputStyle
 from disnake.ext import tasks
 from disnake.ui import TextInput
 
-from bot_init import bot
-from modules.database_manager_class import (fetch_player_data, is_user_linked,
-                                            link_user_to_discord)
+from bot_init import bot, ss14_db
 from modules.get_creation_date import get_creation_date
 
 CHANNEL_AUTH_DISCORD_SS14_ID = 1351213738774237184
@@ -54,15 +52,22 @@ class NicknameModal(disnake.ui.Modal):
             return  # Прерываем выполнение
 
         # Проверяем, есть ли пользователь в БД player
-        player_data = fetch_player_data(nickname)
+        player_data = ss14_db.fetch_player_data(nickname)
         if not player_data:
             try:
                 user = await inter.bot.fetch_user(discord_id)
-                await user.send("❌ Ваш аккаунт не найден в базе данных. Попробуйте позже!")
-                await inter.send("❌ Ваш аккаунт не найден в базе данных. Попробуйте позже!", ephemeral=True)
+                await user.send(
+                    "❌ Ваш аккаунт не найден в базе данных. "
+                    "Попробуйте позже!"
+                )
+                await inter.send(
+                    "❌ Ваш аккаунт не найден в базе данных. "
+                    "Попробуйте позже!",
+                    ephemeral=True
+                )
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
-            
+
             await tech_channel.send(
                 f"⚠️ Пользователь <@{discord_id}> ({discord_id}) пытался "
                 f"привязать несуществующий аккаунт **{nickname}**."
@@ -79,13 +84,19 @@ class NicknameModal(disnake.ui.Modal):
         discord_user = await inter.bot.fetch_user(discord_id)
         discord_creation_date = discord_user.created_at.strftime('%Y-%m-%d %H:%M:%S')
 
-        if is_user_linked(user_id, discord_id):
+        if ss14_db.is_user_linked(user_id, discord_id):
             try:
-                await discord_user.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.")
-                await inter.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.", ephemeral=True)
+                await discord_user.send(
+                    "❌ Ваш аккаунт уже привязан! "
+                    "Повторная привязка невозможна."
+                )
+                await inter.send("❌ Ваш аккаунт уже привязан! "
+                                 "Повторная привязка невозможна.",
+                                 ephemeral=True
+                )
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
-            
+
             await tech_channel.send(
                 f"⚠️ Пользователь <@{discord_id}> ({discord_id}) пытался "
                 f"повторно привязать аккаунт **{nickname}**. Дата создания Discord аккаунта "
@@ -95,7 +106,7 @@ class NicknameModal(disnake.ui.Modal):
 
         creation_date = get_creation_date(user_id)
 
-        link_user_to_discord(user_id, discord_id)
+        ss14_db.link_user_to_discord(user_id, discord_id)
 
         await tech_channel.send(
             f"✅ **Привязка аккаунта**\n"
@@ -124,8 +135,6 @@ class NicknameModal(disnake.ui.Modal):
             )
         except disnake.Forbidden:
             print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
-
-
 
 
 # Класс для кнопки
