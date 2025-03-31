@@ -2,13 +2,10 @@ import json
 
 import requests
 
-from bot_init import bot
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
 from config import (ADDRESS_MRP, POST_ADMIN_API,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
-from modules.database_manager_class import (fetch_player_data,
-                                            get_user_id_by_discord_id,
-                                            get_username_by_user_id, is_admin)
 
 
 @bot.command(name="kick")
@@ -25,7 +22,7 @@ async def kick_command(ctx, nickName: str, reason: str):
     discord_id = str(ctx.author.id)
 
     # Проверяем привязку Discord-аккаунта
-    admin_user_id = get_user_id_by_discord_id(discord_id)
+    admin_user_id = ss14_db.get_user_id_by_discord_id(discord_id)
     if not admin_user_id:
         await ctx.send(
             "⚠️ Ваш Discord-аккаунт не привязан к игровому. "
@@ -35,12 +32,12 @@ async def kick_command(ctx, nickName: str, reason: str):
         return
 
     # Проверяем, является ли пользователь администратором
-    if not is_admin(admin_user_id):
+    if not ss14_db.is_admin(admin_user_id):
         await ctx.send("❌ Ошибка: Вы не являетесь администратором в базе МРП.")
         return
 
     # Получаем никнейм по user_id
-    adminName = get_username_by_user_id(admin_user_id)
+    adminName = ss14_db.get_username_by_user_id(admin_user_id)
     if not adminName:
         await ctx.send("⚠️ Ваш аккаунт SS14 не найден в БД МРП сервера.")
         return
@@ -48,7 +45,7 @@ async def kick_command(ctx, nickName: str, reason: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/kick"
 
     # Проверяем, есть ли пользователь в БД player
-    guidTarget_data = fetch_player_data(nickName)
+    guidTarget_data = ss14_db.fetch_player_data(nickName)
     if not guidTarget_data or len(guidTarget_data) != 4:
         await ctx.send("❌ Пользователь не найден в базе данных")
         return
