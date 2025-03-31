@@ -2,9 +2,8 @@ from datetime import datetime
 
 import disnake
 import psycopg2
-import pytz
 
-from bot_init import bot
+from bot_init import bot, moscow_timezone
 from commands.db_ss.setup_db_ss14_mrp import (DB_DATABASE, DB_HOST, DB_PARAMS,
                                               DB_PASSWORD, DB_PORT, DB_USER)
 from commands.misc.check_roles import has_any_role_by_id
@@ -60,8 +59,7 @@ class AdminsView(disnake.ui.View):
         self.children[1].disabled = self.page == self.total_pages
 
     def get_page_embed(self):
-        tz = pytz.timezone("Europe/Moscow")
-        current_time = datetime.now(tz)
+        current_time = datetime.now(moscow_timezone)
 
         total_admins = len(self.admins)
         start = self.page * self.per_page

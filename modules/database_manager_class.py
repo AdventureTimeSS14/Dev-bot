@@ -2,7 +2,7 @@ from datetime import datetime
 
 import disnake
 import psycopg2
-import pytz
+from bot_init import moscow_timezone
 
 from config import DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER
 
@@ -356,8 +356,7 @@ class DatabaseManagerSS14:
                     admin_name = admin_data[0]
 
                     # Получение текущего времени (MSK)
-                    tz = pytz.timezone("Europe/Moscow")
-                    unban_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
+                    unban_time = datetime.now(moscow_timezone).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
 
                     # Запись в server_unban
                     cursor.execute(
@@ -377,3 +376,32 @@ class DatabaseManagerSS14:
         except psycopg2.Error as e:
             conn.rollback()
             raise RuntimeError(f"Ошибка базы данных при снятии бана: {e}") from e
+
+
+    def fetch_admin_info(self, nickname, db_name='main'):
+        """
+        Получает информацию об администраторе по нику.
+        
+        Parameters
+        ----------
+        nickname : str
+            Никнейм администратора.
+        server : str, optional
+            Название сервера ('main' или 'dev').
+        
+        Returns
+        -------
+        tuple or None
+            (title, rank_name) если админ найден, иначе None.
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT a.title, ar.name
+                FROM public.admin a
+                JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
+                JOIN public.player p ON a.user_id = p.user_id
+                WHERE p.last_seen_user_name ILIKE %s
+                """
+                cursor.execute(query, (nickname,))
+                return cursor.fetchone()

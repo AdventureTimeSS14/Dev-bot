@@ -2,9 +2,8 @@ from datetime import datetime
 
 import disnake
 import psycopg2
-import pytz
 
-from bot_init import bot
+from bot_init import bot, moscow_timezone
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
@@ -48,8 +47,7 @@ class ProfilesView(disnake.ui.View):
         self.children[1].disabled = True if self.page == self.total_pages else False
 
     def get_page_embed(self):
-        tz = pytz.timezone("Europe/Moscow")
-        current_time = datetime.now(tz)
+        current_time = datetime.now(moscow_timezone)
 
         total_profiles = len(self.profiles)
         start = self.page * self.per_page
