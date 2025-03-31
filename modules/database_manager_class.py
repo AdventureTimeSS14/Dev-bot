@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import disnake
 import psycopg2
+import pytz
 
 from config import DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER
 
@@ -292,3 +295,85 @@ class DatabaseManagerSS14:
         except psycopg2.Error as e:
             print(f"Ошибка при запросе к БД: {e}")
             return None
+
+    def pardon_ban(
+        self,
+        ban_id: int,
+        admin_user_id: str,
+        db_name: str = 'main'
+        ) -> tuple[bool, str]:
+        """
+        Снимает бан с указанным ID и записывает информацию о разбане в БД.
+
+        Parameters
+        ----------
+        ban_id : int
+            ID бана для снятия
+        admin_user_id : str
+            UUID администратора, снимающего бан
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+
+        Returns
+        -------
+        tuple[bool, str]
+            Кортеж с результатом операции:
+            - bool: Флаг успешного выполнения
+            - str: Сообщение о результате
+        """
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    # Проверка существования бана
+                    cursor.execute(
+                        "SELECT 1 FROM server_ban WHERE server_ban_id = %s", 
+                        (ban_id,)
+                    )
+                    if not cursor.fetchone():
+                        return False, f"❌ Ошибка: Бан с ID `{ban_id}` не существует."
+
+                    # Проверка, не снят ли уже бан
+                    cursor.execute(
+                        "SELECT 1 FROM server_unban WHERE ban_id = %s", 
+                        (ban_id,)
+                    )
+                    if cursor.fetchone():
+                        return False, f"⚠️ Бан с ID `{ban_id}` уже был снят ранее."
+
+                    # Получение имени администратора
+                    cursor.execute(
+                        "SELECT last_seen_user_name FROM player WHERE user_id = %s",
+                        (admin_user_id,)
+                    )
+                    admin_data = cursor.fetchone()
+
+                    if not admin_data:
+                        return False, (
+                            f"❌ Ошибка: Администратор с user_id `{admin_user_id}` "
+                            "не найден в базе игроков."
+                        )
+
+                    admin_name = admin_data[0]
+
+                    # Получение текущего времени (MSK)
+                    tz = pytz.timezone("Europe/Moscow")
+                    unban_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
+
+                    # Запись в server_unban
+                    cursor.execute(
+                        """
+                        INSERT INTO server_unban (ban_id, unbanning_admin, unban_time)
+                        VALUES (%s, %s, %s::timestamptz)
+                        """,
+                        (ban_id, admin_user_id, unban_time)
+                    )
+                    conn.commit()
+
+                    return True, (
+                        f"✅ Бан с ID `{ban_id}` успешно снят "
+                        f"администратором `{admin_name}`."
+                    )
+
+        except psycopg2.Error as e:
+            conn.rollback()
+            raise RuntimeError(f"Ошибка базы данных при снятии бана: {e}") from e
