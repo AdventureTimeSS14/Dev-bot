@@ -1,5 +1,6 @@
-import psycopg2
 import disnake
+import psycopg2
+
 from config import DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER
 
 

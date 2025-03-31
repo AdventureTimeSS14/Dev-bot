@@ -1,10 +1,11 @@
-import discord
-import requests
 import base64
 import json
-from config import GITHUB, AUTHOR, REPO_NAME
-from bot_init import bot
 
+import discord
+import requests
+
+from bot_init import bot
+from config import AUTHOR, GITHUB, REPO_NAME
 
 FILE_PATH = ".github/workflows/deploy.yml"
 BRANCH = "main"

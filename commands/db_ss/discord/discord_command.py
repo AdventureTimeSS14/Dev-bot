@@ -5,7 +5,8 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import HEAD_ADT_TEAM
 from modules.database_manager_class import (fetch_player_data, is_user_linked,
-                           link_user_to_discord, unlink_user_to_discord)
+                                            link_user_to_discord,
+                                            unlink_user_to_discord)
 
 # Предположим, что у вас уже есть переменная bot, и она инициализирована
 

@@ -6,8 +6,9 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import (ADDRESS_MRP, POST_ADMIN_API,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
-from modules.database_manager_class import (fetch_player_data, get_user_id_by_discord_id,
-                           get_username_by_user_id, is_admin)
+from modules.database_manager_class import (fetch_player_data,
+                                            get_user_id_by_discord_id,
+                                            get_username_by_user_id, is_admin)
 
 
 @bot.command(name="kick")

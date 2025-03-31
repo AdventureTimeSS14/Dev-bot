@@ -6,9 +6,9 @@
 
 import disnake
 from disnake.ext import commands
+
 from modules.database_manager_class import DatabaseManagerSS14
 from modules.database_manager_sponsor import SponsorDatabaseManager
-
 
 intents = disnake.Intents.all()
 intents.message_content = True

@@ -4,9 +4,9 @@ from disnake.ext import tasks
 from disnake.ui import TextInput
 
 from bot_init import bot
-from modules.get_creation_date import get_creation_date
 from modules.database_manager_class import (fetch_player_data, is_user_linked,
-                           link_user_to_discord)
+                                            link_user_to_discord)
+from modules.get_creation_date import get_creation_date
 
 CHANNEL_AUTH_DISCORD_SS14_ID = 1351213738774237184
 AUTH_MESSAGE_ID = 1352243068220342362
