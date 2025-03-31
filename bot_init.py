@@ -6,7 +6,9 @@
 
 import disnake
 from disnake.ext import commands
-from modules.database_manager_class import DatabaseManagerSS14, DatabaseManagerSponsor
+from modules.database_manager_class import DatabaseManagerSS14
+from modules.database_manager_sponsor import SponsorDatabaseManager
+
 
 intents = disnake.Intents.all()
 intents.message_content = True
@@ -21,6 +23,5 @@ bot = commands.Bot(
 )
 
 # Инициализация менеджеров БД
-db_main = DatabaseManagerSS14("main")
-db_dev = DatabaseManagerSS14("dev")
-db_sponsor = DatabaseManagerSponsor()
+ss14_db = DatabaseManagerSS14()
+db_sponsor = SponsorDatabaseManager()
