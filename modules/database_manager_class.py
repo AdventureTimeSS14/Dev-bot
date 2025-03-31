@@ -292,16 +292,17 @@ class DatabaseManagerSS14:
             print(f"Ошибка при запросе к БД: {e}")
             return None
 
-class DatabaseManagerSponsor:
+class SponsorDatabaseManager:
     """
-    Менеджер для работы с базой данных Sponsor (PostgreSQL).
+    Специализированный менеджер для работы с базой данных спонсоров.
     
-    Предоставляет унифицированный интерфейс для работы с БД sponsor
- 
-    Examples
-    --------
-    >>> db_manager = DatabaseManagerSponsor()
-    >>> conn_db_sponsor = db_manager._get_connection()
+    Отдельный класс в связи с совершенно другой структурой БД
+    (содержит всего одну таблицу с уникальной структурой).
+    
+    Attributes
+    ----------
+    db_params : dict
+        Параметры подключения к БД спонсоров
     """
     def __init__(self):
         self.db_params = {
@@ -311,11 +312,9 @@ class DatabaseManagerSponsor:
                 'password': DB_PASSWORD,
                 'host': DB_HOST,
                 'port': DB_PORT
-            },
+            }
         }
-    def _get_connection(self, db_name='sponsor'):
-        """Возвращает соединение с указанной базой данных"""
-        if db_name not in self.db_params:
-            raise ValueError(f"Unknown database name: {db_name}")
 
-        return psycopg2.connect(**self.db_params[db_name])
+    def _get_connection(self):
+        """Возвращает соединение с БД спонсоров"""
+        return psycopg2.connect(**self.db_params['sponsor'])
