@@ -3,11 +3,11 @@ from datetime import datetime
 import disnake
 import psycopg2
 
-from bot_init import bot, moscow_timezone
+from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import (DB_DATABASE, DB_HOST, DB_PARAMS,
                                               DB_PASSWORD, DB_PORT, DB_USER)
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 
 # Функция запроса списка загрузок файлов
@@ -56,7 +56,7 @@ class UploadsView(disnake.ui.View):
         self.children[1].disabled = self.page == self.total_pages
 
     def get_page_embed(self):
-        current_time = datetime.now(moscow_timezone)
+        current_time = datetime.now(MOSCOW_TIMEZONE)
 
         total_uploads = len(self.uploads)
         start = self.page * self.per_page

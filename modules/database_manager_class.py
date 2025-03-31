@@ -1,10 +1,11 @@
+import time
 from datetime import datetime
 
 import disnake
 import psycopg2
-from bot_init import moscow_timezone
 
-from config import DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER
+from config import (DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER,
+                    MOSCOW_TIMEZONE)
 
 
 class DatabaseManagerSS14:
@@ -44,12 +45,66 @@ class DatabaseManagerSS14:
             }
         }
 
+
     def _get_connection(self, db_name='main'):
         """Возвращает соединение с указанной базой данных"""
         if db_name not in self.db_params:
             raise ValueError(f"Unknown database name: {db_name}")
 
         return psycopg2.connect(**self.db_params[db_name])
+
+
+    def check_connection(self, db_name='main') -> tuple[bool, float, str]:
+        """
+        Проверяет подключение к указанной базе данных и возвращает статус.
+        
+        Parameters
+        ----------
+        db_name : str
+            Имя базы данных для проверки ('main' или 'dev')
+            
+        Returns
+        -------
+        tuple[bool, float, str]
+            - bool: Флаг успешного подключения
+            - float: Время отклика в миллисекундах
+            - str: Сообщение об ошибке (пустая строка при успехе)
+        """
+        try:
+            start_time = time.time()
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT 1")
+            ping_time = (time.time() - start_time) * 1000
+            return True, ping_time, ""
+        except Exception as e:
+            return False, 0.0, str(e)
+
+
+    def get_connection_status_report(self) -> str:
+        """
+        Формирует отчет о состоянии подключений ко всем базам данных.
+        
+        Returns
+        -------
+        str
+            Отформатированный отчет в виде строки Markdown
+        """
+        report_lines = ["🔍 **Проверка состояния баз данных:**"]
+        
+        for db_name in self.db_params.keys():
+            success, ping_time, error = self.check_connection(db_name)
+            if success:
+                report_lines.append(
+                    f"✅ `{db_name}`: Подключение успешно | Пинг: {ping_time:.2f}мс"
+                )
+            else:
+                report_lines.append(
+                    f"❌ `{db_name}`: Ошибка подключения - {error}"
+                )
+        
+        return "\n".join(report_lines)
+
 
     def fetch_player_data(self, user_name, db_name='main'):
         """
@@ -356,7 +411,7 @@ class DatabaseManagerSS14:
                     admin_name = admin_data[0]
 
                     # Получение текущего времени (MSK)
-                    unban_time = datetime.now(moscow_timezone).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
+                    unban_time = datetime.now(MOSCOW_TIMEZONE).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
 
                     # Запись в server_unban
                     cursor.execute(

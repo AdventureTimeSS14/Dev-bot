@@ -1,11 +1,10 @@
 from datetime import datetime
 
 import disnake
-import pytz
 
-from bot_init import bot, ss14_db, moscow_timezone
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 
 # Команда поиска админа
@@ -31,7 +30,7 @@ async def admin(ctx, nickname: str):
         return
 
     # Определяем текущую дату и время
-    current_time = datetime.now(moscow_timezone)
+    current_time = datetime.now(MOSCOW_TIMEZONE)
 
     # Создаем эмбед с улучшенным оформлением
     embed = disnake.Embed(

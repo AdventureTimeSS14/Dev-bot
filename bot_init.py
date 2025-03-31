@@ -3,7 +3,6 @@
 Настроены необходимые параметры для запуска и обработки команд.
 И инициализация менеджеров для работы с БД
 """
-import pytz
 import disnake
 from disnake.ext import commands
 
@@ -25,6 +24,3 @@ bot = commands.Bot(
 # Инициализация менеджеров БД
 ss14_db = DatabaseManagerSS14()
 db_sponsor = SponsorDatabaseManager()
-
-# Московский часовой пояс (UTC+3)
-moscow_timezone = pytz.timezone("Europe/Moscow")
