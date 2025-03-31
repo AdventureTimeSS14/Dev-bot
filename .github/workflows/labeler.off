@@ -1,0 +1,26 @@
+# name: Label PRs
+
+# on:
+#   pull_request:
+#     paths:
+#       - '.github/labeler.yml'
+#       - '**/*.py'
+#       - '**/*.md'
+#       - '**/*.yml'
+#       - '**/*.json'
+#     types:
+#       - opened
+#       - synchronize
+#       - reopened
+
+# jobs:
+#   label:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Add labels
+#         uses: actions/labeler@v3
+#         with:
+#           repo-token: ${{ secrets.GITHUB_TOKEN }}
