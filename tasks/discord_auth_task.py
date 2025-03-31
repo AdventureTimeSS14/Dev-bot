@@ -4,7 +4,7 @@ from disnake.ext import tasks
 from disnake.ui import TextInput
 
 from bot_init import bot
-from commands.misc.get_creation_date import get_creation_date
+from modules.get_creation_date import get_creation_date
 from modules.utils import (fetch_player_data, is_user_linked,
                            link_user_to_discord)
 
