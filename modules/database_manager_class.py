@@ -91,7 +91,7 @@ class DatabaseManagerSS14:
             Отформатированный отчет в виде строки Markdown
         """
         report_lines = ["🔍 **Проверка состояния баз данных:**"]
-        
+
         for db_name in self.db_params.keys():
             success, ping_time, error = self.check_connection(db_name)
             if success:
@@ -102,7 +102,7 @@ class DatabaseManagerSS14:
                 report_lines.append(
                     f"❌ `{db_name}`: Ошибка подключения - {error}"
                 )
-        
+
         return "\n".join(report_lines)
 
 
@@ -180,7 +180,10 @@ class DatabaseManagerSS14:
         with self._get_connection(db_name) as conn:
             with conn.cursor() as cursor:
                 # Проверяем, существует ли уже discord_id в базе
-                cursor.execute("SELECT 1 FROM discord_user WHERE discord_id = %s", (str(discord_id),))
+                cursor.execute(
+                    "SELECT 1 FROM discord_user WHERE discord_id = %s",
+                    (str(discord_id),)
+                )
                 result_discord_id = cursor.fetchone()
 
                 # Проверяем, существует ли уже user_id в базе
@@ -485,3 +488,56 @@ class DatabaseManagerSS14:
                 """
                 cursor.execute(query)
                 return cursor.fetchall()
+
+
+    def fetch_profiles_by_nickname(self, nickname, db_name='main'):
+        """
+        Получает информацие о игровых персонажах игрока по его нику
+
+        Parameters
+        ----------
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT p.profile_id, p.preference_id, p.char_name, p.age, p.gender, p.species
+                FROM profile p
+                WHERE p.preference_id IN (
+                    SELECT pr.preference_id
+                    FROM preference pr
+                    WHERE pr.user_id IN 
+                    (SELECT pl.user_id FROM player pl WHERE pl.last_seen_user_name = %s)
+                )
+                ORDER BY p.profile_id ASC
+                """
+                cursor.execute(query, (nickname,))
+                result = cursor.fetchall()
+                return result if result else None
+
+
+    def fetch_profile_by_id(self, profile_id, db_name='main'):
+        """
+        Получает информацие о игровых персонажах игрока по его нику
+
+        Parameters
+        ----------
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT 
+                    p.profile_id, p.slot, p.char_name, p.age, p.sex, p.hair_name, p.hair_color,
+                    p.facial_hair_name, p.facial_hair_color, p.eye_color, p.skin_color, 
+                    p.pref_unavailable, p.preference_id, p.gender, p.species, p.markings,
+                    p.flavor_text, p.voice, p.erpstatus, p.spawn_priority, p.bark_pitch,
+                    p.bark_proto, p.high_bark_var, p.low_bark_var
+                FROM profile p
+                WHERE p.profile_id = %s
+                """
+                cursor.execute(query, (profile_id,))
+                result = cursor.fetchone()
+                return result if result else None

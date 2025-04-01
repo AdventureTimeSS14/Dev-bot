@@ -1,7 +1,7 @@
 import logging
 import time
 
-from bot_init import bot, ss14_db, db_sponsor
+from bot_init import bot, db_sponsor, ss14_db
 from commands.github import check_workflows
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
