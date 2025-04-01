@@ -411,7 +411,11 @@ class DatabaseManagerSS14:
                     admin_name = admin_data[0]
 
                     # Получение текущего времени (MSK)
-                    unban_time = datetime.now(MOSCOW_TIMEZONE).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
+                    unban_time = (
+                        datetime
+                        .now(MOSCOW_TIMEZONE)
+                        .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] + " +0300"
+                    )
 
                     # Запись в server_unban
                     cursor.execute(
@@ -441,7 +445,7 @@ class DatabaseManagerSS14:
         ----------
         nickname : str
             Никнейм администратора.
-        server : str, optional
+        db_name : str, optional
             Название сервера ('main' или 'dev').
         
         Returns
@@ -460,3 +464,24 @@ class DatabaseManagerSS14:
                 """
                 cursor.execute(query, (nickname,))
                 return cursor.fetchone()
+
+
+    def fetch_uploads(self, db_name='main'):
+        """
+        Получает информацие логов загрузок .ogg файлов
+
+        Parameters
+        ----------
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT ul.uploaded_resource_log_id, ul.date, p.last_seen_user_name, ul.path
+                FROM public.uploaded_resource_log ul
+                LEFT JOIN public.player p ON ul.user_id = p.user_id
+                ORDER BY ul.date DESC
+                """
+                cursor.execute(query)
+                return cursor.fetchall()
