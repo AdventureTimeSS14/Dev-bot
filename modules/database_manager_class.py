@@ -54,6 +54,54 @@ class DatabaseManagerSS14:
         return psycopg2.connect(**self.db_params[db_name])
 
 
+    def get_tables_size(self, db_name='main'):
+        """
+        Возвращает список всех таблиц в базе данных с их размерами и общий объём
+
+        Parameters
+        ----------
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+
+        Returns
+        -------
+        tuple
+            (list_of_tables, total_size) где:
+            - list_of_tables: список словарей с информацией о таблицах
+            - total_size: общий размер всех таблиц в удобочитаемом формате
+        """
+        query = """
+        SELECT 
+            table_name,
+            pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size,
+            pg_total_relation_size(quote_ident(table_name)) as size_bytes
+        FROM 
+            information_schema.tables
+        WHERE 
+            table_schema = 'public'
+        ORDER BY 
+            size_bytes DESC;
+        """
+
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query)
+                    tables = [
+                        {'table': row[0], 'size': row[1]}
+                        for row in cursor.fetchall()
+                    ]
+
+                    # Получаем общий размер базы
+                    cursor.execute("SELECT pg_size_pretty(pg_database_size(current_database()))")
+                    total_size = cursor.fetchone()[0]
+
+                    return tables, total_size
+        except Exception as e:
+            print(f"Error getting tables size: {e}")
+            return [], "0 bytes"
+
+
     def check_connection(self, db_name='main') -> tuple[bool, float, str]:
         """
         Проверяет подключение к указанной базе данных и возвращает статус.
