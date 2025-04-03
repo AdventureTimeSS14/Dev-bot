@@ -1,14 +1,13 @@
 from datetime import datetime
 
 import disnake
+from disnake import Embed
+from disnake.ui import Button, View
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
-
-from disnake.ui import View, Button
-from disnake import Embed
 
 class DBTablesView(View):
     def __init__(self, tables, total_size, db_name):

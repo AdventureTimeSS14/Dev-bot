@@ -4,8 +4,8 @@ import disnake
 import psycopg2
 
 from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import (DB_DATABASE, DB_HOST, DB_PARAMS,
-                                              DB_PASSWORD, DB_PORT, DB_USER)
+from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
+                                              DB_USER)
 from commands.misc.check_roles import has_any_role_by_id
 from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
@@ -23,16 +23,20 @@ def fetch_admins(server):
         'port': DB_PORT
     }
 
-    conn_params = {**DB_PARAMS}
-    conn = psycopg2.connect(**conn_params)
+    conn = psycopg2.connect(**DB_PARAMS)
     cursor = conn.cursor()
 
-    # SQL-запрос
+    # SQL-запрос с привязкой к Discord
     query = """
-    SELECT p.last_seen_user_name, a.title, ar.name
-    FROM public.admin a  -- Указываем явную схему public
+    SELECT 
+        p.last_seen_user_name, 
+        a.title, 
+        ar.name, 
+        du.discord_id
+    FROM public.admin a  
     JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
     LEFT JOIN public.player p ON a.user_id = p.user_id
+    LEFT JOIN public.discord_user du ON a.user_id = du.user_id
     ORDER BY p.last_seen_user_name ASC
     """
 
@@ -43,6 +47,7 @@ def fetch_admins(server):
     conn.close()
 
     return admins
+
 
 # Класс для управления страницами
 class AdminsView(disnake.ui.View):
@@ -73,10 +78,11 @@ class AdminsView(disnake.ui.View):
         )
         embed.set_footer(text=f"Страница {self.page + 1} из {self.total_pages + 1}")
 
-        for admin_nickname, title, rank_name in admins_slice:
+        for admin_nickname, title, rank_name, discord_id in admins_slice:
+            discord_info = f"🔗 <@{discord_id}>" if discord_id else "🚫 Не привязан"
             embed.add_field(
                 name=f"👤 {admin_nickname}",
-                value=f"🏷 `{title}` | 🎖 `{rank_name}`",
+                value=f"🏷 `{title}` | 🎖 `{rank_name}`\n{discord_info}",
                 inline=False
             )
 
@@ -103,6 +109,7 @@ class AdminsView(disnake.ui.View):
         self.children[0].disabled = False
 
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
+
 
 # Команда для бота
 @bot.command()

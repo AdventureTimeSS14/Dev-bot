@@ -23,7 +23,7 @@ from commands.db_ss import (admin_command, admins_command, banlist_command,
                             multi_akk_db_command, pardon_command,
                             permissions_command, player_notes_command,
                             player_time_command, profiles_command,
-                            uploads_command, size_db_command)
+                            size_db_command, uploads_command)
 from commands.db_ss.discord import discord_command
 from commands.dbCommand import (get_vacations_command, help_command,
                                 info_command, status_command)

@@ -102,6 +102,43 @@ class DatabaseManagerSS14:
             return [], "0 bytes"
 
 
+    def fetch_discord_admins(self, db_name='main'):
+        """
+        Получает список администраторов с привязкой к Discord
+        
+        Parameters
+        ----------
+        db_name : str
+            Имя базы данных ('main' или 'dev')
+            
+        Returns
+        -------
+        list
+            Список кортежей (discord_id, game_username, title, rank_name)
+        """
+        query = """
+        SELECT 
+            du.discord_id,
+            p.last_seen_user_name AS game_username,
+            a.title,
+            ar.name AS rank_name
+        FROM discord_user du
+        JOIN player p ON du.user_id = p.user_id
+        JOIN admin a ON du.user_id = a.user_id
+        LEFT JOIN admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
+        ORDER BY p.last_seen_user_name ASC
+        """
+        
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query)
+                    return cursor.fetchall()
+        except Exception as e:
+            print(f"Ошибка при запросе администраторов: {str(e)}")
+            return []
+
+
     def check_connection(self, db_name='main') -> tuple[bool, float, str]:
         """
         Проверяет подключение к указанной базе данных и возвращает статус.
