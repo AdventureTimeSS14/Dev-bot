@@ -11,8 +11,7 @@ from tasks.discord_auth_task import discord_auth_update
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
 from tasks.update_admin_stats import update_admin_stats
-from tasks.update_permission_stats import (update_adminboard_perm,
-                                           update_leaderboard)
+from tasks.update_permission_stats import update_permission_stats
 from tasks.update_status_presence_task import update_status_presence
 from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
@@ -64,8 +63,7 @@ async def on_ready():
         (update_whitelist_application, "Update WhiteList Application"),
         (update_admin_stats, "Update Admin Stats"),
         (check_end_vacation, "Check End Vacation"),
-        (update_leaderboard, "Update Leaderboard"),
-        (update_adminboard_perm, "Update adminboard_perm")
+        (update_permission_stats, "Update Permission Stats")
     ]
 
     for task, name in tasks_to_start:

@@ -27,17 +27,6 @@ DB_PARAMS_SS14_DEV = {
     'port': DB_PORT
 }
 
-# Роли
-ROLES = {
-    1054908932868538449: "Руководство",
-    1248667383334178902: "Администрация",
-    1060191651538145420: "Разработка",
-    1084143714110275614: "Мапперы",
-    1155055955214614558: "Спрайтеры",
-    1192426911905874152: "Медиа",
-    1167921041222406306: "Сторожилы на отдыхе",
-}
-
 # Функция запроса пользователей из discord_user
 def fetch_discord_users():
     conn = psycopg2.connect(**DB_PARAMS_SS14)
@@ -63,22 +52,30 @@ def fetch_admins(db_params):
     conn.close()
     return {user_id: (nickname, title, rank) for user_id, nickname, title, rank in admins}
 
-# ID сообщения для обновления
-message_id = 1357300582603292874
-message_id_admin = 1357300771602829424
 
-# Задача обновления статистики раз в 12 часов
-@tasks.loop(hours=12)
-async def update_leaderboard():
+async def update_role_stats(role_id: int, message_id: int, embed_color: disnake.Color):
+    """
+    Обновляет статистику для указанной роли
+    
+    Параметры:
+    -----------
+    role_id: int
+        ID роли Discord
+    message_id: int
+        ID сообщения для обновления
+    embed_color: disnake.Color
+        Цвет эмбеда
+    """
     channel = bot.get_channel(1357300045862404266)  # 🌍▏permission-adt-team
+    if not channel:
+        print(f"Канал не найден: {channel}")
+        return
 
     discord_users = fetch_discord_users()
     admins_ss14 = fetch_admins(DB_PARAMS_SS14)
     admins_ss14_dev = fetch_admins(DB_PARAMS_SS14_DEV)
 
-    # Запрос для "Руководства"
-    role_id = 1054908932868538449
-    role_name = ROLES.get(role_id)
+    role_name = ROLES.get(role_id, "Неизвестная роль")
     members = [m for m in channel.guild.members if any(r.id == role_id for r in m.roles)]
 
     # Формируем данные для администраторов
@@ -91,43 +88,36 @@ async def update_leaderboard():
             mrp_status = "✅" if user_id in admins_ss14 else "❌"
             dev_status = "✅" if user_id in admins_ss14_dev else "❌"
             
-            # Получаем данные из соответствующих баз
             mrp_nickname, mrp_title, mrp_rank = admins_ss14.get(user_id, ("Неизвестно", "-", "-"))
             dev_nickname, dev_title, dev_rank = admins_ss14_dev.get(user_id, ("Неизвестно", "-", "-"))
 
-            # Используем никнейм из MRP, если он есть, иначе из DEV
             nickname = mrp_nickname if mrp_nickname != "Неизвестно" else dev_nickname
-            # Используем title из MRP, если пользователь есть в MRP, иначе из DEV
             title = mrp_title if user_id in admins_ss14 else dev_title
 
-            admin_data.append(
-                {
-                    "discord_name": f"<@{member.id}>",
-                    "nickname": nickname,
-                    "title": title,
-                    "mrp_status": mrp_status,
-                    "dev_status": dev_status,
-                    "mrp_rank": mrp_rank if user_id in admins_ss14 else "Не установлен",
-                    "dev_rank": dev_rank if user_id in admins_ss14_dev else "Не установлен",
-                }
-            )
+            admin_data.append({
+                "discord_name": f"<@{member.id}>",
+                "nickname": nickname,
+                "title": title,
+                "mrp_status": mrp_status,
+                "dev_status": dev_status,
+                "mrp_rank": mrp_rank if user_id in admins_ss14 else "Не установлен",
+                "dev_rank": dev_rank if user_id in admins_ss14_dev else "Не установлен",
+            })
         else:
-            admin_data.append(
-                {
-                    "discord_name": f"<@{member.id}>",
-                    "nickname": "Неизвестно",
-                    "title": "Не привязан",
-                    "mrp_status": "❌",
-                    "dev_status": "❌",
-                    "mrp_rank": "Не установлен",
-                    "dev_rank": "Не установлен",
-                }
-            )
+            admin_data.append({
+                "discord_name": f"<@{member.id}>",
+                "nickname": "Неизвестно",
+                "title": "Не привязан",
+                "mrp_status": "❌",
+                "dev_status": "❌",
+                "mrp_rank": "Не установлен",
+                "dev_rank": "Не установлен",
+            })
 
-    # Сортируем по рангу на MRP (можно добавить сортировку по Dev, если требуется)
+    # Сортируем по рангу
     sorted_admins = sorted(admin_data, key=lambda x: (x["mrp_rank"], x["dev_rank"]), reverse=True)
 
-    # Формируем таблицу с отступами
+    # Формируем таблицу
     leaderboard_text = "```\n"
     for i, admin in enumerate(sorted_admins):
         leaderboard_text += (
@@ -138,11 +128,11 @@ async def update_leaderboard():
         )
     leaderboard_text += "```"
 
-    # Формируем эмбед
+    # Создаем эмбед
     embed = disnake.Embed(
         title=f"📌 {role_name} - Статистика",
         description=f"**Рейтинг permission для роли {role_name}**:\n\n{leaderboard_text}",
-        color=disnake.Color.gold(),
+        color=embed_color,
         timestamp=datetime.now(MOSCOW_TIMEZONE)
     )
     embed.set_footer(
@@ -150,93 +140,285 @@ async def update_leaderboard():
         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
     )
 
-    # Обновление существующего сообщения
-    message = await channel.fetch_message(message_id)
-    await message.edit(embed=embed)
+    # Обновляем сообщение
+    try:
+        message = await channel.fetch_message(message_id)
+        await message.edit(embed=embed)
+    except Exception as e:
+        print(f"Ошибка при обновлении сообщения {message_id}: {e}")
 
-# Задача обновления статистики раз в 12 часов
+# # Роли
+# ROLES = {
+#     1054908932868538449: "Руководство",
+#     1248667383334178902: "Администрация",
+#     1060191651538145420: "Разработка",
+#     1084143714110275614: "Мапперы",
+#     1155055955214614558: "Спрайтеры",
+#     1192426911905874152: "Медиа",
+#     1167921041222406306: "Сторожилы на отдыхе",
+# }
+
+# # ID сообщения для обновления
+# message_id_head = 1357323324174373055
+# message_id_admin = 1357324171880693780
+# message_id_dev 1357324253598322850 # Разработка
+# message_id_map 1357324861327802399 Маппинг
+# message_id_sprite 1357326482556588103 Спрайтинг
+# message_id_wiki 1357326533420781841 Вики
+# message_id_media 1357326883309490176 Медиа
+# message_id_old 1357326950225543298 Сторжил
+
+# Конфигурация ролей и их параметров
+ROLES_CONFIG = [
+    {
+        "role_id": 1054908932868538449,
+        "role_name": "Руководство",
+        "message_id": 1357323324174373055,
+        "color": disnake.Color.gold()
+    },
+    {
+        "role_id": 1248667383334178902,
+        "role_name": "Администрация",
+        "message_id": 1357324171880693780,
+        "color": disnake.Color.red()
+    },
+    {
+        "role_id": 1060191651538145420,
+        "role_name": "Разработка",
+        "message_id": 1357324253598322850,
+        "color": disnake.Color.blue()
+    },
+    {
+        "role_id": 1084143714110275614,
+        "role_name": "Мапперы",
+        "message_id": 1357324861327802399,
+        "color": disnake.Color.green()
+    },
+    {
+        "role_id": 1155055955214614558,
+        "role_name": "Спрайтеры",
+        "message_id": 1357326482556588103,
+        "color": disnake.Color.purple()
+    },
+    {
+        "role_id": 1192426911905874152,
+        "role_name": "Медиа",
+        "message_id": 1357326883309490176,
+        "color": disnake.Color.orange()
+    },
+    {
+        "role_id": 1167921041222406306,
+        "role_name": "Сторожилы",
+        "message_id": 1357326950225543298,
+        "color": disnake.Color.dark_grey()
+    }
+]
+
+# Глобальный словарь ролей для быстрого доступа
+ROLES = {item["role_id"]: item["role_name"] for item in ROLES_CONFIG}
+
+# Задача обновления статистики для всех ролей
 @tasks.loop(hours=12)
-async def update_adminboard_perm():
-    channel = bot.get_channel(1357300045862404266)  # 🌍▏permission-adt-team
+async def update_permission_stats():
+    for role_config in ROLES_CONFIG:
+        try:
+            await update_role_stats(
+                role_id=role_config["role_id"],
+                message_id=role_config["message_id"],
+                embed_color=role_config["color"]
+            )
+            print(f"Статистика для роли {role_config['role_name']} успешно обновлена")
+        except Exception as e:
+            print(f"Ошибка при обновлении статистики для роли {role_config['role_name']}: {e}")
 
-    discord_users = fetch_discord_users()
-    admins_ss14 = fetch_admins(DB_PARAMS_SS14)
-    admins_ss14_dev = fetch_admins(DB_PARAMS_SS14_DEV)
 
-    # Запрос для "Администрация"
-    role_id = 1248667383334178902
-    role_name = ROLES.get(role_id)
-    members = [m for m in channel.guild.members if any(r.id == role_id for r in m.roles)]
+# # Задача обновления
+# @tasks.loop(hours=12)
+# async def update_permission_stats():
+#     await update_role_stats(
+#         role_id=1054908932868538449,  # Руководство
+#         message_id=message_id_head,
+#         embed_color=disnake.Color.gold()
+#     )
+    
+#     await update_role_stats(
+#         role_id=1248667383334178902,  # Администрация
+#         message_id=message_id_admin,
+#         embed_color=disnake.Color.red()
+#     )
 
-    # Формируем данные для администраторов
-    admin_data = []
-    for member in members:
-        discord_id = str(member.id)
-        user_id = discord_users.get(discord_id)
 
-        if user_id:
-            mrp_status = "✅" if user_id in admins_ss14 else "❌"
-            dev_status = "✅" if user_id in admins_ss14_dev else "❌"
+
+# # Задача обновления статистики раз в 12 часов
+# @tasks.loop(hours=12)
+# async def update_leaderboard():
+#     channel = bot.get_channel(1357300045862404266)  # 🌍▏permission-adt-team
+
+#     discord_users = fetch_discord_users()
+#     admins_ss14 = fetch_admins(DB_PARAMS_SS14)
+#     admins_ss14_dev = fetch_admins(DB_PARAMS_SS14_DEV)
+
+#     # Запрос для "Руководства"
+#     role_id = 1054908932868538449
+#     role_name = ROLES.get(role_id)
+#     members = [m for m in channel.guild.members if any(r.id == role_id for r in m.roles)]
+
+#     # Формируем данные для администраторов
+#     admin_data = []
+#     for member in members:
+#         discord_id = str(member.id)
+#         user_id = discord_users.get(discord_id)
+
+#         if user_id:
+#             mrp_status = "✅" if user_id in admins_ss14 else "❌"
+#             dev_status = "✅" if user_id in admins_ss14_dev else "❌"
             
-            # Получаем данные из соответствующих баз
-            mrp_nickname, mrp_title, mrp_rank = admins_ss14.get(user_id, ("Неизвестно", "-", "-"))
-            dev_nickname, dev_title, dev_rank = admins_ss14_dev.get(user_id, ("Неизвестно", "-", "-"))
+#             # Получаем данные из соответствующих баз
+#             mrp_nickname, mrp_title, mrp_rank = admins_ss14.get(user_id, ("Неизвестно", "-", "-"))
+#             dev_nickname, dev_title, dev_rank = admins_ss14_dev.get(user_id, ("Неизвестно", "-", "-"))
 
-            # Используем никнейм из MRP, если он есть, иначе из DEV
-            nickname = mrp_nickname if mrp_nickname != "Неизвестно" else dev_nickname
-            # Используем title из MRP, если пользователь есть в MRP, иначе из DEV
-            title = mrp_title if user_id in admins_ss14 else dev_title
+#             # Используем никнейм из MRP, если он есть, иначе из DEV
+#             nickname = mrp_nickname if mrp_nickname != "Неизвестно" else dev_nickname
+#             # Используем title из MRP, если пользователь есть в MRP, иначе из DEV
+#             title = mrp_title if user_id in admins_ss14 else dev_title
 
-            admin_data.append(
-                {
-                    "discord_name": f"<@{member.id}>",
-                    "nickname": nickname,
-                    "title": title,
-                    "mrp_status": mrp_status,
-                    "dev_status": dev_status,
-                    "mrp_rank": mrp_rank if user_id in admins_ss14 else "Не установлен",
-                    "dev_rank": dev_rank if user_id in admins_ss14_dev else "Не установлен",
-                }
-            )
-        else:
-            admin_data.append(
-                {
-                    "discord_name": f"<@{member.id}>",
-                    "nickname": "Неизвестно",
-                    "title": "Не привязан",
-                    "mrp_status": "❌",
-                    "dev_status": "❌",
-                    "mrp_rank": "Не установлен",
-                    "dev_rank": "Не установлен",
-                }
-            )
+#             admin_data.append(
+#                 {
+#                     "discord_name": f"<@{member.id}>",
+#                     "nickname": nickname,
+#                     "title": title,
+#                     "mrp_status": mrp_status,
+#                     "dev_status": dev_status,
+#                     "mrp_rank": mrp_rank if user_id in admins_ss14 else "Не установлен",
+#                     "dev_rank": dev_rank if user_id in admins_ss14_dev else "Не установлен",
+#                 }
+#             )
+#         else:
+#             admin_data.append(
+#                 {
+#                     "discord_name": f"<@{member.id}>",
+#                     "nickname": "Неизвестно",
+#                     "title": "Не привязан",
+#                     "mrp_status": "❌",
+#                     "dev_status": "❌",
+#                     "mrp_rank": "Не установлен",
+#                     "dev_rank": "Не установлен",
+#                 }
+#             )
 
-    # Сортируем по рангу на MRP (можно добавить сортировку по Dev, если требуется)
-    sorted_admins = sorted(admin_data, key=lambda x: (x["mrp_rank"], x["dev_rank"]), reverse=True)
+#     # Сортируем по рангу на MRP (можно добавить сортировку по Dev, если требуется)
+#     sorted_admins = sorted(admin_data, key=lambda x: (x["mrp_rank"], x["dev_rank"]), reverse=True)
 
-    # Формируем таблицу с отступами
-    leaderboard_text = "```\n"
-    for i, admin in enumerate(sorted_admins):
-        leaderboard_text += (
-            f"{i+1:>2}. {admin['discord_name']} | {admin['nickname']} \n"
-            f"   Title: {admin['title']} \n"
-            f"   Mrp: {admin['mrp_status']} ({admin['mrp_rank']}) \n"
-            f"   Dev: {admin['dev_status']} ({admin['dev_rank']}) \n\n"
-        )
-    leaderboard_text += "```"
+#     # Формируем таблицу с отступами
+#     leaderboard_text = "```\n"
+#     for i, admin in enumerate(sorted_admins):
+#         leaderboard_text += (
+#             f"{i+1:>2}. {admin['discord_name']} | {admin['nickname']} \n"
+#             f"   Title: {admin['title']} \n"
+#             f"   Mrp: {admin['mrp_status']} ({admin['mrp_rank']}) \n"
+#             f"   Dev: {admin['dev_status']} ({admin['dev_rank']}) \n\n"
+#         )
+#     leaderboard_text += "```"
 
-    # Формируем эмбед
-    embed = disnake.Embed(
-        title=f"📌 {role_name} - Статистика",
-        description=f"**Рейтинг permission для роли {role_name}**:\n\n{leaderboard_text}",
-        color=disnake.Color.red(),
-        timestamp=datetime.now(MOSCOW_TIMEZONE)
-    )
-    embed.set_footer(
-        text="Данные из базы SS14 | Последнее обновление",
-        icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
-    )
+#     # Формируем эмбед
+#     embed = disnake.Embed(
+#         title=f"📌 {role_name} - Статистика",
+#         description=f"**Рейтинг permission для роли {role_name}**:\n\n{leaderboard_text}",
+#         color=disnake.Color.gold(),
+#         timestamp=datetime.now(MOSCOW_TIMEZONE)
+#     )
+#     embed.set_footer(
+#         text="Данные из базы SS14 | Последнее обновление",
+#         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
+#     )
 
-    # Обновление существующего сообщения
-    message = await channel.fetch_message(message_id_admin)
-    await message.edit(embed=embed)
+#     # Обновление существующего сообщения
+#     message = await channel.fetch_message(message_id)
+#     await message.edit(embed=embed)
+
+# # Задача обновления статистики раз в 12 часов
+# @tasks.loop(hours=12)
+# async def update_adminboard_perm():
+#     channel = bot.get_channel(1357300045862404266)  # 🌍▏permission-adt-team
+
+#     discord_users = fetch_discord_users()
+#     admins_ss14 = fetch_admins(DB_PARAMS_SS14)
+#     admins_ss14_dev = fetch_admins(DB_PARAMS_SS14_DEV)
+
+#     # Запрос для "Администрация"
+#     role_id = 1248667383334178902
+#     role_name = ROLES.get(role_id)
+#     members = [m for m in channel.guild.members if any(r.id == role_id for r in m.roles)]
+
+#     # Формируем данные для администраторов
+#     admin_data = []
+#     for member in members:
+#         discord_id = str(member.id)
+#         user_id = discord_users.get(discord_id)
+
+#         if user_id:
+#             mrp_status = "✅" if user_id in admins_ss14 else "❌"
+#             dev_status = "✅" if user_id in admins_ss14_dev else "❌"
+            
+#             # Получаем данные из соответствующих баз
+#             mrp_nickname, mrp_title, mrp_rank = admins_ss14.get(user_id, ("Неизвестно", "-", "-"))
+#             dev_nickname, dev_title, dev_rank = admins_ss14_dev.get(user_id, ("Неизвестно", "-", "-"))
+
+#             # Используем никнейм из MRP, если он есть, иначе из DEV
+#             nickname = mrp_nickname if mrp_nickname != "Неизвестно" else dev_nickname
+#             # Используем title из MRP, если пользователь есть в MRP, иначе из DEV
+#             title = mrp_title if user_id in admins_ss14 else dev_title
+
+#             admin_data.append(
+#                 {
+#                     "discord_name": f"<@{member.id}>",
+#                     "nickname": nickname,
+#                     "title": title,
+#                     "mrp_status": mrp_status,
+#                     "dev_status": dev_status,
+#                     "mrp_rank": mrp_rank if user_id in admins_ss14 else "Не установлен",
+#                     "dev_rank": dev_rank if user_id in admins_ss14_dev else "Не установлен",
+#                 }
+#             )
+#         else:
+#             admin_data.append(
+#                 {
+#                     "discord_name": f"<@{member.id}>",
+#                     "nickname": "Неизвестно",
+#                     "title": "Не привязан",
+#                     "mrp_status": "❌",
+#                     "dev_status": "❌",
+#                     "mrp_rank": "Не установлен",
+#                     "dev_rank": "Не установлен",
+#                 }
+#             )
+
+#     # Сортируем по рангу на MRP (можно добавить сортировку по Dev, если требуется)
+#     sorted_admins = sorted(admin_data, key=lambda x: (x["mrp_rank"], x["dev_rank"]), reverse=True)
+
+#     # Формируем таблицу с отступами
+#     leaderboard_text = "```\n"
+#     for i, admin in enumerate(sorted_admins):
+#         leaderboard_text += (
+#             f"{i+1:>2}. {admin['discord_name']} | {admin['nickname']} \n"
+#             f"   Title: {admin['title']} \n"
+#             f"   Mrp: {admin['mrp_status']} ({admin['mrp_rank']}) \n"
+#             f"   Dev: {admin['dev_status']} ({admin['dev_rank']}) \n\n"
+#         )
+#     leaderboard_text += "```"
+
+#     # Формируем эмбед
+#     embed = disnake.Embed(
+#         title=f"📌 {role_name} - Статистика",
+#         description=f"**Рейтинг permission для роли {role_name}**:\n\n{leaderboard_text}",
+#         color=disnake.Color.red(),
+#         timestamp=datetime.now(MOSCOW_TIMEZONE)
+#     )
+#     embed.set_footer(
+#         text="Данные из базы SS14 | Последнее обновление",
+#         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
+#     )
+
+#     # Обновление существующего сообщения
+#     message = await channel.fetch_message(message_id_admin)
+#     await message.edit(embed=embed)
