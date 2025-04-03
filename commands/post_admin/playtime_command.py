@@ -7,7 +7,7 @@ import yaml
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import (ADDRESS_MRP, HEAD_ADT_TEAM, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_PLAYTIME_POST)
+                    WHITELIST_ROLE_PLAYTIME_POST, MY_USER_ID)
 
 GITHUB_URLS = [
     "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/Resources/Prototypes/Roles/play_time_trackers.yml",
@@ -171,6 +171,60 @@ async def playtime_generalrole(ctx, nickname: str):
 
     if error_messages:
         print(f"❌ Ошибки при обработке:\n" + "\n".join(error_messages))
+
+
+
+# @has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
+@bot.command()
+@has_any_role_by_id(HEAD_ADT_TEAM)
+async def playtime_allrole(ctx, nickname: str):
+    url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
+
+    job_times = {
+        "JobMedicalDoctor": "10000",
+        "JobMedicalIntern": "10000",
+        "JobResearchAssistant": "10000",
+        "JobScientist": "10000",
+        "JobCargoTechnician": "10000",
+        "JobServiceWorker": "10000",
+        "JobTechnicalAssistant": "10000",
+        "JobStationEngineer": "10000",
+        "JobAtmosphericTechnician": "10000",
+        "JobChiefMedicalOfficer": "10000",
+        "JobHeadOfSecurity": "10000",
+        "JobHeadOfPersonnel": "10000",
+        "JobParamedic": "10000",
+        "JobSalvageSpecialist": "10000",
+        "JobSecurityOfficer": "10000",
+        "JobMagistrat": "10000",
+        "JobWarden": "10000",
+        "Overall": "100000",
+    }
+
+    await ctx.send(f"✅ Запрос на добавление времени для **{nickname}** отправлен!\n🔄 Обрабатываю...")
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+
+        for job, time in job_times.items():
+            data = {
+                "NickName": nickname,
+                "JobIdPrototype": job,
+                "Time": str(time),
+            }
+            # Отправка запроса без ожидания ответа
+            await asyncio.sleep(3.5)
+            tasks.append(asyncio.create_task(send_post_request(session, url, data, job, ctx)))
+
+        # Выполняем все запросы параллельно
+        await asyncio.gather(*tasks)
+
+async def send_post_request(session, url, data, job, ctx):
+    # Отправка запроса без ожидания ответа
+    asyncio.create_task(session.post(url, json=data, headers=POST_ADMIN_HEADERS))
+    
+    # Логируем сразу после отправки запроса
+    await ctx.send(f"📬 Запрос для **{job}** отправлен!")
 
 
 # @bot.command() # Для тестов
