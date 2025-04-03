@@ -4,7 +4,7 @@ import disnake
 import psycopg2
 from disnake.ext import tasks
 
-from bot_init import bot
+from bot_init import bot, ss14_db
 from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
                                               DB_USER)
 from commands.misc.check_roles import has_any_role_by_id
@@ -57,7 +57,7 @@ async def update_role_stats(role_id: int, message_id: int, embed_color: disnake.
     """
     Обновляет статистику для указанной роли
     """
-    channel = bot.get_channel(1357300045862404266)  # 🌍▏permission-adt-team
+    channel = bot.get_channel(1357300045862404266)  # 🌍️🛏permission-adt-team
     if not channel:
         print(f"Канал не найден: {channel}")
         return
@@ -76,56 +76,55 @@ async def update_role_stats(role_id: int, message_id: int, embed_color: disnake.
         user_id = discord_users.get(discord_id)
 
         if user_id:
-            mrp_status = "✅" if user_id in admins_ss14 else "❌"
-            dev_status = "✅" if user_id in admins_ss14_dev else "❌"
-            
+            mrp_status = "✅" if user_id in admins_ss14 else None
+            dev_status = "✅" if user_id in admins_ss14_dev else None
+
             mrp_nickname, mrp_title, mrp_rank = admins_ss14.get(user_id, (None, None, None))
             dev_nickname, dev_title, dev_rank = admins_ss14_dev.get(user_id, (None, None, None))
 
-            nickname = mrp_nickname or dev_nickname or "Неизвестно"
-            title = mrp_title or dev_title or "-"
-            mrp_rank = mrp_rank or "-"
-            dev_rank = dev_rank or "-"
-
-            admin_data.append({
-                "discord_name": f"<@{member.id}>",
-                "nickname": nickname,
-                "title": title,
-                "mrp_status": mrp_status if mrp_status == "✅" else None,
-                "dev_status": dev_status if dev_status == "✅" else None,
-                "mrp_rank": mrp_rank if mrp_status == "✅" else None,
-                "dev_rank": dev_rank if dev_status == "✅" else None,
-            })
+            nickname = mrp_nickname or dev_nickname or ss14_db.get_username_by_user_id(user_id)
+            title = mrp_title or dev_title or None
+            mrp_rank = mrp_rank if mrp_status else None
+            dev_rank = dev_rank if dev_status else None
         else:
-            admin_data.append({
-                "discord_name": f"<@{member.id}>",
-                "nickname": None,
-                "title": None,
-                "mrp_status": None,
-                "dev_status": None,
-                "mrp_rank": None,
-                "dev_rank": None,
-            })
+            nickname = None
+            title = None
+            mrp_status = None
+            dev_status = None
+            mrp_rank = None
+            dev_rank = None
 
-    # Фильтруем список, убирая ненужные данные
+        admin_data.append({
+            "discord_name": f"<@{member.id}>" if nickname else None,
+            "discord_id": str(member.id),
+            "nickname": nickname,
+            "title": title,
+            "mrp_status": mrp_status,
+            "dev_status": dev_status,
+            "mrp_rank": mrp_rank,
+            "dev_rank": dev_rank,
+        })
+
+    # Сортируем и фильтруем список
     sorted_admins = sorted(
-        [admin for admin in admin_data if admin["mrp_status"] or admin["dev_status"]],
+        admin_data,
         key=lambda x: (x["mrp_rank"] or "", x["dev_rank"] or ""),
         reverse=True
     )
 
     # Формируем таблицу
-    leaderboard_text = "```"
+    leaderboard_text = "```\n"
     for i, admin in enumerate(sorted_admins):
-        leaderboard_text += f"{i+1:>2}. {admin['discord_name']}"
         if admin["nickname"]:
-            leaderboard_text += f" | {admin['nickname']}\n"
+            leaderboard_text += f"{i+1:>2}. {admin['discord_name']} | {admin['nickname']}\n"
             if admin["title"]:
                 leaderboard_text += f"   Title: {admin['title']}\n"
             if admin["mrp_status"]:
                 leaderboard_text += f"   Mrp: {admin['mrp_status']} ({admin['mrp_rank']})\n"
             if admin["dev_status"]:
                 leaderboard_text += f"   Dev: {admin['dev_status']} ({admin['dev_rank']})\n"
+        else:
+            leaderboard_text += f"{i+1:>2}. ID: {admin['discord_id']} - не привязан\n"
         leaderboard_text += "\n"
     leaderboard_text += "```"
 
@@ -149,26 +148,6 @@ async def update_role_stats(role_id: int, message_id: int, embed_color: disnake.
         print(f"Ошибка при обновлении сообщения {message_id}: {e}")
 
 
-# # Роли
-# ROLES = {
-#     1054908932868538449: "Руководство",
-#     1248667383334178902: "Администрация",
-#     1060191651538145420: "Разработка",
-#     1084143714110275614: "Мапперы",
-#     1155055955214614558: "Спрайтеры",
-#     1192426911905874152: "Медиа",
-#     1167921041222406306: "Сторожилы на отдыхе",
-# }
-
-# # ID сообщения для обновления
-# message_id_head = 1357323324174373055
-# message_id_admin = 1357324171880693780
-# message_id_dev 1357324253598322850 # Разработка
-# message_id_map 1357324861327802399 Маппинг
-# message_id_sprite 1357326482556588103 Спрайтинг
-# message_id_wiki 1357326533420781841 Вики
-# message_id_media 1357326883309490176 Медиа
-# message_id_old 1357326950225543298 Сторжил
 
 # Конфигурация ролей и их параметров
 ROLES_CONFIG = [
