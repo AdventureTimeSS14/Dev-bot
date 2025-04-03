@@ -5,6 +5,7 @@
 import json
 import os
 
+import pytz
 import requests
 from dotenv import load_dotenv
 
@@ -67,6 +68,7 @@ CHANNEL_ID_UPDATE_STATUS = 1320771026019422329
 MESSAGE_ID_TIME_SHUTDOWS = 1320771150938243195
 
 TIME_SHUTDOWSE = 5 * 3600 + 57 * 60  # В секундах. 5 часов 57 минут. Время до отключения
+MOSCOW_TIMEZONE = pytz.timezone("Europe/Moscow")
 
 SS14_ADDRESS = "ss14://193.164.18.155"
 SS14_ADDRESS_DEV = "ss14://5.180.174.139"
@@ -76,6 +78,7 @@ ADDRESS_MRP = "193.164.18.155"
 
 REPO_NAME = "Dev-bot"
 AUTHOR = "AdventureTimeSS14"
+REPO_NAME = "Dev-bot"
 SECOND_UPDATE_CHANGELOG = 30  # Частота обновлений изменений в журнале
 
 # Инициализация сессии для запросов

@@ -45,6 +45,3 @@ async def get_server_info(ctx):
 
     # Если сервер не найден
     await ctx.send(f"Сервер с адресом {server_address} не найден на странице хаба.")
-
-# Запуск бота
-bot.run('YOUR_BOT_TOKEN')

@@ -1,46 +1,11 @@
 from datetime import datetime
 
 import disnake
-import psycopg2
-import pytz
 
-from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
-                                              DB_USER)
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
-
-# Функция для поиска админа в базе
-def fetch_admin_info(nickname, server):
-    db_name = "ss14" if server.lower() == "mrp" else "ss14_dev"
-
-    DB_PARAMS = {
-        'database': db_name,
-        'user': DB_USER,
-        'password': DB_PASSWORD,
-        'host': DB_HOST,
-        'port': DB_PORT
-    }
-
-    conn = psycopg2.connect(**DB_PARAMS)
-    cursor = conn.cursor()
-
-    query = """
-    SELECT a.title, ar.name
-    FROM public.admin a
-    JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
-    JOIN public.player p ON a.user_id = p.user_id
-    WHERE p.last_seen_user_name ILIKE %s
-    """
-
-    cursor.execute(query, (nickname,))
-    result = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    return result  # (title, rank_name) или None
 
 # Команда поиска админа
 @bot.command()
@@ -50,11 +15,10 @@ async def admin(ctx, nickname: str):
     Проверяет, есть ли админ с таким ником в базе MRP и DEV.
     Использование: &admin <NickName>
     """
+    mrp_admin_info = ss14_db.fetch_admin_info(nickname)
+    dev_admin_info = ss14_db.fetch_admin_info(nickname, db_name='dev')
 
-    mrp_info = fetch_admin_info(nickname, "mrp")
-    dev_info = fetch_admin_info(nickname, "dev")
-
-    if not mrp_info and not dev_info:
+    if not mrp_admin_info and not dev_admin_info:
         embed = disnake.Embed(
             title="❌ Администратор не найден",
             description=f"**Пользователь** `{nickname}` **отсутствует в списке администраторов**.",
@@ -66,8 +30,7 @@ async def admin(ctx, nickname: str):
         return
 
     # Определяем текущую дату и время
-    tz = pytz.timezone("Europe/Moscow")
-    current_time = datetime.now(tz)
+    current_time = datetime.now(MOSCOW_TIMEZONE)
 
     # Создаем эмбед с улучшенным оформлением
     embed = disnake.Embed(
@@ -76,19 +39,19 @@ async def admin(ctx, nickname: str):
         timestamp=current_time
     )
 
-    if mrp_info:
+    if mrp_admin_info:
         embed.add_field(
             name="🟢 **MRP**",
-            value=f"🏷 **Титул:** `{mrp_info[0]}`\n🎖 **Ранг:** `{mrp_info[1]}`",
+            value=f"🏷 **Титул:** `{mrp_admin_info[0]}`\n🎖 **Ранг:** `{mrp_admin_info[1]}`",
             inline=False
         )
 
-    if dev_info:
-        if mrp_info:
-            embed.add_field(name="──────────────────", value="⠀", inline=False)  # Разделитель
+    if dev_admin_info:
+        if mrp_admin_info:
+            embed.add_field(name="──────────────────", value="⠀", inline=False)
         embed.add_field(
             name="🔵 **DEV**",
-            value=f"🏷 **Титул:** `{dev_info[0]}`\n🎖 **Ранг:** `{dev_info[1]}`",
+            value=f"🏷 **Титул:** `{dev_admin_info[0]}`\n🎖 **Ранг:** `{dev_admin_info[1]}`",
             inline=False
         )
 

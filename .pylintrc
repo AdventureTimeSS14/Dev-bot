@@ -1,5 +1,5 @@
 [MESSAGES CONTROL]
-disable=C0103,W0718,C0114,R0801
+disable=W0718,C0114
 
 [MASTER]
 init-hook='import sys; sys.path.append("C:/Develop/dis/Dev-bot")'

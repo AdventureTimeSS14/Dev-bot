@@ -1,10 +1,7 @@
 import logging
 import time
 
-import disnake
-from disnake.ext import commands
-
-from bot_init import bot
+from bot_init import bot, db_sponsor, ss14_db
 from commands.github import check_workflows
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
@@ -14,6 +11,7 @@ from tasks.discord_auth_task import discord_auth_update
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
 from tasks.update_admin_stats import update_admin_stats
+from tasks.update_permission_stats import update_permission_stats
 from tasks.update_status_presence_task import update_status_presence
 from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
@@ -54,16 +52,25 @@ async def on_ready():
                                              # если бот уже запущен на GitHub Actions
 
     # Запуск всех фоновых задач
-    await start_task_if_not_running(fetch_merged_pull_requests, "fetch merged pr")
-    await start_task_if_not_running(list_team_task, "list team")
-    await start_task_if_not_running(monitor_commits, "monitor commits")
-    await start_task_if_not_running(update_status_presence, "update status presence")
-    await start_task_if_not_running(update_status_server_message_eddit, "update status server")
-    await start_task_if_not_running(update_time_shutdows, "update time shutdows")
-    await start_task_if_not_running(discord_auth_update, "Update Discord Auth")
-    await start_task_if_not_running(update_whitelist_application, "Update WhiteList Application")
-    await start_task_if_not_running(update_admin_stats, "Update Admin Stats")
-    await start_task_if_not_running(check_end_vacation, "Check End Vacation")
+    tasks_to_start = [
+        (fetch_merged_pull_requests, "fetch merged pr"),
+        (list_team_task, "list team"),
+        (monitor_commits, "monitor commits"),
+        (update_status_presence, "update status presence"),
+        (update_status_server_message_eddit, "update status server"),
+        (update_time_shutdows, "update time shutdows"),
+        (discord_auth_update, "Update Discord Auth"),
+        (update_whitelist_application, "Update WhiteList Application"),
+        (update_admin_stats, "Update Admin Stats"),
+        (check_end_vacation, "Check End Vacation"),
+        (update_permission_stats, "Update Permission Stats")
+    ]
+
+    for task, name in tasks_to_start:
+        await start_task_if_not_running(task, name)
+
+    print(ss14_db.get_connection_status_report())
+    print(db_sponsor.get_connection_status_report())
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 
@@ -78,11 +85,6 @@ async def on_ready():
         )
     else:
         print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
-        
-    # await bot.sync_commands()
-    # await bot.command_sync_flags()
-    # await bot._sync_application_commands()
-    # await bot.tree.sync()
 
     # Запуск задачи для автоматического завершения работы через определённое время
     bot.loop.create_task(shutdown_after_time())
