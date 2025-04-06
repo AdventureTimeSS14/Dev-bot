@@ -10,7 +10,7 @@ from config import HEAD_ADT_TEAM, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 async def get_ckey(ctx, discordUser: disnake.Member):
     """Получить ckey (ник в SS14) пользователя по его Discord."""
     try:
-        user_id = ss14_db.get_user_id_by_discord_id(discordUser.id)
+        user_id = ss14_db.get_user_id_by_discord_id(str(discordUser.id))
         if not user_id:
             await ctx.send(f"❌ Пользователь {discordUser.mention} не привязан к SS14!")
             return
@@ -21,7 +21,7 @@ async def get_ckey(ctx, discordUser: disnake.Member):
             return
 
         await ctx.send(
-            f"🔹 **Discord:** {discordUser.mention} ({discordUser.display_name})\n"
+            f"🔹 **Discord:** {discordUser.nick} (ID: {discordUser.id})\n"
             f"🔹 **SS14 ник:** `{userName}`"
         )
     except Exception as e:
