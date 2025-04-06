@@ -3,8 +3,30 @@ from disnake import Option
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM
+from config import HEAD_ADT_TEAM, WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
+@bot.command()
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+async def get_ckey(ctx, discordUser: disnake.Member):
+    """Получить ckey (ник в SS14) пользователя по его Discord."""
+    try:
+        user_id = ss14_db.get_user_id_by_discord_id(discordUser.id)
+        if not user_id:
+            await ctx.send(f"❌ Пользователь {discordUser.mention} не привязан к SS14!")
+            return
+
+        userName = ss14_db.get_username_by_user_id(user_id)
+        if not userName:
+            await ctx.send(f"⚠ Никнейм не найден в базе данных.")
+            return
+
+        await ctx.send(
+            f"🔹 **Discord:** {discordUser.mention} ({discordUser.display_name})\n"
+            f"🔹 **SS14 ник:** `{userName}`"
+        )
+    except Exception as e:
+        await ctx.send(f"🚫 Ошибка при получении данных: `{str(e)}`")
+        raise
 
 @bot.slash_command(name="dis_linc", description="Привязывает игрового пользователя к Discord.")
 @has_any_role_by_id(HEAD_ADT_TEAM)
