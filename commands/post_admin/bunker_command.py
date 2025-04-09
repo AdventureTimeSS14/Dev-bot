@@ -3,11 +3,11 @@ import requests
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def bunker(ctx, toggle: str):
     # Устанавливаем адрес URL
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/panic_bunker"
