@@ -5,34 +5,34 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
 from commands.post_admin.utils import get_field_value
 from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def admin_info(ctx):
     """
     Команда для получения информации о текущем состоянии администраторского интерфейса.
     Включает данные о текущей игре, игроках, настроенных правилах и других параметрах.
     """
-    
+
     url = f"http://{ADDRESS_MRP}:1212/admin/info"
-    
+
     response = requests.get(url, headers=POST_ADMIN_HEADERS)
-    
+
     # Логируем полный ответ для отладки
     # print(f"Response Status Code: {response.status_code}")
     # print(f"Response Text: {response.text}")
-    
+
     if response.status_code == 200:
         data = response.json()
-        
+
         embed = disnake.Embed(
             title="Информация о сервере SS14",
             description="Данная команда выводит информацию о текущем состоянии сервера Mrp в подробном виде SS14.",
             color=disnake.Color.blue()
         )
-        
+
         # Основные данные
         embed.add_field(name="ID Раунда", value=get_field_value(data, ["RoundId"]), inline=False)
         embed.add_field(name="Название карты", value=get_field_value(data, ["Map", "Name"]), inline=False)

@@ -5,11 +5,11 @@ import requests
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
 from config import (ADDRESS_MRP, POST_ADMIN_API,
-                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 
 
 @bot.command(name="kick")
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def kick_command(ctx, nickName: str, reason: str):
     """
     Отправляет запрос на кик игрока через API сервера.

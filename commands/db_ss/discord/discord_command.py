@@ -3,11 +3,11 @@ from disnake import Option
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import HEAD_ADT_TEAM, WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def get_ckey(ctx, discordUser: disnake.Member):
     """Получить ckey (ник в SS14) пользователя по его Discord."""
     try:

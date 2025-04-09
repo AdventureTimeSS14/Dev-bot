@@ -4,7 +4,7 @@ import disnake
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
 
 
 # Класс для управления страницами
@@ -79,7 +79,7 @@ class ProfilesView(disnake.ui.View):
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def profiles(ctx, nick_name: str, server: str = "mrp"):
     """
     Получает информацию о персонажах игрока по его нику.
@@ -112,7 +112,7 @@ async def profiles(ctx, nick_name: str, server: str = "mrp"):
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def profile_id(ctx, input_profile_id: str, server: str = "mrp"):
     """
     Получает информацию о персонаже по ID профиля.
@@ -170,8 +170,8 @@ async def profile_id(ctx, input_profile_id: str, server: str = "mrp"):
     await ctx.send(embed=embed)
 
 
-@bot.command(name="&find_char")
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@bot.command(name="find_char")
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def fetch_username_by_char_name_command(ctx, char_name: str, server: str = "mrp"):
     """
     По имени персонажа выводит список ников с такими именами персов.

@@ -6,7 +6,7 @@ import psycopg2
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
 
 
 # Функция получения заметок из БД
@@ -124,7 +124,7 @@ class PlayerNotesView(disnake.ui.View):
 
 # Команда для бота
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def player_notes(ctx, *, user_name: str):
     """
     Получает информацию о заметках игрока по нику.

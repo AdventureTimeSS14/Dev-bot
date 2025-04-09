@@ -6,7 +6,7 @@ import psycopg2
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
 
 
 # Функция для получения статистики игрока
@@ -111,7 +111,7 @@ class PlayerStatsView(disnake.ui.View):
 
 # Команда для получения временной статистики
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
 async def player_stats(ctx, *, user_name: str):
     """
     Получает информацию о временной статистике игрока.
