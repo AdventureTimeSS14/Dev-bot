@@ -168,3 +168,49 @@ async def profile_id(ctx, input_profile_id: str, server: str = "mrp"):
 
     # Отправляем Embed в чат
     await ctx.send(embed=embed)
+
+
+@bot.command(name="&find_char")
+@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+async def fetch_username_by_char_name_command(ctx, char_name: str, server: str = "mrp"):
+    """
+    По имени персонажа выводит список ников с такими именами персов.
+    Использование: &find_char <char_name> [server=mrp|dev]
+    """
+    server = server.lower()
+
+    # Проверка допустимых значений сервера
+    if server not in ("mrp", "dev"):
+        await ctx.send("❌ Неверный сервер. Используйте `mrp` или `dev`.")
+        return
+
+    # Определяем базу данных
+    db_name = "main" if server == "mrp" else "dev"
+
+    try:
+        # Ищем ники по имени персонажа
+        userNameList = ss14_db.fetch_username_by_char_name(char_name, db_name)
+
+        if not userNameList:
+            await ctx.send(f"🔍 Персонаж `{char_name}` не найден на сервере `{server}`.")
+            return
+
+        # Форматируем список ников
+        if len(userNameList) == 1:
+            message = f"👤 Персонаж `{char_name}` принадлежит игроку: `{userNameList[0]}`"
+        else:
+            players_list = "\n".join([f"• `{name}`" for name in userNameList])
+            message = f"👥 Персонаж `{char_name}` найден у {len(userNameList)} игроков:\n{players_list}"
+
+        # Отправляем результат с ограничением длины сообщения
+        if len(message) > 2000:
+            # Если сообщение слишком длинное, разбиваем на части
+            parts = [message[i:i+2000] for i in range(0, len(message), 2000)]
+            for part in parts:
+                await ctx.send(part)
+        else:
+            await ctx.send(message)
+
+    except Exception as e:
+        await ctx.send(f"❌ Произошла ошибка при поиске персонажа: {str(e)}")
+        print(f"Error in fetch_username_by_char_name_command: {e}")

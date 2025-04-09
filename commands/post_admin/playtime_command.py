@@ -6,8 +6,8 @@ import yaml
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
-from config import (ADDRESS_MRP, HEAD_ADT_TEAM, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_PLAYTIME_POST, MY_USER_ID)
+from config import (ADDRESS_MRP, HEAD_ADT_TEAM, MY_USER_ID, POST_ADMIN_HEADERS,
+                    WHITELIST_ROLE_PLAYTIME_POST)
 
 GITHUB_URLS = [
     "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/Resources/Prototypes/Roles/play_time_trackers.yml",
@@ -174,9 +174,9 @@ async def playtime_generalrole(ctx, nickname: str):
 
 
 
-# @has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
 @bot.command()
 @has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
 async def playtime_allrole(ctx, nickname: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 

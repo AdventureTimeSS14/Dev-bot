@@ -78,6 +78,14 @@ ADMIN_COMMANDS = [
         "description": "Выводит подробную ифнформацию о персонаже по id профиля.",
     },
     {
+        "name": "👤 &find_char \"<char_name>\" [<mrp/dev>](default: mrp)",
+        "description": "По имени персонажа выводит список ников с такими именами персов.",
+    },
+    {
+        "name": "🔮 &get_ckey <discord>",
+        "description": "Получить ckey (ник в SS14) пользователя по его Discord.",
+    },
+    {
         "name": "🎃 &admin <NickName>",
         "description": "Показывает имеет ли данный пользователь права на mrp & dev сервере.",
     },

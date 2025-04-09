@@ -602,6 +602,43 @@ class DatabaseManagerSS14:
                 return result if result else None
 
 
+    def fetch_username_by_char_name(self, char_name, db_name='main'):
+        """
+        Получает список ников игроков по имени игрового персонажа
+
+        Parameters
+        ----------
+        char_name : str
+            Имя игрового персонажа (может быть у нескольких игроков)
+        db_name : str, optional
+            Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+        
+        Returns
+        -------
+        list of str or None
+            Список ников игроков или None, если персонажи с таким именем не найдены
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT pl.last_seen_user_name
+                FROM player pl
+                WHERE pl.user_id IN (
+                    SELECT pr.user_id
+                    FROM preference pr
+                    WHERE pr.preference_id IN (
+                        SELECT p.preference_id
+                        FROM profile p
+                        WHERE p.char_name = %s
+                    )
+                )
+                ORDER BY pl.last_seen_user_name ASC
+                """
+                cursor.execute(query, (char_name,))
+                result = cursor.fetchall()
+                return [row[0] for row in result] if result else None
+
+
     def fetch_profile_by_id(self, profile_id, db_name='main'):
         """
         Получает информацие о игровых персонажах игрока по его нику
