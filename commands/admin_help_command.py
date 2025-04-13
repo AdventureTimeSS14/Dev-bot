@@ -86,19 +86,19 @@ ADMIN_COMMANDS = [
         "description": "Список админов и их ранги.",
     },
     {
-        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>]",
+        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>](default: mrp)",
         "description": "Добавляет админа (аргументы в кавычках).",
     },
     {
-        "name": "📤 &perm_del <NickName> [<mrp/dev>]",
+        "name": "📤 &perm_del <NickName> [<mrp/dev>](default: mrp)",
         "description": "Удаляет администратора.",
     },
     {
-        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>]",
+        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>](default: mrp)",
         "description": "Изменяет права администратора.",
     },
     {
-        "name": "🏷️ &admin_rank [<mrp/dev>]",
+        "name": "🏷️ &admin_rank [<mrp/dev>](default: mrp)",
         "description": "Список допустимых админ рангов.",
     },
     {
