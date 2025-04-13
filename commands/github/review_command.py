@@ -2,7 +2,7 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.github.utils import validate_and_return_if_invalid
+from commands.misc.check_roles import has_any_role_by_keys
 
 from .github_processor import (create_embed_list, fetch_github_data,
                                send_embeds, validate_repository)
@@ -12,14 +12,11 @@ from .github_processor import (create_embed_list, fetch_github_data,
     name="review",
     help="Получает список пулл-реквестов для ревью из указанного репозитория.",
 )
+@has_any_role_by_keys("whitelist_role_id")
 async def review(ctx, repo_key: str):
     """
     Команда для получения списка пулл-реквестов, которые требуют ревью, из указанного репозитория.
     """
-    # Проверяем, имеет ли пользователь доступ к выполнению команды
-    if not await validate_and_return_if_invalid(ctx):
-        return
-
     # Проверяем репозиторий по переданному ключу
     repository_name = await validate_repository(ctx, repo_key)
     if not repository_name:

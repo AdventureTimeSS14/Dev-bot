@@ -2,20 +2,18 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
+from commands.misc.check_roles import has_any_role_by_keys
 
 from .github_processor import (create_embed_list, fetch_github_data,
-                               send_embeds, validate_repository, validate_user)
+                               send_embeds, validate_repository)
 
 
 @bot.command(name="achang")
+@has_any_role_by_keys("whitelist_role_id")
 async def achang(ctx, repo_key: str):
     """
     Команда для получения списка пулл-реквестов, которые требуют изменений.
     """
-    # Проверяем, имеет ли пользователь доступ к команде
-    if not await validate_user(ctx):
-        return
-
     # Валидируем ключ репозитория
     repository_name = await validate_repository(ctx, repo_key)
     if not repository_name:

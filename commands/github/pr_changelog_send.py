@@ -6,8 +6,7 @@ import requests
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import (AUTHOR, CHANGELOG_CHANNEL_ID, REPOSITORIES,
-                    WHITELIST_ROLE_ID)
+from config import AUTHOR, CHANGELOG_CHANNEL_ID, REPOSITORIES
 
 MAX_FIELD_LENGTH = 1024  # Максимальный размер поля для Embed
 

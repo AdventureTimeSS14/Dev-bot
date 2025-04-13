@@ -1,19 +1,6 @@
 import disnake
 
-from config import AUTHOR, GLOBAL_SESSION, REPOSITORIES, WHITELIST_ROLE_ID
-
-
-async def validate_user(ctx):
-    """
-    Проверяет, есть ли у пользователя необходимые роли для использования команды.
-    """
-    if not any(role.id in WHITELIST_ROLE_ID for role in ctx.author.roles):
-        await ctx.send(
-            "❌ Вы не идентифицированы как участник команды разработки Adventure Time. "
-            "Вы не можете пользоваться этой командой."
-        )
-        return False
-    return True
+from config import AUTHOR, GLOBAL_SESSION, REPOSITORIES
 
 
 async def validate_repository(ctx, repo_key):

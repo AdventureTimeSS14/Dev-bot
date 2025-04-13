@@ -6,7 +6,6 @@ from disnake.ui import Button, View
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 
 class DBTablesView(View):

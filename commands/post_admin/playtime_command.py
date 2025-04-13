@@ -6,8 +6,7 @@ import yaml
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import (ADDRESS_MRP, HEAD_ADT_TEAM, MY_USER_ID, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_PLAYTIME_POST)
+from config import ADDRESS_MRP, POST_ADMIN_HEADERS
 
 GITHUB_URLS = [
     "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/Resources/Prototypes/Roles/play_time_trackers.yml",

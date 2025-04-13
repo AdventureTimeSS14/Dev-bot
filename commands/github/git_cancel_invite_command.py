@@ -4,7 +4,7 @@ from disnake.ext import commands
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
+from config import ACTION_GITHUB, AUTHOR
 
 
 def cancel_invitation_by_login(login: str):

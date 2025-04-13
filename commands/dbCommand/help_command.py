@@ -3,7 +3,6 @@ from disnake.ext import commands
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 COLOR = disnake.Color.dark_purple()
 

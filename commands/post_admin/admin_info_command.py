@@ -4,8 +4,7 @@ import requests
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 from commands.post_admin.utils import get_field_value
-from config import (ADDRESS_MRP, GENERAL_ADMINISRATION_ROLE,
-                    POST_ADMIN_HEADERS)
+from config import ADDRESS_MRP, POST_ADMIN_HEADERS
 
 
 @bot.command()

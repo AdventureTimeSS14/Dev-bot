@@ -4,7 +4,7 @@ from disnake.ext import commands
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import ACTION_GITHUB, AUTHOR, REPOSITORIES, WHITELIST_ROLE_ID
+from config import ACTION_GITHUB, AUTHOR, REPOSITORIES
 
 
 # Функция для запуска GitHub Actions workflow

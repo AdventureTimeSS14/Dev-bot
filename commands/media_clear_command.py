@@ -4,7 +4,6 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 
 
-
 @bot.command(name="media_clear")
 @has_any_role_by_keys("head_adt_team")
 async def media_clear(ctx, count: int):

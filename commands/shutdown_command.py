@@ -10,7 +10,6 @@ from commands.misc.check_roles import has_any_role_by_keys
 from commands.misc.shutdows_deff import shutdown_def
 
 
-
 @bot.command(name="shutdown")
 @has_any_role_by_keys("head_adt_team")
 async def shutdown(ctx):

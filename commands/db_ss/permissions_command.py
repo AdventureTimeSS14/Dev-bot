@@ -10,7 +10,6 @@ from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
 from commands.misc.check_roles import has_any_role_by_keys
 
 
-
 def get_db_params(server):
     db_name = "ss14" if server.lower() == "mrp" else "ss14_dev"
     return {

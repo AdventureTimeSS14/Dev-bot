@@ -4,7 +4,7 @@ import requests
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import AUTHOR, GITHUB, REPO_NAME, SERVER_ADMIN_POST
+from config import AUTHOR, GITHUB, REPO_NAME
 
 FILE_PATH = ".github/workflows/deploy.yml"
 BRANCH = "main"

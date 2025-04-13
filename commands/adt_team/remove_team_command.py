@@ -2,7 +2,7 @@ import disnake
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN
+from config import ADMIN_TEAM
 
 
 async def get_log_channel():

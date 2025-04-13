@@ -5,7 +5,6 @@ from disnake.utils import get
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 
-
 roles_team = [
     # Список ролей и их ID
     # Руководство проекта

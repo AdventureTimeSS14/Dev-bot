@@ -4,8 +4,7 @@ import requests
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
-from config import (ADDRESS_MRP, GENERAL_ADMINISRATION_ROLE, POST_ADMIN_API,
-                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+from config import ADDRESS_MRP, POST_ADMIN_API
 
 
 @bot.command(name="kick")

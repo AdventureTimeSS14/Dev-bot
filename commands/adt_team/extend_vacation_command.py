@@ -9,7 +9,7 @@ import disnake
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
 from commands.misc.check_roles import has_any_role_by_keys
-from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
+from config import ADMIN_TEAM, VACATION_ROLE
 
 
 @bot.command()

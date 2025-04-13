@@ -2,12 +2,14 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
+from commands.misc.check_roles import has_any_role_by_keys
 
 from .github_processor import (create_embed_list, fetch_github_data,
-                               send_embeds, validate_repository, validate_user)
+                               send_embeds, validate_repository)
 
 
 @bot.command(name="milestones")
+@has_any_role_by_keys("whitelist_role_id")
 async def milestones(ctx, repo_key: str):
     """
     Команда для получения списка Milestones в GitHub репозитории.
@@ -19,9 +21,6 @@ async def milestones(ctx, repo_key: str):
     Возвращает:
     Отправляет список milestones в чат.
     """
-    if not await validate_user(ctx):
-        return
-
     repository_name = await validate_repository(ctx, repo_key)
     if not repository_name:
         return

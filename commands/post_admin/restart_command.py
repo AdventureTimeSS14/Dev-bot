@@ -2,7 +2,7 @@ from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 from commands.post_admin.utils import send_server_request
 from config import (ADDRESS_DEV, ADDRESS_MRP, POST_DATA_DEV, POST_DATA_MRP,
-                    POST_HEADERS_DEV, POST_HEADERS_MPR, SERVER_ADMIN_POST)
+                    POST_HEADERS_DEV, POST_HEADERS_MPR)
 
 
 @bot.command(name="restart")
