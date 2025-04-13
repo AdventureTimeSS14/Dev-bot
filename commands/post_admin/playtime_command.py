@@ -213,7 +213,7 @@ async def playtime_allrole(ctx, nickname: str):
                 "Time": str(time),
             }
             # Отправка запроса без ожидания ответа
-            await asyncio.sleep(3.5)
+            await asyncio.sleep(6.5)
             tasks.append(asyncio.create_task(send_post_request(session, url, data, job, ctx)))
 
         # Выполняем все запросы параллельно
