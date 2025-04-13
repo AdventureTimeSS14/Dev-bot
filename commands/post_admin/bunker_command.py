@@ -2,8 +2,8 @@ import requests
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_id
-from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
-                    WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
+from config import (ADDRESS_MRP, GENERAL_ADMINISRATION_ROLE,
+                    POST_ADMIN_HEADERS, WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command()

@@ -8,7 +8,8 @@ from dateutil import parser
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS, DB_PARAMS_SPONSOR
 from commands.misc.check_roles import has_any_role_by_id
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
+from config import (GENERAL_ADMINISRATION_ROLE,
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 from modules.get_creation_date import get_creation_date
 
 # import requests

@@ -7,9 +7,8 @@ from components.button_help_components import (action_row_bug_report,
                                                action_row_button_help)
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
-COLOR = disnake.Color.dark_red()  # Красный цвет для эмбеда
+COLOR = disnake.Color.dark_red()
 
-# Список команд и их описаний для администрирования
 ADMIN_COMMANDS = [
     {
         "name": "🛠️ &update mrp/dev",
@@ -37,7 +36,7 @@ ADMIN_COMMANDS = [
     },
     {
         "name": "👢 &kick <NickName> <Reason>",
-        "description": "Отправляет Пост запрос на Кик указанного пользователя.",
+        "description": "Отправляет POST запрос на кик указанного пользователя.",
     },
     {
         "name": "📝 &player_notes <NickName>",
@@ -53,96 +52,71 @@ ADMIN_COMMANDS = [
     },
     {
         "name": "🔨 &ban <NickName> <Reason> <Minutes>",
-        "description": "Пост запрос на серверный бан на МРП сервере. 0 - для пермабана.",
+        "description": "POST запрос на серверный бан. 0 — для пермабана.",
     },
     {
         "name": "🔓 &pardon <ban_id>",
-        "description": (
-            "Разбанивает пользователя по id его серверного бана.(не путать с "
-            "разбаном для ролей)."
-        ),
+        "description": "Разбан по ID серверного бана (не роли).",
     },
     {
         "name": "📂 &uploads [<mrp/dev>](default: mrp)",
-        "description": (
-            "Выводит логи загрузок файлов ogg? в "
-            "виде списка. Можно указать mrp или dev."
-        ),
+        "description": "Выводит логи загрузок файлов.",
     },
     {
         "name": "👥 &profiles <NickName>",
-        "description": "Выводит список персонажей игрока с общей информацией о них.",
+        "description": "Выводит список персонажей игрока.",
     },
     {
         "name": "🚹 &profile_id <profile_id>",
-        "description": "Выводит подробную ифнформацию о персонаже по id профиля.",
+        "description": "Подробная инфа по id профиля.",
     },
     {
         "name": "👤 &find_char \"<char_name>\" [<mrp/dev>](default: mrp)",
-        "description": "По имени персонажа выводит список ников с такими именами персов.",
+        "description": "Поиск по имени персонажа.",
     },
     {
         "name": "🔮 &get_ckey <discord>",
-        "description": "Получить ckey (ник в SS14) пользователя по его Discord.",
+        "description": "Получить ckey игрока по Discord.",
     },
     {
         "name": "🎃 &admin <NickName>",
-        "description": "Показывает имеет ли данный пользователь права на mrp & dev сервере.",
+        "description": "Проверяет, есть ли права у игрока.",
     },
     {
         "name": "👑 &admins [<mrp/dev>](default: mrp)",
-        "description": "Выводит список админов на mrp или dev указывая title и админ ранг.",
+        "description": "Список админов и их ранги.",
     },
     {
-        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](default: mrp)",
-        "description": (
-            "Добавляет нового администратора в таблицу администраторов, "
-            "на мрп или деве.***(Если аргументы из более одного слова, "
-            "заключаем в кавычки)***"
-        ),
+        "name": "📥 &perm_add <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>]",
+        "description": "Добавляет админа (аргументы в кавычках).",
     },
     {
-        "name": "📤 &perm_del <NickName> [<Mrp/Dev>](default: mrp)",
-        "description": "Удаляет пользователя из таблицы администраторов, на мрп или деве.",
+        "name": "📤 &perm_del <NickName> [<mrp/dev>]",
+        "description": "Удаляет администратора.",
     },
     {
-        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<Mrp/Dev>](default: mrp)",
-        "description": (
-            "Изменяет пользователю админские права, на мрп или деве.***"
-            "(Если аргументы из более одного слова, заключаем в кавычки)***"
-        ),
+        "name": "♻️ &perm_tweak <NickName> \"<Title>\" \"<AdminRank>\" [<mrp/dev>]",
+        "description": "Изменяет права администратора.",
     },
     {
-        "name": "🏷️ &admin_rank [<Mrp/Dev>](default: mrp)",
-        "description": "Выводит список допустимых админ рангов. Мрп или Дев сервера.",
+        "name": "🏷️ &admin_rank [<mrp/dev>]",
+        "description": "Список допустимых админ рангов.",
     },
     {
         "name": "👮‍♂️ &playtime",
-        "description": (
-            "Выводит список всех допустимых <ProtoPlayTimeTracker> "
-            "таймтрекеров сборки ADT."
-        ),
+        "description": "Список доступных ProtoPlayTimeTracker.",
     },
     {
         "name": "⏱️ &player_stats <NickName>",
-        "description": "Выводит информацию о времени на всех наигранных ролях игрока.",
+        "description": "Наигранное время по ролям.",
     },
     {
-        "name": "⏱ &playtime_addrole <NickName> <ProtoPlayTimeTracker> <Time>",
-        "description": (
-            "Добавляет указанное количество времени игроку для "
-            "определённой должности. Укажите никнейм игрока, идентификатор "
-            "должности (ProtoIdJob) и количество времени (в минутах). "
-            "‼️ Минуты можно ввести отрицательные, тогда время будет убавлено!!"
-        ),
+        "name": "⏱ &playtime_addrole <NickName> <Proto> <Time>",
+        "description": "Добавляет или убавляет время игроку по роли.",
     },
     {
         "name": "💯 &playtime_generalrole <NickName>",
-        "description": (
-            "Добавляет общее время игроку для открытия "
-            "всех стандартных должностей (кроме глав и СБ). "
-            "Укажите никнейм игрока."
-        ),
+        "description": "Добавляет общее время для открытия стандартных ролей.",
     },
 ]
 
@@ -153,45 +127,42 @@ async def admin_help(ctx: commands.Context):
     Выводит список доступных команд для администрирования сервером.
     """
     try:
-        # Создаем embed
+        # Собираем все команды в одну строку
+        command_list_text = "\n".join(
+            f"**{cmd['name']}** — {cmd['description']}" for cmd in ADMIN_COMMANDS
+        )
+
+        # Создаём embed
         embed = disnake.Embed(
-            title="Команды для администрирования 🔧",
-            description="Список доступных команд для администрирования сервера:",
+            title="🔧 Команды для администрирования",
+            description=command_list_text,
             color=COLOR,
         )
 
-        # Добавляем каждую команду из списка ADMIN_COMMANDS
-        for command in ADMIN_COMMANDS:
-            embed.add_field(
-                name=command["name"], value=command["description"], inline=False
-            )
-
-        # Устанавливаем автора embed
+        # Автор
         avatar_url = ctx.author.avatar.url if ctx.author.avatar else None
         embed.set_author(name=ctx.author.name, icon_url=avatar_url)
 
-        # Добавляем изображение икону : D
+        # Иконка
         embed.set_thumbnail(
             url=(
-                "https://media.discordapp.net/attachme"
-                "nts/1255118642442403986/135308226898126"
-                "4555/229_20250311204105.png?ex=67e05b8f&i"
-                "s=67df0a0f&hm=d516adce879449d2f3268ca0881aa"
-                "c9fed48ef23530d2953afaf74b9ff503779&=&form"
-                "at=webp&quality=lossless&width=281&height=394"
+                "https://media.discordapp.net/attachments/1255118642442403986/"
+                "1353082268981264555/229_20250311204105.png?ex=67e05b8f&is=67df0a0f&"
+                "hm=d516adce879449d2f3268ca0881aac9fed48ef23530d2953afaf74b9ff503779&=&"
+                "format=webp&quality=lossless&width=281&height=394"
             )
         )
 
-        # Отправляем embed
+        # Отправка
         await ctx.send(embed=embed, components=[action_row_button_help, action_row_bug_report])
 
     except Exception as e:
-        # Логируем и обрабатываем ошибку
+        # Обработка ошибок
         error_message = (
-            f"❌ Произошла ошибка при выполнении команды `admin_help`: {e}\n"
+            f"❌ Ошибка в `admin_help`: {e}\n"
             f"Пользователь: {ctx.author} (ID: {ctx.author.id})"
         )
-        print(error_message)  # Логирование в консоль
+        print(error_message)
         await ctx.send(
-            "Произошла ошибка при выполнении команды. Пожалуйста, попробуйте позже."
+            "Произошла ошибка при выполнении команды. Попробуйте позже."
         )

@@ -3,7 +3,8 @@ from disnake import Option
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM, WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE
+from config import (GENERAL_ADMINISRATION_ROLE, HEAD_ADT_TEAM,
+                    WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command()
