@@ -4,6 +4,7 @@ import disnake
 from disnake.ext import tasks
 
 from bot_init import bot
+from config import MOSCOW_TIMEZONE
 
 # ID каналов
 LOG_CHANNEL_ID = 1041654367712976966  # Канал логов ахелпов
@@ -75,12 +76,13 @@ async def count_admin_actions():
     embed = disnake.Embed(
         title=f"📊 Топ админов за {month_year}",
         description=f"**Рейтинг по ахелпам 🆘 и банам 🔨:**\n\n{leaderboard_text}",
-        color=disnake.Color.red()
+        color=disnake.Color.red(),
+        timestamp=datetime.now(MOSCOW_TIMEZONE)
     )
 
     # Устанавливаем подпись (футер)
     embed.set_footer(
-        text="Adventure Time SS14 MRP Server | Данные могут отличаться, точность не 100%", 
+        text="Adventure Time SS14 MRP Server | Данные могут отличаться, точность не 100% | Последнее обновление", 
         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
     )
 
