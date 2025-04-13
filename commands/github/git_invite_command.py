@@ -3,7 +3,7 @@ import requests
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
 
 
@@ -52,7 +52,7 @@ def remove_from_github_org(username):
     name="git_invite",
     help="Приглашает пользователя в организацию GitHub по логину."
 )
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def git_invite(ctx, username: str):
     """
     Команда для отправки приглашения пользователю в организацию на GitHub.
@@ -63,7 +63,7 @@ async def git_invite(ctx, username: str):
     name="git_remove",
     help="Удаляет пользователя из организации GitHub."
 )
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def git_remove_team(ctx, username: str):
     """
     Команда для удаления пользователя из организации на GitHub.

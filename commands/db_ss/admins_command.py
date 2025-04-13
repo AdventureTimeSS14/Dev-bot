@@ -6,8 +6,8 @@ import psycopg2
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
                                               DB_USER)
-from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from commands.misc.check_roles import has_any_role_by_keys
+from config import MOSCOW_TIMEZONE
 
 
 # Функция запроса списка администраторов из базы данных
@@ -113,7 +113,7 @@ class AdminsView(disnake.ui.View):
 
 # Команда для бота
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def admins(ctx, server: str = "mrp"):
     """
     Получает список всех администраторов из указанной базы данных (по умолчанию MRP).

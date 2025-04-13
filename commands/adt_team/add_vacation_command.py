@@ -5,12 +5,12 @@ import disnake
 
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def add_vacation(ctx, user: disnake.Member, end_date: str, *, reason: str):
     """
     Выдача отпуска пользователю. Добавляется роль отпуска с указанием срока и причины.

@@ -1,16 +1,16 @@
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from commands.post_admin.utils import send_server_request
 from config import (ADDRESS_DEV, ADDRESS_MRP, POST_DATA_DEV, POST_DATA_MRP,
-                    POST_HEADERS_DEV, POST_HEADERS_MPR, SERVER_ADMIN_POST)
+                    POST_HEADERS_DEV, POST_HEADERS_MPR)
 
 
 @bot.command(name="update")
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def update(ctx, server_name: str):
     """
     Команда для обновления MRP или DEV сервера.
-    Доступна только для пользователей с ролью из SERVER_ADMIN_POST.
+    Доступна только для пользователей с ролью из server_admin_post.
     """
     url_mrp = f"http://{ADDRESS_MRP}:5000/instances/MRP/update"
     url_dev = f"http://{ADDRESS_DEV}:5000/instances/DEV/update"

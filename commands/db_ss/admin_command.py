@@ -3,13 +3,13 @@ from datetime import datetime
 import disnake
 
 from bot_init import bot, ss14_db
-from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from commands.misc.check_roles import has_any_role_by_keys
+from config import MOSCOW_TIMEZONE
 
 
 # Команда поиска админа
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def admin(ctx, nickname: str):
     """
     Проверяет, есть ли админ с таким ником в базе MRP и DEV.

@@ -1,29 +1,31 @@
 from disnake.ext import commands
 
-from config import MY_USER_ID
+from config import MY_USER_ID, ROLE_WHITELISTS
 
 
-def has_any_role_by_id(*role_id_groups):
+def has_any_role_by_keys(*role_id_groups):
     """
-    Декоратор для проверки, имеет ли пользователь одну из указанных ролей из нескольких групп ролей.
+    Декоратор для проверки, имеет ли пользователь одну из указанных ключей групп ролей.
     Если пользователь имеет ID MY_USER_ID, доступ всегда разрешён.
 
-    :param role_id_groups: Список массивов ID ролей, доступ к которым проверяется.
+    :param role_id_groups: Ключи через запятую, доступ к которым проверяется.
     :return: Декоратор команды.
     """
     async def predicate(ctx):
         if ctx.author.id == MY_USER_ID:
             return True
 
-        # Проверяем, есть ли у пользователя хотя бы одна роль из каждого массива ролей
-        has_role = False
-        for role_ids in role_id_groups:
-            if any(role.id in role_ids for role in ctx.author.roles):
-                has_role = True
-                break  # Прерываем, как только нашли хотя бы одну подходящую роль
+        user_role_ids = [role.id for role in ctx.author.roles]
 
-        if not has_role:
-            await ctx.send("❌ У вас нет доступа к этой команде.")
-        return has_role
+        # Объединяем все разрешённые роли из переданных ключей
+        allowed_roles = set()
+        for key in whitelist_keys:
+            allowed_roles.update(ROLE_WHITELISTS.get(key, []))
+
+        if any(role_id in allowed_roles for role_id in user_role_ids):
+            return True
+
+        await ctx.send("❌ У вас нет доступа к этой команде.")
+        return False
 
     return commands.check(predicate)

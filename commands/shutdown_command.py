@@ -6,13 +6,13 @@
 import sys
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from commands.misc.shutdows_deff import shutdown_def
-from config import HEAD_ADT_TEAM
+
 
 
 @bot.command(name="shutdown")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def shutdown(ctx):
     """
     Команда для перезапуска бота.

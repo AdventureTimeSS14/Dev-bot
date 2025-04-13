@@ -3,7 +3,7 @@ import base64
 import requests
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import AUTHOR, GITHUB, REPO_NAME, SERVER_ADMIN_POST
 
 FILE_PATH = ".github/workflows/deploy.yml"
@@ -11,7 +11,7 @@ BRANCH = "main"
 
 
 @bot.command(name="deploy")
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def deply_command(ctx, agr: str):
     """
         Делает коммит в файл запуска акшона бота

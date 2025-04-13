@@ -7,8 +7,8 @@ from disnake.ext import tasks
 from bot_init import bot, ss14_db
 from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
                                               DB_USER)
-from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from commands.misc.check_roles import has_any_role_by_keys
+from config import MOSCOW_TIMEZONE
 
 # Настройки БД
 DB_PARAMS_SS14 = {

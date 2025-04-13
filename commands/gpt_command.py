@@ -9,13 +9,13 @@ from g4f.client import Client
 from g4f.Provider import FreeGpt
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
-from config import GPT_PROMPT, WHITELIST_ROLE_ID
+from commands.misc.check_roles import has_any_role_by_keys
+from config import GPT_PROMPT
 
 
 @bot.command()
 @commands.cooldown(1, 60, BucketType.user)
-@has_any_role_by_id(WHITELIST_ROLE_ID)
+@has_any_role_by_keys("whitelist_role_id")
 async def gpt(ctx, *prompt):
     """
     Команда принимает промт и отправляет его

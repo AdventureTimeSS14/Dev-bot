@@ -2,8 +2,8 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM
+from commands.misc.check_roles import has_any_role_by_keys
+
 
 # ID роли, которую будем добавлять или удалять
 WL_ROLE_ID = 1060239440930418828
@@ -15,7 +15,7 @@ VOTE_CHANNEL_ID = 1351277093140303913
 MRP_CHANNEL_ID = 1060236040377466920
 
 @bot.slash_command(name="wl_add", description="Добавить роль White List указанному пользователю")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
     Добавляет роль White List пользователю и обновляет его заявку как одобренную.
@@ -81,7 +81,7 @@ async def wl_add(interaction: disnake.ApplicationCommandInteraction, user: disna
         await interaction.response.send_message(f"❌ Ошибка при добавлении роли: {e}", ephemeral=True)
 
 @bot.slash_command(name="wl_del", description="Удалить роль White List у указанного пользователя")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def wl_del(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
     Удаляет роль White List у пользователя.
@@ -124,7 +124,7 @@ async def wl_del(interaction: disnake.ApplicationCommandInteraction, user: disna
         await interaction.response.send_message(f"❌ Ошибка при удалении роли: {e}", ephemeral=True)
 
 @bot.slash_command(name="wl_deny", description="Отказ пользователю в WL")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def wl_deny(interaction: disnake.ApplicationCommandInteraction, user: disnake.Member):
     """
     Отказывает пользователю в принятии в White List, редактируя его последнюю заявку.

@@ -2,10 +2,9 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from components.button_help_components import (action_row_bug_report,
                                                action_row_button_help)
-from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 COLOR = disnake.Color.dark_red()
 
@@ -121,7 +120,7 @@ ADMIN_COMMANDS = [
 ]
 
 @bot.command(name="admin_help")
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def admin_help(ctx: commands.Context):
     """
     Выводит список доступных команд для администрирования сервером.

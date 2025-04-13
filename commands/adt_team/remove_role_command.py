@@ -6,12 +6,11 @@ import disnake
 from disnake.utils import get
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN
+from commands.misc.check_roles import has_any_role_by_keys
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def remove_role(ctx, user: disnake.Member, *role_names: str):
     """
     Команда для снятия указанных ролей у пользователя.

@@ -2,14 +2,14 @@ import requests
 from disnake import Color, Embed
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from commands.post_admin.utils import get_field_value
 from config import (ADDRESS_MRP, POST_ADMIN_HEADERS,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def game_rules(ctx):
     """
     Команда для получения информации о текущих правилах игры.

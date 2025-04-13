@@ -5,12 +5,12 @@
 import disnake
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM
+from commands.misc.check_roles import has_any_role_by_keys
+
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def user_role_mention(ctx, *role_names: str):
     """
     Команда для получения списка пользователей с заданной ролью по имени.

@@ -2,14 +2,14 @@ import disnake
 import requests
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from commands.post_admin.utils import get_field_value
 from config import (ADDRESS_MRP, GENERAL_ADMINISRATION_ROLE,
-                    POST_ADMIN_HEADERS, WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+                    POST_ADMIN_HEADERS)
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
+@has_any_role_by_keys("whitelist_role_id_administration_post", "general_adminisration_role")
 async def admin_info(ctx):
     """
     Команда для получения информации о текущем состоянии администраторского интерфейса.

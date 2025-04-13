@@ -3,13 +3,13 @@ import json
 import requests
 
 from bot_init import bot, ss14_db
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import (ADDRESS_MRP, POST_ADMIN_API,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command(name="ban")
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def post_server_ban(ctx, nickName: str, reason: str, time: str):
     """
     Отправляет запрос на выдачу бана игроку через API сервера.

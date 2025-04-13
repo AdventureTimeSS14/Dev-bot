@@ -2,13 +2,13 @@ import disnake
 from disnake import Option
 
 from bot_init import bot, ss14_db
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import (GENERAL_ADMINISRATION_ROLE, HEAD_ADT_TEAM,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
+@has_any_role_by_keys("whitelist_role_id_administration_post", "general_adminisration_role")
 async def get_ckey(ctx, discordUser: disnake.Member):
     """Получить ckey (ник в SS14) пользователя по его Discord."""
     try:
@@ -31,7 +31,7 @@ async def get_ckey(ctx, discordUser: disnake.Member):
         raise
 
 @bot.slash_command(name="dis_linc", description="Привязывает игрового пользователя к Discord.")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def linc_dis(
     inter: disnake.ApplicationCommandInteraction,
     nickname: str = Option(
@@ -80,7 +80,7 @@ async def linc_dis(
 
 
 @bot.slash_command(name="dis_unlink", description="Удаляет привязку Discord-аккаунта.")
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def unlink_dis(
     inter: disnake.ApplicationCommandInteraction,
     discord: disnake.Member = Option(name="discord", description="Пинг Discord", required=True)

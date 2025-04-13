@@ -5,7 +5,7 @@ from disnake import Embed
 from disnake.ui import Button, View
 
 from bot_init import bot, ss14_db
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import WHITELIST_ROLE_ID_ADMINISTRATION_POST
 
 
@@ -76,7 +76,7 @@ class DBTablesView(View):
             view=self)
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def db_stats(ctx, db_name: str = 'main'):
     """
     Показывает статистику по таблицам базы данных

@@ -3,7 +3,7 @@ import requests
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
 
 
@@ -211,7 +211,7 @@ def remove_member_from_team(team_slug, github_login):
     name="add_maint",
     help="Добавляет пользователя в команду adt_maintainer на GitHub."
 )
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def add_to_maintainer(ctx, github_login: str):
     """
     Добавляет пользователя в команду adt_maintainer.
@@ -229,7 +229,7 @@ async def add_to_maintainer(ctx, github_login: str):
     name="del_maint",
     help="Удаляет пользователя из команды adt_maintainer на GitHub."
 )
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def remove_from_maintainer(ctx, github_login: str):
     """
     Удаляет пользователя из команды adt_maintainer.

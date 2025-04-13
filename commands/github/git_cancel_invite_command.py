@@ -3,7 +3,7 @@ import requests
 from disnake.ext import commands
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ACTION_GITHUB, AUTHOR, SERVER_ADMIN_POST
 
 
@@ -44,7 +44,7 @@ def cancel_invitation_by_login(login: str):
     name="git_cancel_invite",
     help="Отменяет приглашение для пользователя по его логину на GitHub."
 )
-@has_any_role_by_id(SERVER_ADMIN_POST)
+@has_any_role_by_keys("server_admin_post")
 async def git_cancel_invite(ctx, login: str):
     """
     Команда для отмены приглашения для пользователя по его логину на GitHub.

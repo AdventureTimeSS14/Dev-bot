@@ -7,8 +7,8 @@ import pytz
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
                                               DB_USER)
-from commands.misc.check_roles import has_any_role_by_id
-from config import HEAD_ADT_TEAM
+from commands.misc.check_roles import has_any_role_by_keys
+
 
 
 def get_db_params(server):
@@ -82,7 +82,7 @@ def fetch_admin_ranks(server):
     return ranks
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def perm_add(ctx, nickname: str, title: str, admin_rank: str, server: str = "mrp"):
     """Добавляет нового администратора."""
     player = fetch_player(nickname, server)
@@ -110,7 +110,7 @@ async def perm_add(ctx, nickname: str, title: str, admin_rank: str, server: str 
     await ctx.send(f"✅ `{nickname}` добавлен как `{title}` ({admin_rank}).")
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def perm_tweak(ctx, nickname: str, title: str, admin_rank: str, server: str = "mrp"):
     """Изменяет права существующего администратора."""
     admin = fetch_admin(nickname, server)
@@ -134,7 +134,7 @@ async def perm_tweak(ctx, nickname: str, title: str, admin_rank: str, server: st
     await ctx.send(f"✅ `{nickname}` обновлен: `{title}` ({admin_rank}).")
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def perm_del(ctx, nickname: str, server: str = "mrp"):
     """Удаляет администратора из таблицы."""
     admin = fetch_admin(nickname, server)
@@ -151,7 +151,7 @@ async def perm_del(ctx, nickname: str, server: str = "mrp"):
     await ctx.send(f"✅ `{nickname}` удален из списка администраторов {server.upper()}")
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
+@has_any_role_by_keys("head_adt_team")
 async def admin_rank(ctx, server: str = "mrp"):
     """
     Выводит список всех админских рангов.

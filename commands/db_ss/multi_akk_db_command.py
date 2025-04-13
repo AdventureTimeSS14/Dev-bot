@@ -7,7 +7,7 @@ from dateutil import parser
 
 from bot_init import bot
 from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS, DB_PARAMS_SPONSOR
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import (GENERAL_ADMINISRATION_ROLE,
                     WHITELIST_ROLE_ID_ADMINISTRATION_POST)
 from modules.get_creation_date import get_creation_date
@@ -267,7 +267,7 @@ def get_discord_info_by_user_id(user_id: str):
     return None
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST, GENERAL_ADMINISRATION_ROLE)
+@has_any_role_by_keys("whitelist_role_id_administration_post", "general_adminisration_role")
 async def check_nick(ctx, *, user_name: str):
     data, related_accounts = fetch_player_data(user_name)
     data_sponsor = fetch_sponsor_data(user_name)  
@@ -376,7 +376,7 @@ import os
 
 
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def check_nick_file(ctx, *, user_name: str):
     data, related_accounts = fetch_player_data(user_name)
     if data:

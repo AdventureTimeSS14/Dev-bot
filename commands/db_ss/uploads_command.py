@@ -4,8 +4,8 @@ import disnake
 import psycopg2
 
 from bot_init import bot, ss14_db
-from commands.misc.check_roles import has_any_role_by_id
-from config import MOSCOW_TIMEZONE, WHITELIST_ROLE_ID_ADMINISTRATION_POST
+from commands.misc.check_roles import has_any_role_by_keys
+from config import MOSCOW_TIMEZONE
 
 
 # Класс для управления страницами логов загрузок
@@ -71,7 +71,7 @@ class UploadsView(disnake.ui.View):
 
 # Команда для просмотра логов загрузок файлов
 @bot.command()
-@has_any_role_by_id(WHITELIST_ROLE_ID_ADMINISTRATION_POST)
+@has_any_role_by_keys("whitelist_role_id_administration_post")
 async def uploads(ctx, server: str = "mrp"):
     """
     Получает список логов загруженных файлов из базы данных (по умолчанию MRP).

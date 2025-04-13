@@ -5,7 +5,7 @@ import disnake
 import requests
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import (AUTHOR, CHANGELOG_CHANNEL_ID, REPOSITORIES,
                     WHITELIST_ROLE_ID)
 
@@ -51,7 +51,7 @@ def process_description(description):
     name="pr",
     help="Получить информацию о замерженном пулл-реквесте по его номеру.",
 )
-@has_any_role_by_id(WHITELIST_ROLE_ID)
+@has_any_role_by_keys("whitelist_role_id")
 async def get_pr_info(ctx, pr_number: int):
     """
     Команда для получения информации о замерженном пулл-реквесте из GitHub.

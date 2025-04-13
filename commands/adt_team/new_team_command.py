@@ -5,12 +5,12 @@
 import disnake
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def new_team(ctx, user: disnake.Member, *roles: disnake.Role):
     """
     Команда для назначения пользователя на должность в команде.

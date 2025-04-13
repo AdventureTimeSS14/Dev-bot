@@ -5,7 +5,7 @@ import disnake
 import yaml
 
 from bot_init import bot
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import (ADDRESS_MRP, HEAD_ADT_TEAM, MY_USER_ID, POST_ADMIN_HEADERS,
                     WHITELIST_ROLE_PLAYTIME_POST)
 
@@ -84,7 +84,7 @@ async def playtime(ctx):
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
+@has_any_role_by_keys("head_adt_team", "whitelist_role_playtime_post")
 async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 
@@ -121,7 +121,7 @@ async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
+@has_any_role_by_keys("head_adt_team", "whitelist_role_playtime_post")
 async def playtime_generalrole(ctx, nickname: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 
@@ -175,8 +175,8 @@ async def playtime_generalrole(ctx, nickname: str):
 
 
 @bot.command()
-@has_any_role_by_id(HEAD_ADT_TEAM)
-@has_any_role_by_id(HEAD_ADT_TEAM, WHITELIST_ROLE_PLAYTIME_POST)
+@has_any_role_by_keys("head_adt_team")
+@has_any_role_by_keys("head_adt_team", "whitelist_role_playtime_post")
 async def playtime_allrole(ctx, nickname: str):
     url = f"http://{ADDRESS_MRP}:1212/admin/actions/play_time_addjob"
 

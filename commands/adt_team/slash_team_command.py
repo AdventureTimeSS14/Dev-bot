@@ -5,7 +5,7 @@ from disnake import Option
 
 from bot_init import bot
 from commands.dbCommand.get_db_connection import get_db_connection
-from commands.misc.check_roles import has_any_role_by_id
+from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
 
 
@@ -13,7 +13,7 @@ from config import ADMIN_TEAM, HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN, VACATION_ROLE
     name="team_add_vacation",
     description="Выдача отпуска пользователю с указанием срока и причины."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def team_add_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которому выдать отпуск", required=True),
@@ -124,7 +124,7 @@ async def team_add_vacation_slash(
     name="team_end_vacation",
     description="Завершает отпуск пользователя, удаляя роль отпуска."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def team_end_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, у которого завершить отпуск")
@@ -201,7 +201,7 @@ async def team_end_vacation_slash(
     name="team_extend_vacation",
     description="Продлевает отпуск пользователя, обновляя срок и причину."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def team_extend_vacation_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которому продлеваем отпуск", required=True),
@@ -308,7 +308,7 @@ async def team_extend_vacation_slash(
     name="team_tweak",
     description="Изменяет роль пользователя, заменяя одну на другую с указанием причины."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def tweak_team_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которому меняем роль", required=True),
@@ -442,7 +442,7 @@ async def send_results(inter, removed_roles, errors):
     name="team_remove",
     description="Снимает сотрудника с должности, удаляя две роли и логируя действие в админ состав."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def team_remove_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которого нужно снять с должности", required=True),
@@ -489,7 +489,7 @@ async def team_remove_slash(
     name="new_team",
     description="Назначает пользователя на новую должность (требуется две роли: отдел и должность)."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def new_team(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(name="user", description="Пользователь, которого нужно назначить", required=True),
@@ -554,7 +554,7 @@ async def new_team(
     name="contribute",
     description="Добавляет роль контрибьютера указанному пользователю."
 )
-@has_any_role_by_id(HEAD_ADT_TEAM, HEAD_DISCORD_ADMIN)
+@has_any_role_by_keys("head_adt_team", "head_discord_admin")
 async def contribution_add_slash(
     inter: disnake.ApplicationCommandInteraction,
     user: disnake.Member = Option(
