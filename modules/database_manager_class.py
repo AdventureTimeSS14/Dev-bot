@@ -7,6 +7,7 @@ import psycopg2
 from config import (DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER,
                     MOSCOW_TIMEZONE)
 
+# from commands.db_ss.setup_db_ss14_mrp
 
 class DatabaseManagerSS14:
     """

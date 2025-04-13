@@ -3,12 +3,12 @@ from disnake.ext import commands
 from config import MY_USER_ID, ROLE_WHITELISTS
 
 
-def has_any_role_by_keys(*role_id_groups):
+def has_any_role_by_keys(*whitelist_keys):
     """
     Декоратор для проверки, имеет ли пользователь одну из указанных ключей групп ролей.
     Если пользователь имеет ID MY_USER_ID, доступ всегда разрешён.
 
-    :param role_id_groups: Ключи через запятую, доступ к которым проверяется.
+    :param whitelist_keys: Ключи через запятую, доступ к которым проверяется.
     :return: Декоратор команды.
     """
     async def predicate(ctx):
