@@ -72,7 +72,7 @@ ADMIN_COMMANDS = [
     },
     {
         "name": "👤 &find_char \"<char_name>\" [<mrp/dev>](default: mrp)",
-        "description": "Поиск по имени персонажа.",
+        "description": "Поиск никнейма игрока по имени персонажа.",
     },
     {
         "name": "🔮 &get_ckey <discord>",
@@ -108,7 +108,7 @@ ADMIN_COMMANDS = [
     },
     {
         "name": "⏱️ &player_stats <NickName>",
-        "description": "Наигранное время по ролям.",
+        "description": "Вывести наигранное время игрока по ролям.",
     },
     {
         "name": "⏱ &playtime_addrole <NickName> <Proto> <Time>",
