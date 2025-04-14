@@ -1,52 +1,10 @@
 from datetime import datetime
 
 import disnake
-import psycopg2
 
-from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import (DB_HOST, DB_PASSWORD, DB_PORT,
-                                              DB_USER)
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
 from config import MOSCOW_TIMEZONE
-
-
-# Функция запроса списка администраторов из базы данных
-def fetch_admins(server):
-    db_name = "ss14" if server.lower() == "mrp" else "ss14_dev"
-
-    # Подключение к базе данных
-    DB_PARAMS = {
-        'database': db_name,
-        'user': DB_USER,
-        'password': DB_PASSWORD,
-        'host': DB_HOST,
-        'port': DB_PORT
-    }
-
-    conn = psycopg2.connect(**DB_PARAMS)
-    cursor = conn.cursor()
-
-    # SQL-запрос с привязкой к Discord
-    query = """
-    SELECT 
-        p.last_seen_user_name, 
-        a.title, 
-        ar.name, 
-        du.discord_id
-    FROM public.admin a  
-    JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
-    LEFT JOIN public.player p ON a.user_id = p.user_id
-    LEFT JOIN public.discord_user du ON a.user_id = du.user_id
-    ORDER BY p.last_seen_user_name ASC
-    """
-
-    cursor.execute(query)
-    admins = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    return admins
 
 
 # Класс для управления страницами
@@ -119,7 +77,15 @@ async def admins(ctx, server: str = "mrp"):
     Получает список всех администраторов из указанной базы данных (по умолчанию MRP).
     Использование: &admins [mrp/dev]
     """
-    admins = fetch_admins(server)
+    server = server.lower()
+    if server == "mrp":
+        server = "main"
+    elif server == "dev":
+        pass
+    else:
+        await ctx.send("❌ Используйте аргумент `mrp` или `dev`.")
+
+    admins = ss14_db.fetch_admins(server)
 
     if not admins:
         embed = disnake.Embed(

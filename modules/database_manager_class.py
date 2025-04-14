@@ -620,6 +620,29 @@ class DatabaseManagerSS14:
                 cursor.execute(query, (nickname,))
                 return cursor.fetchone()
 
+    def fetch_admins(self, db_name='main'):
+        """
+            Функция запроса списка администраторов из базы данных
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                # SQL-запрос с привязкой к Discord
+                query = """
+                SELECT 
+                    p.last_seen_user_name, 
+                    a.title, 
+                    ar.name, 
+                    du.discord_id
+                FROM public.admin a  
+                JOIN public.admin_rank ar ON a.admin_rank_id = ar.admin_rank_id
+                LEFT JOIN public.player p ON a.user_id = p.user_id
+                LEFT JOIN public.discord_user du ON a.user_id = du.user_id
+                ORDER BY p.last_seen_user_name ASC
+                """
+                cursor.execute(query)
+                admins = cursor.fetchall()
+
+                return admins
 
     def fetch_uploads(self, db_name='main'):
         """
