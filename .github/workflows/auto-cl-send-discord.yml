@@ -1,0 +1,35 @@
+name: Notify Discord on Multiple Commits
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Send all commit messages to Discord
+        run: |
+          for COMMIT_SHA in $(git rev-list ${{ github.event.before }}..${{ github.event.after }}); do
+            SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
+            AUTHOR=$(git show -s --format="%an" $COMMIT_SHA)
+            DATE=$(git show -s --format="%cd" --date=iso-strict $COMMIT_SHA)
+            MESSAGE=$(git show -s --format="%B" $COMMIT_SHA | sed ':a;N;$!ba;s/\n/\\n/g')
+            COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
+
+            curl -X POST "$DISCORD_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"embeds\": [{
+                  \"title\": \"Коммит $SHORT_SHA\",
+                  \"url\": \"$COMMIT_URL\",
+                  \"description\": \"**Автор:** $AUTHOR\\n**Дата:** $DATE\\n**Сообщение:**\\n\\\`\\\`\\\`\\n$MESSAGE\\n\\\`\\\`\\\`\",
+                  \"color\": 5814783
+                }]
+              }"
+          done
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
