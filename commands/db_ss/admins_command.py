@@ -7,8 +7,10 @@ from commands.misc.check_roles import has_any_role_by_keys
 from config import MOSCOW_TIMEZONE
 
 
-# Класс для управления страницами
 class AdminsView(disnake.ui.View):
+    """
+        Класс для управления страницами
+    """
     def __init__(self, ctx, admins, server):
         super().__init__(timeout=500)
         self.ctx = ctx
