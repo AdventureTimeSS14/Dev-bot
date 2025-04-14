@@ -17,22 +17,20 @@ jobs:
         run: |
             for COMMIT_SHA in $(git rev-list ${{ github.event.before }}..${{ github.event.after }}); do
               SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
-              AUTHOR=$(git show -s --format="%an" $COMMIT_SHA)
-              DATE=$(git show -s --format="%cd" --date=iso-strict $COMMIT_SHA)
-              MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
+              AUTHOR_NAME=$(git show -s --format="%an" $COMMIT_SHA)
+              COMMIT_DATE=$(git show -s --format="%cd" --date=format:"%Y-%m-%d %H:%M" $COMMIT_SHA)
+              COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
+              COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
         
-              # Формируем JSON безопасно
-              PAYLOAD=$(jq -n \
-                --arg title "Коммит $SHORT_SHA" \
-                --arg url "https://github.com/${{ github.repository }}/commit/$COMMIT_SHA" \
-                --arg author "$AUTHOR" \
-                --arg date "$DATE" \
-                --arg message "$MESSAGE" \
+              JSON_PAYLOAD=$(jq -n \
+                --arg title "🟣 Новый коммит в ${{ github.repository }}" \
+                --arg url "$COMMIT_URL" \
+                --arg description "**Автор:** $AUTHOR_NAME\n**Дата:** $COMMIT_DATE\n**Сообщение:**\n```$COMMIT_MESSAGE```" \
                 '{
                   embeds: [{
                     title: $title,
                     url: $url,
-                    description: ("**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```" + $message + "```"),
+                    description: $description,
                     color: 10181046
                   }]
                 }'
@@ -40,7 +38,7 @@ jobs:
         
               curl -X POST "$DISCORD_WEBHOOK_URL" \
                 -H "Content-Type: application/json" \
-                -d "$PAYLOAD"
+                -d "$JSON_PAYLOAD"
             done
         env:
             DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
