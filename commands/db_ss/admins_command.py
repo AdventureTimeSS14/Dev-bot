@@ -68,8 +68,6 @@ class AdminsView(disnake.ui.View):
 
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
 
-
-# Команда для бота
 @bot.command()
 @has_any_role_by_keys("whitelist_role_id_administration_post")
 async def admins(ctx, server: str = "mrp"):
