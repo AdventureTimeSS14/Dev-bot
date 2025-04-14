@@ -33,7 +33,7 @@ jobs:
                     title: $title,
                     url: $url,
                     description: ("**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```" + $message + "```"),
-                    color: 5814783
+                    color: 10181046
                   }]
                 }'
               )
