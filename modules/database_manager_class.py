@@ -440,6 +440,40 @@ class DatabaseManagerSS14:
             print(f"Ошибка при запросе к БД: {e}")
             return None
 
+    def fetch_player_notes_by_username(self, username, db_name='main'):
+        """
+            Функция получения заметок из БД
+        """
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                    SELECT 
+                        admin_notes.admin_notes_id,
+                        admin_notes.created_at,
+                        admin_notes.message,
+                        admin_notes.severity,
+                        admin_notes.secret,
+                        admin_notes.last_edited_at,
+                        admin_notes.last_edited_by_id,
+                        player.player_id,
+                        player.last_seen_user_name,
+                        admin.created_by_name
+                    FROM admin_notes
+                    INNER JOIN player ON admin_notes.player_user_id = player.user_id
+                    LEFT JOIN (
+                        SELECT user_id AS created_by_id, last_seen_user_name AS created_by_name
+                        FROM player
+                    ) AS admin ON admin_notes.created_by_id = admin.created_by_id
+                    WHERE player.last_seen_user_name = %s;
+                    """
+                    cursor.execute(query, (username,))
+                    result = cursor.fetchall()
+                    return result
+        except psycopg2.Error as e:
+            print(f"Ошибка при запросе к БД: {e}")
+            return None
+
     def fetch_banlist_by_username(self, username, db_name='main'):
         """
             Возращает информацию об истории банов игрока по игровому никнейму

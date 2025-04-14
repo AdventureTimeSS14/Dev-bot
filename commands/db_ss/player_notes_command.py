@@ -1,44 +1,10 @@
 from datetime import datetime
 
 import disnake
-import psycopg2
 
-from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
 
-
-# Функция получения заметок из БД
-def fetch_player_notes(user_name):
-    connection = psycopg2.connect(**DB_PARAMS)
-    cursor = connection.cursor()
-
-    cursor.execute('''
-        SELECT 
-            admin_notes.admin_notes_id,
-            admin_notes.created_at,
-            admin_notes.message,
-            admin_notes.severity,
-            admin_notes.secret,
-            admin_notes.last_edited_at,
-            admin_notes.last_edited_by_id,
-            player.player_id,
-            player.last_seen_user_name,
-            admin.created_by_name
-        FROM admin_notes
-        INNER JOIN player ON admin_notes.player_user_id = player.user_id
-        LEFT JOIN (
-            SELECT user_id AS created_by_id, last_seen_user_name AS created_by_name
-            FROM player
-        ) AS admin ON admin_notes.created_by_id = admin.created_by_id
-        WHERE player.last_seen_user_name = %s;
-    ''', (user_name,))
-
-    result = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return result
 
 # Класс для управления страницами
 class PlayerNotesView(disnake.ui.View):
@@ -129,7 +95,7 @@ async def player_notes(ctx, *, user_name: str):
     Получает информацию о заметках игрока по нику.
     Использование: &player_notes <NickName>
     """
-    notes = fetch_player_notes(user_name)
+    notes = ss14_db.fetch_player_notes_by_username(user_name)
 
     if not notes:
         embed = disnake.Embed(
