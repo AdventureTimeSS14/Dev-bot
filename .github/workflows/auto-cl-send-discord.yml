@@ -16,26 +16,29 @@ jobs:
       - name: Send all commit messages to Discord
         run: |
             for COMMIT_SHA in $(git rev-list ${{ github.event.before }}..${{ github.event.after }}); do
-                SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
-                AUTHOR=$(git show -s --format="%an" $COMMIT_SHA)
-                DATE=$(git show -s --format="%cd" --date=iso-strict $COMMIT_SHA)
-                MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
+              SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
+              AUTHOR=$(git show -s --format="%an" $COMMIT_SHA)
+              DATE=$(git show -s --format="%cd" --date=iso-strict $COMMIT_SHA)
+              MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
         
-                PAYLOAD=$(jq -n \
+              # Формируем JSON безопасно
+              PAYLOAD=$(jq -n \
                 --arg title "Коммит $SHORT_SHA" \
                 --arg url "https://github.com/${{ github.repository }}/commit/$COMMIT_SHA" \
-                --arg desc "**Автор:** $AUTHOR\n**Дата:** $DATE\n**Сообщение:**\n\`\`\`\n$MESSAGE\n\`\`\`" \
+                --arg author "$AUTHOR" \
+                --arg date "$DATE" \
+                --arg message "$MESSAGE" \
                 '{
-                    embeds: [{
+                  embeds: [{
                     title: $title,
                     url: $url,
-                    description: $desc,
+                    description: ("**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```" + $message + "```"),
                     color: 5814783
-                    }]
+                  }]
                 }'
-                )
+              )
         
-                curl -X POST "$DISCORD_WEBHOOK_URL" \
+              curl -X POST "$DISCORD_WEBHOOK_URL" \
                 -H "Content-Type: application/json" \
                 -d "$PAYLOAD"
             done
