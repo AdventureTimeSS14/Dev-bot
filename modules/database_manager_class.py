@@ -668,6 +668,27 @@ class DatabaseManagerSS14:
                 result = cursor.fetchall()
                 return result if result else None
 
+    def get_player_timestats_by_username(self, username, db_name='main'):
+        """
+            Функция для получения статистики времени игрока
+        """
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                    SELECT 
+                        play_time.tracker,
+                        play_time.time_spent
+                    FROM player
+                    INNER JOIN play_time ON player.user_id = play_time.player_id
+                    WHERE player.last_seen_user_name = %s;
+                    """
+                    cursor.execute(query, (username,))
+                    result = cursor.fetchall()
+                    return result
+        except psycopg2.Error as e:
+            print(f"Ошибка при запросе к БД: {e}")
+            return None
 
     def fetch_username_by_char_name(self, char_name, db_name='main'):
         """

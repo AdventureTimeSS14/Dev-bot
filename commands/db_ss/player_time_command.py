@@ -3,30 +3,9 @@ from datetime import datetime, timedelta
 import disnake
 import psycopg2
 
-from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
 
-
-# Функция для получения статистики игрока
-def fetch_player_stats(user_name):
-    connection = psycopg2.connect(**DB_PARAMS)
-    cursor = connection.cursor()
-
-    cursor.execute('''
-        SELECT 
-            play_time.tracker,
-            play_time.time_spent
-        FROM player
-        INNER JOIN play_time ON player.user_id = play_time.player_id
-        WHERE player.last_seen_user_name = %s;
-    ''', (user_name,))
-
-    result = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return result
 
 # Класс для управления страницами
 class PlayerStatsView(disnake.ui.View):
@@ -116,7 +95,7 @@ async def player_stats(ctx, *, user_name: str):
     Получает информацию о временной статистике игрока.
     Использование: &player_stats <NickName>
     """
-    stats = fetch_player_stats(user_name)
+    stats = ss14_db.get_player_timestats_by_username(user_name)
 
     if not stats:
         embed = disnake.Embed(
