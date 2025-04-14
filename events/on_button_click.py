@@ -37,11 +37,8 @@ class BugReportModal(Modal):
                 )
                 embed.add_field(name="Текст сообщения:", value=report_text, inline=False)
                 embed.set_footer(
-                    text = (
-                        f"Отправлено: {inter.created_at.strftime('%Y-%m-%d %H:%M:%S')} "
-                        f"от {inter.author.display_name}",
-                    ),
-                    icon_url=inter.author.avatar.url
+                    text = f"Отправлено: {inter.created_at.strftime('%Y-%m-%d %H:%M:%S')} от {inter.author.display_name}",
+                    icon_url=inter.author.avatar.url,
                 )
 
                 await target_channel.send(embed=embed)
