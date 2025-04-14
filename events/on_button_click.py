@@ -26,17 +26,14 @@ class BugReportModal(Modal):
         """
         try:
             report_text = inter.text_values['bug_report_details']
-            target_channel_id = 1333381720996843551
+            target_channel_id = 1361464069068034068
             target_channel = inter.bot.get_channel(target_channel_id)
 
             if target_channel:
                 embed = disnake.Embed(
                     title="📝 Новый отзыв/баг-репорт",
-                    description= (
-                        f"Сообщение от пользователя {inter.author.display_name} "
-                        f"({inter.author.mention}) ({inter.author.id}):",
-                    ),
-                    color=disnake.Color.yellow()
+                    description= f"Сообщение от пользователя: {inter.author.display_name} ({inter.author.mention}) ({inter.author.id})",
+                    color=disnake.Color.yellow(),
                 )
                 embed.add_field(name="Текст сообщения:", value=report_text, inline=False)
                 embed.set_footer(
