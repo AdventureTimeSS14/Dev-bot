@@ -20,17 +20,21 @@ jobs:
               AUTHOR_NAME=$(git show -s --format="%an" $COMMIT_SHA)
               COMMIT_DATE=$(git show -s --format="%cd" --date=format:"%Y-%m-%d %H:%M" $COMMIT_SHA)
               COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
-              COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
+        
+              # Escape message safely for JSON block
+              COMMIT_MESSAGE_ESCAPED=$(printf '%s' "$COMMIT_MESSAGE" | jq -Rs .)
         
               JSON_PAYLOAD=$(jq -n \
                 --arg title "🟣 Новый коммит в ${{ github.repository }}" \
-                --arg url "$COMMIT_URL" \
-                --arg description "**Автор:** $AUTHOR_NAME\n**Дата:** $COMMIT_DATE\n**Сообщение:**\n```$COMMIT_MESSAGE```" \
+                --arg url "https://github.com/${{ github.repository }}/commit/$COMMIT_SHA" \
+                --arg author "$AUTHOR_NAME" \
+                --arg date "$COMMIT_DATE" \
+                --argjson message "$COMMIT_MESSAGE_ESCAPED" \
                 '{
                   embeds: [{
                     title: $title,
                     url: $url,
-                    description: $description,
+                    description: "**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```\($message)```",
                     color: 10181046
                   }]
                 }'
