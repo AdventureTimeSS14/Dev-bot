@@ -425,12 +425,12 @@ async def remove_roles_from_user(user, roles):
     return removed_roles, errors
 
 
-async def send_results(inter, removed_roles, errors):
+async def send_results(user, removed_roles, errors, inter):
     """ Отправляет результаты удаления ролей или ошибки в канал. """
     messages = []
     if removed_roles:
         role_names = ", ".join([role.name for role in removed_roles])
-        messages.append(f"✅ У {inter.author.mention} успешно сняты роли: **{role_names}**.")
+        messages.append(f"✅ У {user.mention} успешно сняты роли: **{role_names}**.")
 
     if errors:
         messages.extend(errors)
@@ -468,7 +468,7 @@ async def team_remove_slash(
     removed_roles, errors = await remove_roles_from_user(user, [role_dep, role_job])
 
     # Отправляем результаты
-    await send_results(inter, removed_roles, errors)
+    await send_results(user, removed_roles, errors, inter)
 
     # Если обе роли успешно удалены, отправляем Embed в лог-канал
     if len(removed_roles) == 2:
