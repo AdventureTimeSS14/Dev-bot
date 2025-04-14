@@ -440,6 +440,38 @@ class DatabaseManagerSS14:
             print(f"Ошибка при запросе к БД: {e}")
             return None
 
+    def fetch_banlist_by_username(self, username, db_name='main'):
+        """
+            Возращает информацию об истории банов игрока по игровому никнейму
+        """
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                    SELECT 
+                        sb.server_ban_id, 
+                        sb.ban_time, 
+                        sb.expiration_time, 
+                        sb.reason, 
+                        COALESCE(p.last_seen_user_name, 'Неизвестно') AS admin_nickname,
+                        ub.unban_time,
+                        COALESCE(p2.last_seen_user_name, 'Неизвестно') AS unban_admin_nickname
+                    FROM server_ban sb
+                    LEFT JOIN player p ON sb.banning_admin = p.user_id
+                    LEFT JOIN server_unban ub ON sb.server_ban_id = ub.ban_id
+                    LEFT JOIN player p2 ON ub.unbanning_admin = p2.user_id
+                    WHERE sb.player_user_id = (
+                        SELECT user_id FROM player WHERE last_seen_user_name = %s
+                    )
+                    ORDER BY sb.server_ban_id ASC
+                    """
+                    cursor.execute(query, (username,))
+                    result = cursor.fetchall()
+                    return result
+        except psycopg2.Error as e:
+            print(f"Ошибка при запросе к БД: {e}")
+            return None
+
     def pardon_ban(
         self,
         ban_id: int,

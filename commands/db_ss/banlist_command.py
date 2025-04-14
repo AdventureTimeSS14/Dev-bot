@@ -1,44 +1,11 @@
 from datetime import datetime
 
 import disnake
-import psycopg2
 
-from bot_init import bot
-from commands.db_ss.setup_db_ss14_mrp import DB_PARAMS
+from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
 from config import MOSCOW_TIMEZONE
 
-
-# Функция запроса данных о банах игрока
-def fetch_banlist(nick_name):
-    conn = psycopg2.connect(**DB_PARAMS)
-    cursor = conn.cursor()
-
-    query = """
-    SELECT 
-        sb.server_ban_id, 
-        sb.ban_time, 
-        sb.expiration_time, 
-        sb.reason, 
-        COALESCE(p.last_seen_user_name, 'Неизвестно') AS admin_nickname,
-        ub.unban_time,
-        COALESCE(p2.last_seen_user_name, 'Неизвестно') AS unban_admin_nickname
-    FROM server_ban sb
-    LEFT JOIN player p ON sb.banning_admin = p.user_id
-    LEFT JOIN server_unban ub ON sb.server_ban_id = ub.ban_id
-    LEFT JOIN player p2 ON ub.unbanning_admin = p2.user_id
-    WHERE sb.player_user_id = (
-        SELECT user_id FROM player WHERE last_seen_user_name = %s
-    )
-    ORDER BY sb.server_ban_id ASC
-    """
-    cursor.execute(query, (nick_name,))
-    result = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    return result
 
 # Класс для управления страницами
 class BanlistView(disnake.ui.View):
@@ -135,7 +102,7 @@ async def banlist(ctx, *, nick_name: str):
     Получает информацию о банах игрока по его нику.
     Использование: &banlist <NickName>
     """
-    bans = fetch_banlist(nick_name)
+    bans = ss14_db.fetch_banlist_by_username(nick_name)
 
     if not bans:
         embed = disnake.Embed(
