@@ -3,7 +3,7 @@ from datetime import datetime
 import disnake
 from disnake.ext import tasks
 
-from bot_init import bot
+from bot_init import bot, ss14_db
 from config import MOSCOW_TIMEZONE
 
 # ID каналов
@@ -12,13 +12,27 @@ BAN_CHANNEL_ID = 1291023511607054387  # Канал логов банов
 STATIC_ADMIN_CHANNEL_ID = 1352637128961556580  # Канал для вывода статистики
 EMBED_MESSAGE_ID = 1352638882310656051
 
-# Список ников админов
-ADMIN_NICKS = [
-    "Pangaari", "Mina0", "kiwi_fruit", "Syrel", "Legion_159", "Estrie", "RevengenRat", "LightSurvivor", "meesooruu", 
-    "Mr_NIkolos", "saint_madman", "SuperUltraGigachad", "KriTs", "Green_Lama", "Pushnidze", "Jmurik01", 
-    "Korpraali", "Doc7", "Dark_Plague111", "maksim21612", "Daxim", "vadi_al", "moon_so_red", "WaRz", "Prunt", 
-    "Shtrudel1", "Carneline", "Lokotyasha", "KOT_PILOT558", "Jaba213", "0Kermit0", "Kazbalger", "Ak1rava"
-]
+
+async def get_valid_admins_with_role(guild, role_id):
+    # Получаем всех админов из базы
+    all_admins = ss14_db.fetch_admins()
+    
+    # Фильтруем только тех, у кого есть discord_id
+    discord_admins = [(nick, int(discord_id)) for nick, _, _, discord_id in all_admins if discord_id]
+
+    # Проверяем наличие роли у каждого пользователя
+    role = guild.get_role(role_id)
+    if not role:
+        print("Роль не найдена")
+        return []
+
+    valid_admins = []
+    for nick, discord_id in discord_admins:
+        member = guild.get_member(discord_id)
+        if member and role in member.roles:
+            valid_admins.append(nick)
+
+    return valid_admins
 
 # Функция для поиска сообщений админов и обновления эмбеда
 async def count_admin_actions():
@@ -26,22 +40,27 @@ async def count_admin_actions():
     channel_static_admin = bot.get_channel(STATIC_ADMIN_CHANNEL_ID)
     log_channel = bot.get_channel(LOG_CHANNEL_ID)
     ban_channel = bot.get_channel(BAN_CHANNEL_ID)
+
     if not log_channel or not ban_channel or not channel_static_admin:
         print("Каналы не найдены!")
         return
 
-    # Определяем диапазон дат (текущий месяц)
+    guild = log_channel.guild
+    admin_nicks = await get_valid_admins_with_role(guild, role_id=1248667383334178902)
+
+    if not admin_nicks:
+        print("Нет админов с нужной ролью")
+        return
+
     today = datetime.now()
     first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    month_year = today.strftime("%B %Y")  # Название месяца и год
+    month_year = today.strftime("%B %Y")
 
-    # Словарь для хранения количества ахелпов и банов
-    admin_actions = {nick: {"ахелпы": 0, "баны": 0} for nick in ADMIN_NICKS}
+    admin_actions = {nick: {"ахелпы": 0, "баны": 0} for nick in admin_nicks}
 
-    # Подсчёт ахелпов
     async for message in log_channel.history(limit=4000, after=first_day_of_month):
         for embed in message.embeds:
-            for admin_nick in ADMIN_NICKS:
+            for admin_nick in admin_nicks:
                 if any(admin_nick.lower() in (getattr(embed, attr, "") or "").lower() for attr in ["title", "description"]):
                     admin_actions[admin_nick]["ахелпы"] += 1
                     continue
@@ -50,10 +69,9 @@ async def count_admin_actions():
                         admin_actions[admin_nick]["ахелпы"] += 1
                         break
 
-    # Подсчёт банов
     async for message in ban_channel.history(limit=4000, after=first_day_of_month):
         for embed in message.embeds:
-            for admin_nick in ADMIN_NICKS:
+            for admin_nick in admin_nicks:
                 if any(admin_nick.lower() in (getattr(embed, attr, "") or "").lower() for attr in ["title", "description"]):
                     admin_actions[admin_nick]["баны"] += 1
                     continue
