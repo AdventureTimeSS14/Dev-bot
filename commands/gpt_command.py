@@ -10,21 +10,26 @@ from g4f.Provider import FreeGpt
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import GPT_PROMPT
+from config import GPT_PROMPT, MY_USER_ID
 
 
 @bot.command()
-@commands.cooldown(1, 60, BucketType.user)
 @has_any_role_by_keys("whitelist_role_id")
 async def gpt(ctx, *prompt):
     """
     Команда принимает промт и отправляет его
     к Gpt чату, и присылает от него же ответ.
-
-    Параметры:
-    ctx: Контекст команды из Discord.
-    prompt: Строка запроса, которую пользователь хочет отправить в GPT.
     """
+    EXEMPT_USER_IDS = [MY_USER_ID]  # Пользователи без кулдауна
+
+    # Проверка кулдауна вручную, только если пользователь не в списке исключений
+    if ctx.author.id not in EXEMPT_USER_IDS:
+        bucket = gpt._buckets.get_bucket(ctx.message)
+        retry_after = bucket.update_rate_limit()
+        if retry_after:
+            await ctx.send(f"Эту команду можно использовать снова через {int(retry_after)} секунд.")
+            return
+
     async with ctx.typing():
         formatted_prompt = GPT_PROMPT.format(user_id=ctx.author.id)
         client = Client(provider=FreeGpt)
@@ -37,14 +42,11 @@ async def gpt(ctx, *prompt):
                     {"role": "user", "content": " ".join(prompt)},
                 ],
             )
-            # Отправляем ответ от GPT в канал
             await ctx.send(response.choices[0].message.content)
 
         except (ConnectionError, TimeoutError) as e:
-            # Обработка более конкретных ошибок подключения и таймаутов
             await ctx.send(f"Ошибка при подключении к GPT: {str(e)}")
         except Exception as e:
-            # Общая ошибка для всех остальных случаев
             await ctx.send(f"Произошла ошибка при обращении к GPT: {str(e)}")
 
 
