@@ -58,6 +58,16 @@ POST_ADMIN_API = get_env_variable("POST_ADMIN_API")
 POST_ADMIN_NAME = get_env_variable("POST_ADMIN_NAME")
 POST_ADMIN_GUID = get_env_variable("POST_ADMIN_GUID")
 
+# Загрузка реплеев
+PORTAINER_USERNAME = get_env_variable("PORTAINER_USERNAME")
+PORTAINER_PASSWORD = get_env_variable("PORTAINER_PASSWORD")
+UPLOAD_FOLDER_ID = get_env_variable("UPLOAD_FOLDER_ID")
+PRIVATE_KEY_ID = get_env_variable("PRIVATE_KEY_ID")
+PRIVATE_KEY = get_env_variable("PRIVATE_KEY")
+CLIENT_EMAIL = get_env_variable("CLIENT_EMAIL")
+CLIENT_ID = get_env_variable("CLIENT_ID")
+CLIENT_X509_CERT_URL = get_env_variable("CLIENT_X509_CERT_URL")
+
 # Константы для идентификаторов
 CHANGELOG_CHANNEL_ID = 1089490875182239754
 LOG_CHANNEL_ID = 1141810442721833060
@@ -201,4 +211,19 @@ POST_ADMIN_HEADERS = {
     "Authorization": f"SS14Token {POST_ADMIN_API}",
     "Content-Type": "application/json",
     "Actor": json.dumps(ACTOR_DATA_ADMIN)
+}
+
+# Загрузка реплеев
+SERVICE_ACCOUNT_INFO = {
+    "type": "service_account",
+    "project_id": "ss14replayfolder2233",
+    "private_key_id": PRIVATE_KEY_ID,
+    "private_key": PRIVATE_KEY,
+    "client_email": CLIENT_EMAIL,
+    "client_id": CLIENT_ID,
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": CLIENT_X509_CERT_URL,
+    "universe_domain": "googleapis.com"
 }

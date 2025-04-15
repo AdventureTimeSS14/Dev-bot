@@ -41,8 +41,8 @@ from commands.misc.shutdows_deff import \
 from commands.post_admin import (admin_info_command, admin_presets_command,
                                  bunker_command, game_rules_command,
                                  kick_command, playtime_command,
-                                 restart_command, server_ban_command,
-                                 update_command)
+                                 replay_command, restart_command,
+                                 server_ban_command, update_command)
 from config import DISCORD_KEY
 from events import (on_button_click, on_command, on_error, on_message,
                     on_ready, update_status)

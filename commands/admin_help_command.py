@@ -82,6 +82,10 @@ ADMIN_COMMANDS = [
         "description": "Проверяет, есть ли права у игрока.",
     },
     {
+        "name": "🎬 &replay <round_id>",
+        "description": "Загружает реплей указанного раунда на Google Drive и присылает ссылку на скачивание.",
+    },
+    {
         "name": "👑 &admins [<mrp/dev>](default: mrp)",
         "description": "Список админов и их ранги.",
     },

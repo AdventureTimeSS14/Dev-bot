@@ -55,6 +55,14 @@ jobs:
           echo "POST_ADMIN_API=${{ secrets.POST_ADMIN_API }}" >> $GITHUB_ENV
           echo "POST_ADMIN_NAME=${{ secrets.POST_ADMIN_NAME }}" >> $GITHUB_ENV
           echo "POST_ADMIN_GUID=${{ secrets.POST_ADMIN_GUID }}" >> $GITHUB_ENV
+          echo "PORTAINER_USERNAME=${{ secrets.PORTAINER_USERNAME }}" >> $GITHUB_ENV
+          echo "PORTAINER_PASSWORD=${{ secrets.PORTAINER_PASSWORD }}" >> $GITHUB_ENV
+          echo "UPLOAD_FOLDER_ID=${{ secrets.UPLOAD_FOLDER_ID }}" >> $GITHUB_ENV
+          echo "PRIVATE_KEY_ID=${{ secrets.PRIVATE_KEY_ID }}" >> $GITHUB_ENV
+          echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "CLIENT_EMAIL=${{ secrets.CLIENT_EMAIL }}" >> $GITHUB_ENV
+          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
+          echo "CLIENT_X509_CERT_URL=${{ secrets.CLIENT_X509_CERT_URL }}" >> $GITHUB_ENV
 
       - name: Run bot
         env:
