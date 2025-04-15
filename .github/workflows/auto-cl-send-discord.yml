@@ -15,35 +15,35 @@ jobs:
 
       - name: Send all commit messages to Discord
         run: |
-            for COMMIT_SHA in $(git rev-list ${{ github.event.before }}..${{ github.event.after }}); do
-              SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
-              AUTHOR_NAME=$(git show -s --format="%an" $COMMIT_SHA)
-              COMMIT_DATE=$(git show -s --format="%cd" --date=format:"%Y-%m-%d %H:%M" $COMMIT_SHA)
-              COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
-              COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
-        
-              COMMIT_MESSAGE_ESCAPED=$(printf '%s' "$COMMIT_MESSAGE" | jq -Rs .)
-              TITLE="🟣 [$SHORT_SHA] Новый коммит в ${{ github.repository }}"
-        
-              JSON_PAYLOAD=$(jq -n \
-                --arg title "$TITLE" \
-                --arg url "$COMMIT_URL" \
-                --arg author "$AUTHOR_NAME" \
-                --arg date "$COMMIT_DATE" \
-                --argjson message "$COMMIT_MESSAGE_ESCAPED" \
-                '{
-                  embeds: [{
-                    title: $title,
-                    url: $url,
-                    description: "**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```\($message)```",
-                    color: 10181046
-                  }]
-                }'
-              )
-        
-              curl -X POST "$DISCORD_WEBHOOK_URL" \
-                -H "Content-Type: application/json" \
-                -d "$JSON_PAYLOAD"
-            done
+          for COMMIT_SHA in $(git rev-list --reverse ${{ github.event.before }}..${{ github.event.after }}); do
+            SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
+            AUTHOR_NAME=$(git show -s --format="%an" $COMMIT_SHA)
+            COMMIT_DATE=$(git show -s --format="%cd" --date=format:"%Y-%m-%d %H:%M" $COMMIT_SHA)
+            COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
+            COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
+
+            COMMIT_MESSAGE_ESCAPED=$(printf '%s' "$COMMIT_MESSAGE" | jq -Rs .)
+            TITLE="🟣 [$SHORT_SHA] Новый коммит в ${{ github.repository }}"
+
+            JSON_PAYLOAD=$(jq -n \
+              --arg title "$TITLE" \
+              --arg url "$COMMIT_URL" \
+              --arg author "$AUTHOR_NAME" \
+              --arg date "$COMMIT_DATE" \
+              --argjson message "$COMMIT_MESSAGE_ESCAPED" \
+              '{
+                embeds: [{
+                  title: $title,
+                  url: $url,
+                  description: "**Автор:** \($author)\n**Дата:** \($date)\n**Сообщение:**\n```\($message)```",
+                  color: 10181046
+                }]
+              }'
+            )
+
+            curl -X POST "$DISCORD_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD"
+          done
         env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
