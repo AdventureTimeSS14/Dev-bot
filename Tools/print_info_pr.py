@@ -1,9 +1,10 @@
-from github import Github
+import sys
 from datetime import datetime, timezone
 
-import sys
+from github import Github
+
 sys.path.append("..")
-from config import GITHUB, REPO_NAME, AUTHOR
+from config import AUTHOR, GITHUB, REPO_NAME
 
 GITHUB_TOKEN = GITHUB
 REPO_NAME = f'{AUTHOR}/{REPO_NAME}'

@@ -620,6 +620,65 @@ class DatabaseManagerSS14:
                 cursor.execute(query, (nickname,))
                 return cursor.fetchone()
 
+    def get_user_id_admin_by_username(self, nickname, db_name='main'):
+        """
+        Возращает user_id администратора по его нику
+        Args:
+            nickname (str): Игровой никнейм администратора.
+            db_name (str, optional): Имя БД. Defaults to 'main'.
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT a.user_id FROM public.admin a
+                JOIN public.player p ON a.user_id = p.user_id
+                WHERE p.last_seen_user_name ILIKE %s
+                """
+                cursor.execute(query, (nickname,))
+                result = cursor.fetchone()
+                
+                return result
+
+    def fetch_admin_rank(self, admin_rank, db_name='main'):
+        """
+        Метод для получения id админ ранга по его имени
+        Args:
+            admin_rank (str):
+            db_name (str, optional): Название БД в которую мы делаем запрос. Defaults to 'main'.
+        Returns:
+            Выводит admin_rank_id, или None если такого не нашёл
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT admin_rank_id
+                FROM public.admin_rank
+                WHERE name ILIKE %s
+                """
+                cursor.execute(query, (admin_rank,))
+                result = cursor.fetchone()
+                
+                return result
+
+    def fetch_admin_ranks(self, db_name='main'):
+        """
+        Возращает список админ рангов на МРП или Дев сервере
+        Args:
+            db_name (str, optional): Имя БД к которой мы делаем запрос. Defaults to 'main'.
+        Returns:
+            list: Возращает отсортированный список админ рангов с их айди и именем
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT admin_rank_id, name
+                FROM public.admin_rank ORDER BY admin_rank_id ASC
+                """
+                cursor.execute(query)
+                result = cursor.fetchall()
+                
+                return result
+
     def fetch_admins(self, db_name='main'):
         """
             Функция запроса списка администраторов из базы данных
@@ -643,6 +702,57 @@ class DatabaseManagerSS14:
                 admins = cursor.fetchall()
 
                 return admins
+
+    def permission_add_admin(self, user_id, title, rank, db_name='main'):
+        """
+        С помощью INSERT добавляет нового администратора в таблицу
+        Тем самым выдавая ему права
+        Args:
+            user_id (str): user_id пользователя сс14
+            title (str): Подпись администратора
+            rank (str): Id админ ранга
+            db_name (str, optional): Имя БД. Defaults to 'main'.
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                INSERT INTO
+                public.admin (user_id, title, admin_rank_id)
+                VALUES (%s, %s, %s)
+                """
+                cursor.execute(query, (user_id, title, rank))
+
+    def permission_tweak_admin(self, title, rank, user_id, db_name='main'):
+        """
+        Изменяет обновляет права администратору
+        Args:
+            title (str): Подпись администратора
+            rank (str): Id админ ранга
+            user_id (str): user_id пользователя сс14
+            db_name (str, optional): Имя БД. Defaults to 'main'.
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                UPDATE public.admin
+                SET title = %s, admin_rank_id = %s WHERE user_id = %s
+                """
+                cursor.execute(query, (title, rank, user_id))
+
+    def permission_delete_admin(self, admin_id, db_name='main'):
+        """
+        Удаляет администратора из таблицы по его user_id
+        Args:
+            admin_id (str): admin_id пользователя сс14
+            db_name (str, optional): Имя БД. Defaults to 'main'.
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                DELETE FROM public.admin
+                WHERE user_id = %s
+                """
+                cursor.execute(query, (admin_id,))
 
     def fetch_uploads(self, db_name='main'):
         """
