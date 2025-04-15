@@ -25,10 +25,11 @@ async def gpt(ctx, *prompt):
     # Проверка кулдауна вручную, только если пользователь не в списке исключений
     if ctx.author.id not in EXEMPT_USER_IDS:
         bucket = gpt._buckets.get_bucket(ctx.message)
-        retry_after = bucket.update_rate_limit()
-        if retry_after:
-            await ctx.send(f"Эту команду можно использовать снова через {int(retry_after)} секунд.")
-            return
+        if bucket is not None:
+            retry_after = bucket.get_retry_after()
+            if retry_after:
+                await ctx.send(f"Эту команду можно использовать снова через {int(retry_after)} секунд.")
+                return
 
     async with ctx.typing():
         formatted_prompt = GPT_PROMPT.format(user_id=ctx.author.id)
