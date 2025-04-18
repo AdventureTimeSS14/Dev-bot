@@ -27,6 +27,7 @@ def get_env_variable(name: str, default: str = "NULL") -> str:
 
 # Получение переменных из окружения
 DISCORD_KEY = get_env_variable("DISCORD_KEY")
+DISCORD_TOKEN_USER = get_env_variable("DISCORD_TOKEN_USER")
 GITHUB = get_env_variable("GITHUB")
 ACTION_GITHUB = get_env_variable("ACTION_GITHUB")
 

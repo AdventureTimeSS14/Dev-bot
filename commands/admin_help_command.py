@@ -74,6 +74,10 @@ ADMIN_COMMANDS = [
         "description": "Поиск никнейма игрока по имени персонажа.",
     },
     {
+        "name": "🔍 &find_bans <NickName>",
+        "description": "Ищет баны по нику сразу на нескольких дискорд серверах.",
+    },
+    {
         "name": "🔮 &get_ckey <discord>",
         "description": "Получить ckey игрока по Discord.",
     },

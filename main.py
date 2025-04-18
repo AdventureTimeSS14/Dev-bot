@@ -12,7 +12,7 @@ from bot_init import bot
 from commands import (admin_help_command, echo_command, general_commands,
                       gpt_command, help_command, media_clear_command,
                       shutdown_command, status_command, uptime_command,
-                      user_role_command, user_role_mention_command)
+                      user_role_command, user_role_mention_command, find_bans_command)
 from commands.adt_team import (add_role_command, add_vacation_command,
                                end_vacation_command, extend_vacation_command,
                                new_team_command, remove_role_command,
