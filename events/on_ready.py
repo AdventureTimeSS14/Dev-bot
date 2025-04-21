@@ -65,6 +65,9 @@ async def on_ready():
         (check_end_vacation, "Check End Vacation"),
         (update_permission_stats, "Update Permission Stats")
     ]
+    
+    # Для дебага
+    # tasks_to_start = []
 
     for task, name in tasks_to_start:
         await start_task_if_not_running(task, name)

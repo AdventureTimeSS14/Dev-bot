@@ -1,6 +1,8 @@
-from commands.misc.search_bans_in_channel import search_bans_in_multiple_channels
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
+from commands.misc.search_bans_in_channel import \
+    search_bans_in_multiple_channels
+
 
 @bot.command(name="find_bans")
 @has_any_role_by_keys("whitelist_role_id_administration_post")

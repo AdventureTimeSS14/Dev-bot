@@ -14,10 +14,12 @@
 # # https://discord.com/channels/919301044784226385/921498847862214666
 # # https://discord.com/channels/1354120935225167883/1358791362773913853
 
-import discord
-from discord.ext import commands
 import asyncio
 import random
+
+import discord
+from discord.ext import commands
+
 from config import DISCORD_TOKEN_USER
 
 CHANNELS_TO_CHECK = [

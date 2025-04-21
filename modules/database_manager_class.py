@@ -474,6 +474,24 @@ class DatabaseManagerSS14:
             print(f"Ошибка при запросе к БД: {e}")
             return None
 
+    def get_baninfo_by_ban_id(self, ban_id, db_name='main'):
+        """
+            Возращает информацию о бане по айди бана
+        Args:
+            ban_id (str): Айди бана
+            db_name (str, optional): Имя базы данных ('main' или 'dev'), по умолчанию 'main'
+        """
+        with self._get_connection(db_name) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                SELECT player_user_id, address, ban_time, expiration_time, reason, banning_admin, round_id
+                FROM server_ban
+                WHERE server_ban_id = %s
+                """
+                cursor.execute(query, (ban_id,))
+                result = cursor.fetchone()
+                return result
+
     def fetch_banlist_by_username(self, username, db_name='main'):
         """
             Возращает информацию об истории банов игрока по игровому никнейму

@@ -9,7 +9,8 @@ from googleapiclient.http import MediaIoBaseUpload
 
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
-from config import PORTAINER_USERNAME, PORTAINER_PASSWORD, SERVICE_ACCOUNT_INFO, UPLOAD_FOLDER_ID
+from config import (PORTAINER_PASSWORD, PORTAINER_USERNAME,
+                    SERVICE_ACCOUNT_INFO, UPLOAD_FOLDER_ID)
 
 # Конфигурация
 AUTH_URL = "http://control.adventurestation.space:9000/api/auth"

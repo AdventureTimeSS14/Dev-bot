@@ -9,21 +9,22 @@ import signal
 import sys
 
 from bot_init import bot
-from commands import (admin_help_command, echo_command, general_commands,
-                      gpt_command, help_command, media_clear_command,
-                      shutdown_command, status_command, uptime_command,
-                      user_role_command, user_role_mention_command, find_bans_command)
+from commands import (admin_help_command, echo_command, find_bans_command,
+                      general_commands, gpt_command, help_command,
+                      media_clear_command, shutdown_command, status_command,
+                      uptime_command, user_role_command,
+                      user_role_mention_command)
 from commands.adt_team import (add_role_command, add_vacation_command,
                                end_vacation_command, extend_vacation_command,
                                new_team_command, remove_role_command,
                                remove_team_command, slash_team_command,
                                team_help_command, tweak_team_command,
                                while_list_command)
-from commands.db_ss import (admin_command, admins_command, banlist_command,
-                            multi_akk_db_command, pardon_command,
-                            permissions_command, player_notes_command,
-                            player_time_command, profiles_command,
-                            size_db_command, uploads_command)
+from commands.db_ss import (admin_command, admins_command, baninfo_id_command,
+                            banlist_command, multi_akk_db_command,
+                            pardon_command, permissions_command,
+                            player_notes_command, player_time_command,
+                            profiles_command, size_db_command, uploads_command)
 from commands.db_ss.discord import discord_command
 from commands.dbCommand import (get_vacations_command, help_command,
                                 info_command, status_command)

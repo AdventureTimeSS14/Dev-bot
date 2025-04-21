@@ -50,6 +50,10 @@ ADMIN_COMMANDS = [
         "description": "Выводит список банов игрока.",
     },
     {
+        "name": "🔏 &baninfo_id <BanID>",
+        "description": "Получает полную информацию о бане по его ID.",
+    },
+    {
         "name": "🔨 &ban <NickName> <Reason> <Minutes>",
         "description": "POST запрос на серверный бан. 0 — для пермабана.",
     },
