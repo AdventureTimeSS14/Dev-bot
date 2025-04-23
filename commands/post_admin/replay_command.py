@@ -79,7 +79,7 @@ async def replay_command(ctx, round_id: int):
         token = await async_get_jwt_token()
         files = await async_list_files(token)
         matching_files = [f["Name"] for f in files if str(round_id) in f["Name"]]
-
+        await ctx.send("🔁 Начата загрузка реплея..")
         if not matching_files:
             await ctx.send("❌ Реплей не найден.")
             return
