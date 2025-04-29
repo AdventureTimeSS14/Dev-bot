@@ -73,7 +73,7 @@ async def send_ahat_message_post(message):
 
 async def check_new_player(message):
     # Проверяем, содержит ли сообщение нужный формат
-    if "Оповещение: ЗАШЁЛ НОВИЧОК (" in message.content and ")" in message.content:
+    if "**Оповещение: ЗАШЁЛ НОВИЧОК** (" in message.content and ")" in message.content:
         start_index = message.content.find("(") + 1
         end_index = message.content.find(")")
         nickname = message.content[start_index:end_index]
