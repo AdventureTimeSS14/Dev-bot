@@ -46,3 +46,26 @@ async def check_size_log():
                         )
     except Exception as e:
         print(f"Ошибка в check_size_log: {e}")
+
+
+# TODO: Доделать чтобы при превышении 17 Гб, 
+# прописывались эти скрипты
+"""sql
+DELETE FROM admin_log
+WHERE round_id NOT IN (
+    SELECT DISTINCT round_id 
+    FROM admin_log 
+    ORDER BY round_id DESC 
+    LIMIT 70
+);
+
+VACUUM FULL ANALYZE admin_log;
+
+
+DELETE FROM admin_log_player
+WHERE round_id NOT IN (
+    SELECT DISTINCT round_id FROM admin_log
+);
+
+VACUUM FULL ANALYZE admin_log_player;
+"""
