@@ -9,6 +9,7 @@ from bot_init import bot
 from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS
 from data import JsonData
 from events.utils import get_github_link
+from commands.find_bans_command import find_bans
 
 
 @bot.event
@@ -37,6 +38,7 @@ async def on_message(message):
 
     if message.channel.id == 1309262152586235964:
         await send_ahat_message_post(message)
+        await check_new_player(message)
 
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
@@ -67,6 +69,47 @@ async def send_ahat_message_post(message):
     else:
         print("Status Code:", response.status_code)
         print("Response Text:", response.text)
+
+
+async def check_new_player(message):
+    # Проверяем, содержит ли сообщение нужный формат
+    if "Оповещение: ЗАШЁЛ НОВИЧОК (" in message.content and ")" in message.content:
+        start_index = message.content.find("(") + 1
+        end_index = message.content.find(")")
+        nickname = message.content[start_index:end_index]
+        
+        # Отправляем ник в лог-канал
+        log_channel = bot.get_channel(LOG_CHANNEL_ID)
+        if not log_channel:
+            print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
+            return
+        
+        await log_channel.send(f"Зашёл новый игрок: **{nickname}**")
+        
+        # Создаем искусственный контекст для выполнения команды
+        class FakeContext:
+            def __init__(self, channel, author):
+                self.channel = channel
+                self.author = author
+                self.guild = channel.guild
+                self.bot = bot
+                self.message = None
+                
+            async def send(self, *args, **kwargs):
+                return await self.channel.send(*args, **kwargs)
+                
+            async def trigger_typing(self):
+                return await self.channel.trigger_typing()
+        
+        # Создаем контекст с автором-ботом
+        fake_ctx = FakeContext(log_channel, bot.user)
+        
+        # Прямой вызов функции команды
+        try:
+            await find_bans(fake_ctx, nickname)
+        except Exception as e:
+            await log_channel.send(f"⚠ Ошибка при автоматической проверке банов: {str(e)}")
+
 
 async def handle_message_deletion(message):
     """
