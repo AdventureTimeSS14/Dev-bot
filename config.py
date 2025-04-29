@@ -228,3 +228,5 @@ SERVICE_ACCOUNT_INFO = {
     "client_x509_cert_url": CLIENT_X509_CERT_URL,
     "universe_domain": "googleapis.com"
 }
+
+SCOPES = ['https://www.googleapis.com/auth/drive.file']

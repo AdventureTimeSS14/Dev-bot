@@ -7,6 +7,7 @@ from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
 from tasks.check_end_vacation_task import check_end_vacation
 from tasks.check_new_commit_task import monitor_commits
+from tasks.clear_doker_replay_task import clear_doker_replay_ss14
 from tasks.discord_auth_task import discord_auth_update
 from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
@@ -63,7 +64,8 @@ async def on_ready():
         (update_whitelist_application, "Update WhiteList Application"),
         (update_admin_stats, "Update Admin Stats"),
         (check_end_vacation, "Check End Vacation"),
-        (update_permission_stats, "Update Permission Stats")
+        (update_permission_stats, "Update Permission Stats"),
+        (clear_doker_replay_ss14, "Clear Doker Replay")
     ]
     
     # Для дебага
