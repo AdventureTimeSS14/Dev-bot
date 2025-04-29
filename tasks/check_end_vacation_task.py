@@ -55,7 +55,8 @@ async def check_end_vacation():
 
         # Проходим по всем пользователям, чьи отпуска завершились
         for user_id, data_end_vacation in users_to_end_vacation:
-            await log_channel.send(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
+            user = await bot.fetch_user(user_id)
+            await log_channel.send(f"Пользователь {user.display_name}({user_id}): дата окончания отпуска {data_end_vacation}")
             print(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
 
             # Проверяем, прошла ли дата окончания отпуска или наступила
