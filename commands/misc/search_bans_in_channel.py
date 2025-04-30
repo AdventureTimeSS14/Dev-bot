@@ -130,4 +130,6 @@ async def search_bans_in_multiple_channels(username: str):
         await temp_bot.close()
 
     await temp_bot.start(DISCORD_TOKEN_USER)
-    return result, permanent_ban_count
+    status_message = result[-1]
+    messages = result[:-1]
+    return messages, status_message, permanent_ban_count
