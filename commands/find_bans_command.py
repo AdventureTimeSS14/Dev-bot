@@ -20,13 +20,15 @@ async def find_bans(ctx, username: str):
             await ctx.send("⚠ Произошла ошибка при поиске.")
             return
 
-        *messages, status_message = search_results
+        # Распаковываем: список сообщений, статус и кол-во пермабанов
+        messages, status_message, permanent_bans_count = search_results
+        total_bans = sum(1 for msg in messages if msg.startswith("•"))
 
         if not messages:
             await ctx.send(status_message)
             return
 
-        # Разбиваем сообщения на части по 1900 символов
+        # Разбиваем на чанки до 1900 символов
         chunks = []
         current_chunk = ""
         for text in messages:
@@ -41,6 +43,9 @@ async def find_bans(ctx, username: str):
             await ctx.send(chunk)
 
         await ctx.send(status_message)
+        await ctx.send(f"📊 Всего банов найдено: **{total_bans}**")
+        if permanent_bans_count > 0:
+            await ctx.send(f"🔒 Из них перманентных: **{permanent_bans_count}**")
 
     except Exception as e:
         await ctx.send(f"⚠ Произошла ошибка: {str(e)}")

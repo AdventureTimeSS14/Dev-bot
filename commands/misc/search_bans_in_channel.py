@@ -42,29 +42,26 @@ CHANNELS_TO_CHECK = [
 
 async def search_bans_in_multiple_channels(username: str):
     result = []
+    permanent_ban_count = 0
 
     temp_bot = commands.Bot(command_prefix="!", self_bot=True)
 
     @temp_bot.event
     async def on_ready():
-        nonlocal result
+        nonlocal result, permanent_ban_count
         for guild_id_str, channel_id_str in CHANNELS_TO_CHECK:
             guild_id = int(guild_id_str)
             channel_id = int(channel_id_str)
 
             guild = temp_bot.get_guild(guild_id)
             if not guild:
-                msg = f"❌ Гильдия `{guild_id}` не найдена."
-                result.append(msg)
-                print(msg)
+                result.append(f"❌ Гильдия `{guild_id}` не найдена.")
                 continue
 
             try:
                 channel = guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
             except discord.NotFound:
-                msg = f"❌ Канал `{channel_id}` не найден в **{guild.name}**."
-                result.append(msg)
-                print(msg)
+                result.append(f"❌ Канал `{channel_id}` не найден в **{guild.name}**.")
                 continue
 
             found = 0
@@ -73,65 +70,64 @@ async def search_bans_in_multiple_channels(username: str):
             async for message in channel.history(limit=5000):
                 for embed in message.embeds:
                     match = False
+                    content_to_check = []
 
                     for attr in ["title", "description"]:
                         value = getattr(embed, attr, "") or ""
+                        content_to_check.append(value)
                         if username.lower() in value.lower():
                             match = True
                             break
 
                     if not match:
                         for field in embed.fields:
+                            content_to_check.append(field.name)
+                            content_to_check.append(field.value)
                             if username.lower() in field.name.lower() or username.lower() in field.value.lower():
                                 match = True
                                 break
 
                     if match:
                         found += 1
-                        short = f"• {message.created_at.strftime('%m/%d %H:%M')} — "
 
+                        # Проверка на перманентный бан
+                        for text in content_to_check:
+                            if any(perm in text.lower() for perm in ["навсегда", "перманентный бан"]):
+                                permanent_ban_count += 1
+                                break
+
+                        short = f"• {message.created_at.strftime('%m/%d %H:%M')} — "
                         issuer = "неизвестно"
+                        reason = ""
+
                         for field in embed.fields:
                             if "выдал" in field.name.lower():
                                 issuer = field.value
                             elif "наказание" in field.name.lower():
                                 issuer = field.value
+                            elif "причина" in field.name.lower():
+                                reason = field.value.split("\n")[0].strip()
 
-                        if "выдал" in (embed.description or "").lower():
-                            issuer_line = embed.description.splitlines()
-                            for line in issuer_line:
+                        if embed.description:
+                            for line in embed.description.splitlines():
                                 if "выдал" in line.lower():
                                     issuer = line.split(":", 1)[-1].strip()
-
-                        reason = ""
-                        if embed.description:
-                            lines = embed.description.splitlines()
-                            for line in lines:
                                 if username.lower() in line.lower() or "причина" in line.lower():
                                     reason = line.strip()
-                                    break
-
-                        for field in embed.fields:
-                            if "причина" in field.name.lower():
-                                reason = field.value.split("\n")[0].strip()
-                                break
 
                         short += f"{issuer}: {reason[:60]}".strip()
                         compact_lines.append(short)
 
             if found == 0:
                 result.append(f"🌐 {guild.name} — ✅ Чисто")
-                print(f"[{guild.name}] — Поиск завершён, результатов нет.")
             else:
                 result.append(f"🌐 {guild.name} — ⚠ {found} бан(ов):")
                 result.extend(compact_lines)
-                print(f"[{guild.name}] — Поиск завершён, найдено {found} результат(ов).")
 
             await asyncio.sleep(random.randint(6, 9))
 
         result.append("✅ Поиск завершен.")
-        print("🔍 Поиск завершён во всех каналах.")
         await temp_bot.close()
 
     await temp_bot.start(DISCORD_TOKEN_USER)
-    return result
+    return result, permanent_ban_count
