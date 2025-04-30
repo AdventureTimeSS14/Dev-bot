@@ -43,6 +43,7 @@ CHANNELS_TO_CHECK = [
 async def search_bans_in_multiple_channels(username: str):
     result = []
     permanent_ban_count = 0
+    total_bans = 0
 
     temp_bot = commands.Bot(command_prefix="!", self_bot=True)
 
@@ -89,6 +90,7 @@ async def search_bans_in_multiple_channels(username: str):
 
                     if match:
                         found += 1
+                        total_bans += 1
 
                         # Проверка на перманентный бан
                         for text in content_to_check:
@@ -132,4 +134,4 @@ async def search_bans_in_multiple_channels(username: str):
     await temp_bot.start(DISCORD_TOKEN_USER)
     status_message = result[-1]
     messages = result[:-1]
-    return messages, status_message, permanent_ban_count
+    return messages, status_message, permanent_ban_count, total_bans

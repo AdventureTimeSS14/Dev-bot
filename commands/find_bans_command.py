@@ -21,8 +21,7 @@ async def find_bans(ctx, username: str):
             return
 
         # Распаковываем: список сообщений, статус и кол-во пермабанов
-        messages, status_message, permanent_bans_count = search_results
-        total_bans = sum(1 for msg in messages if msg.startswith("•"))
+        messages, status_message, permanent_bans_count, total_bans = search_results
 
         if not messages:
             await ctx.send(status_message)

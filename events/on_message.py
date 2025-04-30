@@ -10,6 +10,7 @@ from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS
 from data import JsonData
 from events.utils import get_github_link
 from commands.find_bans_command import find_bans
+from commands.misc.search_bans_in_channel import search_bans_in_multiple_channels
 
 
 @bot.event
@@ -77,36 +78,67 @@ async def check_new_player(message):
         start_index = message.content.find("(") + 1
         end_index = message.content.find(")")
         nickname = message.content[start_index:end_index]
-        
         # Отправляем ник в лог-канал
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if not log_channel:
             print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
             return
-        
-        await log_channel.send(f"Зашёл новый игрок: **{nickname}**")
-        
-        # Создаем искусственный контекст для выполнения команды
-        class FakeContext:
-            def __init__(self, channel, author):
-                self.channel = channel
-                self.author = author
-                self.guild = channel.guild
-                self.bot = bot
-                self.message = None
-                
-            async def send(self, *args, **kwargs):
-                return await self.channel.send(*args, **kwargs)
-                
-            async def trigger_typing(self):
-                return await self.channel.trigger_typing()
-        
-        # Создаем контекст с автором-ботом
-        fake_ctx = FakeContext(log_channel, bot.user)
-        
-        # Прямой вызов функции команды
+        await log_channel.send(f"Зашёл новый игрок: `{nickname}`\n🔍 Ищу баны по нику..")
+
         try:
-            await find_bans(fake_ctx, nickname)
+            search_results = await search_bans_in_multiple_channels(nickname)
+            if not search_results:
+                await log_channel.send("⚠ Произошла ошибка при поиске.")
+                return
+            # Распаковываем: список сообщений, статус и кол-во пермабанов
+            messages, status_message, permanent_bans_count, total_bans = search_results
+            if not messages:
+                await log_channel.send(status_message)
+                return
+
+            if permanent_bans_count:
+                reason = " ПДК. Подозрение на набег - перманентный бан на стороннем проекте."
+                url = f"http://{ADDRESS_MRP}:1212/admin/actions/server_ban"
+                post_data = {
+                    "NickName": nickname,
+                    "Reason": reason,
+                    "Time": "0"
+                }
+                # Отправляем запрос
+                try:
+                    response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
+                    response.raise_for_status()
+                    await log_channel.send(f"✅ Запрос на Бан `{nickname}` успешно отправлен!")
+                    return
+                except requests.exceptions.Timeout:
+                    await log_channel.send("🕒 Сервер не ответил за 5 секунд. Попробуйте позже.")
+                except requests.exceptions.ConnectionError as e:
+                    await log_channel.send(f"🔌 Ошибка подключения: {str(e)}")
+                except requests.exceptions.HTTPError as e:
+                    await log_channel.send(f"❌ Ошибка сервера: {e.response.status_code} - {e.response.text}")
+                except Exception as e:
+                    await log_channel.send(f"⚠️ Неизвестная ошибка: {str(e)}")
+            if total_bans:
+                message_adminchat = (
+                    f"⚠ ВНИМАНИЕ! Новый игрок ({nickname}) "
+                    f"имеет {total_bans} бан(а) на сторонних проектах! "
+                    "БУДЬТЕ ВНИМАТЕЛЬНЫ! ^_^"
+                )
+                url = f"http://{ADDRESS_MRP}:1212/admin/actions/a_chat"
+                post_data = {
+                    "Message": message_adminchat,
+                    "NickName": "Астра BOT"
+                }
+                try:
+                    response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
+                    response.raise_for_status()
+                except requests.exceptions.Timeout:
+                    await log_channel.send("Request timed out")
+                except requests.exceptions.RequestException as e:
+                    await log_channel.send(f"Request failed: {e}")
+                else:
+                    await log_channel.send(f"Status Code: {response.status_code}")
+                    await log_channel.send(f"Response Text: {response.text}")
         except Exception as e:
             await log_channel.send(f"⚠ Ошибка при автоматической проверке банов: {str(e)}")
 
