@@ -49,7 +49,7 @@ async def search_bans_in_multiple_channels(username: str):
 
     @temp_bot.event
     async def on_ready():
-        nonlocal result, permanent_ban_count
+        nonlocal result, permanent_ban_count, total_bans
         for guild_id_str, channel_id_str in CHANNELS_TO_CHECK:
             guild_id = int(guild_id_str)
             channel_id = int(channel_id_str)
