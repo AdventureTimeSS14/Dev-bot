@@ -1,3 +1,7 @@
+import io
+import disnake
+from datetime import datetime
+import traceback
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 from commands.misc.search_bans_in_channel import \
@@ -40,3 +44,58 @@ async def find_bans(ctx, username: str):
 
     except Exception as e:
         await ctx.send(f"⚠ Произошла ошибка: {str(e)}")
+
+@bot.command(name="find_bans_debug")
+@has_any_role_by_keys("whitelist_role_id_administration_post")
+async def find_bans_debug(ctx, username: str):
+    """Отправляет результаты поиска банов в виде TXT файла для отладки"""
+    await ctx.send(f"🔍 Ищу баны по нику `{username}` (режим отладки)...")
+
+    try:
+        search_results = await search_bans_in_multiple_channels(username)
+        
+        if not search_results:
+            await ctx.send("⚠ Произошла ошибка при поиске.")
+            return
+
+        *messages, status_message = search_results
+        
+        # Создаем структурированный TXT файл
+        debug_content = f"=== ОТЛАДОЧНАЯ ИНФОРМАЦИЯ О БАНАХ ===\n"
+        debug_content += f"Запрос от: {ctx.author.display_name} ({ctx.author.id})\n"
+        debug_content += f"Дата запроса: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        debug_content += f"Искомый ник: {username}\n\n"
+        
+        debug_content += "=== СТАТУС ===\n"
+        debug_content += f"{status_message}\n\n"
+        
+        debug_content += "=== ПОЛНЫЕ ДАННЫЕ ===\n"
+        for i, message in enumerate(messages, 1):
+            debug_content += f"\n--- Блок данных {i} ---\n"
+            debug_content += message + "\n"
+        
+        debug_content += "\n=== СЫРЫЕ ДАННЫЕ ===\n"
+        debug_content += f"Тип объекта: {type(search_results)}\n"
+        debug_content += f"Количество элементов: {len(search_results)}\n"
+        debug_content += f"Типы элементов: {', '.join(str(type(x)) for x in search_results)}\n"
+        
+        # Создаем временный файл
+        with io.StringIO() as file_stream:
+            file_stream.write(debug_content)
+            file_stream.seek(0)
+            txt_file = disnake.File(file_stream, filename=f"bans_debug_{username}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+            
+            await ctx.send(file=txt_file)
+            await ctx.send("✅ Файл с отладочной информацией сгенерирован")
+
+    except Exception as e:
+        error_msg = f"⚠ Произошла ошибка: {str(e)}\n\nТрейсбек:\n{traceback.format_exc()}"
+        # Отправляем ошибку тоже в файле если она слишком большая
+        if len(error_msg) > 1500:
+            with io.StringIO() as file_stream:
+                file_stream.write(error_msg)
+                file_stream.seek(0)
+                error_file = disnake.File(file_stream, filename=f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+                await ctx.send(file=error_file)
+        else:
+            await ctx.send(error_msg)
