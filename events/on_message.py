@@ -101,7 +101,15 @@ async def check_new_player(message):
                     *(f"{field.name} {field.value}" for field in embed.fields)
                 ]).lower()
                 if nickname.lower() in text:
-                    await log_channel.send(f"⛔ Игрок `{nickname}` уже был забанен ранее — отмена действия.")
+                    # Формируем сообщение со ссылкой на оригинальное сообщение о бане
+                    ban_message = (
+                        f"⛔ Игрок `{nickname}` уже был забанен ранее:\n"
+                        f"• Сервер: {msg.guild.name if msg.guild else 'Unknown'}\n"
+                        f"• Канал: {msg.channel.mention if isinstance(msg.channel, disnake.TextChannel) else '#'+str(msg.channel)}\n"
+                        f"• Дата: {msg.created_at.strftime('%Y-%m-%d %H:%M')}\n"
+                        f"• [Ссылка на сообщение]({msg.jump_url})"
+                    )
+                    await log_channel.send(ban_message)
                     return
 
         try:
