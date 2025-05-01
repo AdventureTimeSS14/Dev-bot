@@ -34,15 +34,15 @@ async def get_valid_admins_with_role(guild, role_id):
 
     return valid_admins
 
-# Функция для поиска сообщений админов и обновления эмбеда
 async def count_admin_actions():
     global EMBED_MESSAGE_ID
     channel_static_admin = bot.get_channel(STATIC_ADMIN_CHANNEL_ID)
     log_channel = bot.get_channel(LOG_CHANNEL_ID)
     ban_channel = bot.get_channel(BAN_CHANNEL_ID)
+    archive_channel = bot.get_channel(1248663316583288872)  # Канал старшей админки
 
-    if not log_channel or not ban_channel or not channel_static_admin:
-        print("Каналы не найдены!")
+    if not log_channel or not ban_channel or not channel_static_admin or not archive_channel:
+        print("Один или несколько каналов не найдены!")
         return
 
     guild = log_channel.guild
@@ -80,42 +80,48 @@ async def count_admin_actions():
                         admin_actions[admin_nick]["баны"] += 1
                         break
 
-    # Формируем текст для эмбеда в виде таблицы
     sorted_admins = sorted(admin_actions.items(), key=lambda x: (x[1]["ахелпы"], x[1]["баны"]), reverse=True)
-    # Находим максимальную длину ника
     max_nick_length = max(len(admin) for admin in admin_actions.keys())
-    # Формируем текст для лидерборда
     leaderboard_text = "```\n" + "\n".join(
         f"{i+1:>2}. {admin:<{max_nick_length}} | ахелпы {data['ахелпы']:>3} | баны {data['баны']:>3}"
         for i, (admin, data) in enumerate(sorted_admins)
     ) + "\n```"
 
-    # Формируем эмбед
     embed = disnake.Embed(
         title=f"📊 Топ админов за {month_year}",
         description=f"**Рейтинг по ахелпам 🆘 и банам 🔨:**\n\n{leaderboard_text}",
         color=disnake.Color.red(),
         timestamp=datetime.now(MOSCOW_TIMEZONE)
     )
-
-    # Устанавливаем подпись (футер)
     embed.set_footer(
-        text="Adventure Time SS14 MRP Server | Данные могут отличаться, точность не 100% | Последнее обновление", 
+        text="Adventure Time SS14 MRP Server | Данные могут отличаться, точность не 100% | Последнее обновление",
         icon_url="https://media.discordapp.net/attachments/1255118642442403986/1351231449470079046/icon-256x256.png"
     )
 
-    # Получаем сообщение с эмбедом и редактируем его
     if EMBED_MESSAGE_ID:
         try:
             msg = await channel_static_admin.fetch_message(EMBED_MESSAGE_ID)
-            await msg.edit(embed=embed)
-            return
+            old_embed = msg.embeds[0] if msg.embeds else None
+            if old_embed and old_embed.title:
+                old_month = old_embed.title.replace("📊 Топ админов за ", "")
+                if old_month != month_year:
+                    # Месяц изменился — пересылаем сообщение в архив
+                    archive_embed = old_embed.copy()
+                    await archive_channel.send(embed=archive_embed)
+                    await log_channel.send(f"📁 Архивирован рейтинг за {old_month} в {archive_channel.mention}")
         except disnake.NotFound:
-            print("Сообщение не найдено, создаем новое!")
-    
-    # Если нет сохраненного сообщения, создаем новое и сохраняем его ID
-    new_msg = await channel_static_admin.send(embed=embed)
-    EMBED_MESSAGE_ID = new_msg.id
+            print("Старое сообщение с эмбедом не найдено. Будет создано новое.")
+
+    # Создаём или обновляем эмбед
+    try:
+        if EMBED_MESSAGE_ID:
+            msg = await channel_static_admin.fetch_message(EMBED_MESSAGE_ID)
+            await msg.edit(embed=embed)
+        else:
+            new_msg = await channel_static_admin.send(embed=embed)
+            EMBED_MESSAGE_ID = new_msg.id
+    except Exception as e:
+        print(f"Ошибка при обновлении/отправке эмбеда: {e}")
 
 # Запуск задачи на обновление каждые 2 часа
 @tasks.loop(hours=2)
