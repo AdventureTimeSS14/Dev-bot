@@ -32,6 +32,9 @@ async def get_valid_admins_with_role(guild, role_id):
         if member and role in member.roles:
             valid_admins.append(nick)
 
+    # Добавляем технический аккаунта также
+    valid_admins.append("AdventureTimeSS14Action")
+
     return valid_admins
 
 async def count_admin_actions():
