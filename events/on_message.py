@@ -124,7 +124,10 @@ async def check_new_player(message):
                 return
 
             if permanent_bans_count:
-                reason = "ПДК. Подозрение на набег — перманентный бан на стороннем проекте."
+                reason = (
+                    "Перманентная блокировка для коммуникации. "
+                    "Подозрение на набег — перманентный бан на стороннем проекте."
+                )
                 url = f"http://{ADDRESS_MRP}:1212/admin/actions/server_ban"
                 post_data = {
                     "NickName": nickname,
