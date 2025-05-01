@@ -73,7 +73,6 @@ async def send_ahat_message_post(message):
 
 
 async def check_new_player(message):
-    # Проверяем, содержит ли сообщение нужный формат
     if "**Оповещение: ЗАШЁЛ НОВИЧОК** (" in message.content and ")" in message.content:
         adminchat_channel = bot.get_channel(1309262152586235964)
         if not adminchat_channel:
@@ -84,12 +83,26 @@ async def check_new_player(message):
         end_index = message.content.find(")")
         nickname = message.content[start_index:end_index]
 
-        # Отправляем ник в лог-канал
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
-        if not log_channel:
-            print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
+        ban_channel = bot.get_channel(1291023511607054387)
+
+        if not log_channel or not ban_channel:
+            print("Не удалось найти один из каналов логов или банов.")
             return
+
         await log_channel.send(f"Зашёл новый игрок: `{nickname}`\n🔍 Ищу баны по нику...")
+
+        # 🔒 Проверка: был ли уже забанен ранее
+        async for msg in ban_channel.history(limit=5000):
+            for embed in msg.embeds:
+                text = " ".join([
+                    embed.title or "",
+                    embed.description or "",
+                    *(f"{field.name} {field.value}" for field in embed.fields)
+                ]).lower()
+                if nickname.lower() in text:
+                    await log_channel.send(f"⛔ Игрок `{nickname}` уже был забанен ранее — отмена действия.")
+                    return
 
         try:
             search_results = await search_bans_in_multiple_channels(nickname)
@@ -113,7 +126,7 @@ async def check_new_player(message):
                 try:
                     response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
                     response.raise_for_status()
-                    await log_channel.send(f"✅ Запрос на Бан `{nickname}` успешно отправлен!")
+                    await log_channel.send(f"✅ Запрос на бан `{nickname}` успешно отправлен!")
                 except requests.exceptions.Timeout:
                     await log_channel.send("🕒 Сервер не ответил за 5 секунд. Попробуйте позже.")
                 except requests.exceptions.ConnectionError as e:
