@@ -75,41 +75,45 @@ async def send_ahat_message_post(message):
 async def check_new_player(message):
     # Проверяем, содержит ли сообщение нужный формат
     if "**Оповещение: ЗАШЁЛ НОВИЧОК** (" in message.content and ")" in message.content:
+        adminchat_channel = bot.get_channel(1309262152586235964)
+        if not adminchat_channel:
+            print("Канал с 1309262152586235964 не найден")
+            return
+
         start_index = message.content.find("(") + 1
         end_index = message.content.find(")")
         nickname = message.content[start_index:end_index]
+
         # Отправляем ник в лог-канал
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if not log_channel:
             print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
             return
-        await log_channel.send(f"Зашёл новый игрок: `{nickname}`\n🔍 Ищу баны по нику..")
+        await log_channel.send(f"Зашёл новый игрок: `{nickname}`\n🔍 Ищу баны по нику...")
 
         try:
             search_results = await search_bans_in_multiple_channels(nickname)
             if not search_results:
                 await log_channel.send("⚠ Произошла ошибка при поиске.")
                 return
-            # Распаковываем: список сообщений, статус и кол-во пермабанов
+
             messages, status_message, permanent_bans_count, total_bans = search_results
             if not messages:
                 await log_channel.send(status_message)
                 return
 
             if permanent_bans_count:
-                reason = " ПДК. Подозрение на набег - перманентный бан на стороннем проекте."
+                reason = "ПДК. Подозрение на набег — перманентный бан на стороннем проекте."
                 url = f"http://{ADDRESS_MRP}:1212/admin/actions/server_ban"
                 post_data = {
                     "NickName": nickname,
                     "Reason": reason,
                     "Time": "0"
                 }
-                # Отправляем запрос
                 try:
                     response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
                     response.raise_for_status()
                     await log_channel.send(f"✅ Запрос на Бан `{nickname}` успешно отправлен!")
-                    return
                 except requests.exceptions.Timeout:
                     await log_channel.send("🕒 Сервер не ответил за 5 секунд. Попробуйте позже.")
                 except requests.exceptions.ConnectionError as e:
@@ -118,7 +122,12 @@ async def check_new_player(message):
                     await log_channel.send(f"❌ Ошибка сервера: {e.response.status_code} - {e.response.text}")
                 except Exception as e:
                     await log_channel.send(f"⚠️ Неизвестная ошибка: {str(e)}")
-            if total_bans:
+
+                message_for_adminchat = f"🔒 Игрок `{nickname}` получил **перманентный бан** (найдено {permanent_bans_count} пермабан(ов))."
+                await log_channel.send(message_for_adminchat)
+                await adminchat_channel.send(message_for_adminchat)
+
+            elif total_bans:
                 message_adminchat = (
                     f"⚠ ВНИМАНИЕ! Новый игрок ({nickname}) "
                     f"имеет {total_bans} бан(а) на сторонних проектах! "
@@ -129,16 +138,24 @@ async def check_new_player(message):
                     "Message": message_adminchat,
                     "NickName": "Астра BOT"
                 }
+
+                await adminchat_channel.send(message_adminchat)
+
                 try:
                     response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
                     response.raise_for_status()
                 except requests.exceptions.Timeout:
-                    await log_channel.send("Request timed out")
+                    await log_channel.send("🕒 Сервер не ответил за 5 секунд при отправке сообщения в a-chat.")
                 except requests.exceptions.RequestException as e:
                     await log_channel.send(f"Request failed: {e}")
                 else:
+                    await log_channel.send(f"⚠ Игрок `{nickname}` имеет {total_bans} бан(а), **но перманентных нет**.")
                     await log_channel.send(f"Status Code: {response.status_code}")
                     await log_channel.send(f"Response Text: {response.text}")
+
+            else:
+                await log_channel.send(f"✅ Игрок `{nickname}` чист — **банов не найдено**.")
+
         except Exception as e:
             await log_channel.send(f"⚠ Ошибка при автоматической проверке банов: {str(e)}")
 

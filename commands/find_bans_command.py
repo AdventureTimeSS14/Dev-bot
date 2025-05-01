@@ -45,6 +45,7 @@ async def find_bans(ctx, username: str):
         await ctx.send(f"📊 Всего банов найдено: **{total_bans}**")
         if permanent_bans_count > 0:
             await ctx.send(f"🔒 Из них перманентных: **{permanent_bans_count}**")
+        await ctx.send(f"{ctx.author.mention} поиск банов по нику: `{username}` завершён!")
 
     except Exception as e:
         await ctx.send(f"⚠ Произошла ошибка: {str(e)}")
