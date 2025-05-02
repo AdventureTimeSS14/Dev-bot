@@ -126,7 +126,7 @@ async def search_bans_in_multiple_channels(username: str):
                 result.append(f"🌐 {guild.name} — ⚠ {found} бан(ов):")
                 result.extend(compact_lines)
 
-            await asyncio.sleep(random.randint(6, 9))
+            await asyncio.sleep(random.randint(1, 2))
 
         result.append("✅ Поиск завершен.")
         await temp_bot.close()
