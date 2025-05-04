@@ -40,35 +40,29 @@ CHANNELS_TO_CHECK = [
     ("1354120935225167883", "1358791362773913853"), # [Space Dream - [MRP][18+][SS14]]
 ]
 
-async def search_bans_in_multiple_channels(username: str):
-    result = []
-    permanent_ban_count = 0
-    total_bans = 0
+SEMAPHORE_LIMIT = 3  # регулировать: 3–5 безопасно
 
-    temp_bot = commands.Bot(command_prefix="!", self_bot=True)
+async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, shared_data):
+    async with semaphore:
+        guild_id = int(guild_id_str)
+        channel_id = int(channel_id_str)
 
-    @temp_bot.event
-    async def on_ready():
-        nonlocal result, permanent_ban_count, total_bans
-        for guild_id_str, channel_id_str in CHANNELS_TO_CHECK:
-            guild_id = int(guild_id_str)
-            channel_id = int(channel_id_str)
+        guild = bot.get_guild(guild_id)
+        if not guild:
+            shared_data["result"].append(f"❌ Гильдия `{guild_id}` не найдена.")
+            return
 
-            guild = temp_bot.get_guild(guild_id)
-            if not guild:
-                result.append(f"❌ Гильдия `{guild_id}` не найдена.")
-                continue
+        try:
+            channel = guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
+        except discord.NotFound:
+            shared_data["result"].append(f"❌ Канал `{channel_id}` не найден в **{guild.name}**.")
+            return
 
-            try:
-                channel = guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
-            except discord.NotFound:
-                result.append(f"❌ Канал `{channel_id}` не найден в **{guild.name}**.")
-                continue
+        found = 0
+        compact_lines = []
 
-            found = 0
-            compact_lines = []
-
-            async for message in channel.history(limit=5000):
+        try:
+            async for message in channel.history(limit=4000):
                 for embed in message.embeds:
                     match = False
                     content_to_check = []
@@ -90,12 +84,11 @@ async def search_bans_in_multiple_channels(username: str):
 
                     if match:
                         found += 1
-                        total_bans += 1
+                        shared_data["total_bans"] += 1
 
-                        # Проверка на перманентный бан
                         for text in content_to_check:
                             if any(perm in text.lower() for perm in ["навсегда", "перманентный бан"]):
-                                permanent_ban_count += 1
+                                shared_data["permanent_ban_count"] += 1
                                 break
 
                         short = f"• {message.created_at.strftime('%m/%d %H:%M')} — "
@@ -120,18 +113,54 @@ async def search_bans_in_multiple_channels(username: str):
                         short += f"{issuer}: {reason[:60]}".strip()
                         compact_lines.append(short)
 
-            if found == 0:
-                result.append(f"🌐 {guild.name} — ✅ Чисто")
+        except discord.errors.HTTPException as e:
+            if e.status == 429:
+                retry_after = getattr(e, 'retry_after', 10)
+                wait_time = float(retry_after) if isinstance(retry_after, (int, float)) else 10
+                shared_data["result"].append(
+                    f"⏳ Rate Limit в **{guild.name}**, ждём {wait_time:.1f} сек..."
+                )
+                await asyncio.sleep(wait_time + random.uniform(1, 3))
+                await process_guild(guild_id_str, channel_id_str, username, bot, semaphore, shared_data)
+                return
             else:
-                result.append(f"🌐 {guild.name} — ⚠ {found} бан(ов):")
-                result.extend(compact_lines)
+                shared_data["result"].append(f"❌ Ошибка в {guild.name}: {str(e)}")
+                return
 
-            await asyncio.sleep(random.randint(1, 2))
+        if found == 0:
+            shared_data["result"].append(f"🌐 {guild.name} — ✅ Чисто")
+        else:
+            shared_data["result"].append(f"🌐 {guild.name} — ⚠ {found} бан(ов):")
+            shared_data["result"].extend(compact_lines)
 
-        result.append("✅ Поиск завершен.")
+        await asyncio.sleep(random.uniform(1, 2))
+
+
+async def search_bans_in_multiple_channels(username: str):
+    result = []
+    shared_data = {
+        "result": result,
+        "permanent_ban_count": 0,
+        "total_bans": 0,
+    }
+
+    temp_bot = commands.Bot(command_prefix="!", self_bot=True)
+
+    @temp_bot.event
+    async def on_ready():
+        semaphore = asyncio.Semaphore(SEMAPHORE_LIMIT)
+
+        tasks = [
+            process_guild(guild_id, channel_id, username, temp_bot, semaphore, shared_data)
+            for guild_id, channel_id in CHANNELS_TO_CHECK
+        ]
+
+        await asyncio.gather(*tasks)
+        shared_data["result"].append("✅ Поиск завершен.")
         await temp_bot.close()
 
     await temp_bot.start(DISCORD_TOKEN_USER)
+
     status_message = result[-1]
     messages = result[:-1]
-    return messages, status_message, permanent_ban_count, total_bans
+    return messages, status_message, shared_data["permanent_ban_count"], shared_data["total_bans"]
