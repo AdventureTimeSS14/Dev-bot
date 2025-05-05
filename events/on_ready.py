@@ -3,6 +3,7 @@ import time
 
 from bot_init import bot, db_sponsor, ss14_db
 from commands.github import check_workflows
+from commands.misc.search_bans_in_channel import search_bans_in_multiple_channels
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
 from tasks.check_end_vacation_task import check_end_vacation
@@ -92,6 +93,8 @@ async def on_ready():
         )
     else:
         print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
+    
+    search_results = await search_bans_in_multiple_channels("TestSearch")
 
     # Запуск задачи для автоматического завершения работы через определённое время
     bot.loop.create_task(shutdown_after_time())

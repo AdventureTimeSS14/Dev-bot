@@ -16,11 +16,16 @@
 
 import asyncio
 import random
+import os
+import pickle
 
 import discord
 from discord.ext import commands
 
 from config import DISCORD_TOKEN_USER
+
+CACHE_DIR = "cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
 
 CHANNELS_TO_CHECK = [
     ("1225126931532353568", "1226254116368683088"), # [Space Cats]
@@ -40,9 +45,24 @@ CHANNELS_TO_CHECK = [
     ("1354120935225167883", "1358791362773913853"), # [Space Dream - [MRP][18+][SS14]]
 ]
 
-SEMAPHORE_LIMIT = 3  # регулировать: 3–5 безопасно
+SEMAPHORE_LIMIT = 3
 
-async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, shared_data):
+def get_cache_path(channel_id):
+    return os.path.join(CACHE_DIR, f"{channel_id}_messages.pkl")
+
+def load_cache(channel_id):
+    path = get_cache_path(channel_id)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    return []
+
+def save_cache(channel_id, messages):
+    path = get_cache_path(channel_id)
+    with open(path, "wb") as f:
+        pickle.dump(messages, f)
+
+async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, shared_data, force_update=False):
     async with semaphore:
         guild_id = int(guild_id_str)
         channel_id = int(channel_id_str)
@@ -58,61 +78,21 @@ async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, 
             shared_data["result"].append(f"❌ Канал `{channel_id}` не найден в **{guild.name}**.")
             return
 
-        found = 0
-        compact_lines = []
+        if not force_update:
+            cached_embeds = load_cache(channel_id)
+            last_cached_time = cached_embeds[-1]["created_at"] if cached_embeds else None
+        else:
+            cached_embeds = []
+            last_cached_time = None
+
+        new_messages = []
 
         try:
-            async for message in channel.history(limit=4000):
-                for embed in message.embeds:
-                    match = False
-                    content_to_check = []
-
-                    for attr in ["title", "description"]:
-                        value = getattr(embed, attr, "") or ""
-                        content_to_check.append(value)
-                        if username.lower() in value.lower():
-                            match = True
-                            break
-
-                    if not match:
-                        for field in embed.fields:
-                            content_to_check.append(field.name)
-                            content_to_check.append(field.value)
-                            if username.lower() in field.name.lower() or username.lower() in field.value.lower():
-                                match = True
-                                break
-
-                    if match:
-                        found += 1
-                        shared_data["total_bans"] += 1
-
-                        for text in content_to_check:
-                            if any(perm in text.lower() for perm in ["навсегда", "перманентный бан"]):
-                                shared_data["permanent_ban_count"] += 1
-                                break
-
-                        short = f"• {message.created_at.strftime('%m/%d %H:%M')} — "
-                        issuer = "неизвестно"
-                        reason = ""
-
-                        for field in embed.fields:
-                            if "выдал" in field.name.lower():
-                                issuer = field.value
-                            elif "наказание" in field.name.lower():
-                                issuer = field.value
-                            elif "причина" in field.name.lower():
-                                reason = field.value.split("\n")[0].strip()
-
-                        if embed.description:
-                            for line in embed.description.splitlines():
-                                if "выдал" in line.lower():
-                                    issuer = line.split(":", 1)[-1].strip()
-                                if username.lower() in line.lower() or "причина" in line.lower():
-                                    reason = line.strip()
-
-                        short += f"{issuer}: {reason[:60]}".strip()
-                        compact_lines.append(short)
-
+            async for msg in channel.history(limit=5000, after=last_cached_time):
+                new_messages.append({
+                    "created_at": msg.created_at,
+                    "embeds": [embed.to_dict() for embed in msg.embeds]
+                })
         except discord.errors.HTTPException as e:
             if e.status == 429:
                 retry_after = getattr(e, 'retry_after', 10)
@@ -127,6 +107,66 @@ async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, 
                 shared_data["result"].append(f"❌ Ошибка в {guild.name}: {str(e)}")
                 return
 
+        if new_messages:
+            cached_embeds.extend(new_messages)
+            save_cache(channel_id, cached_embeds)
+
+        found = 0
+        compact_lines = []
+
+        for msg in cached_embeds:
+            created_at = msg["created_at"]
+            for raw_embed in msg["embeds"]:
+                embed = discord.Embed.from_dict(raw_embed)
+                match = False
+                content_to_check = []
+
+                for attr in ["title", "description"]:
+                    value = getattr(embed, attr, "") or ""
+                    content_to_check.append(value)
+                    if username.lower() in value.lower():
+                        match = True
+                        break
+
+                if not match:
+                    for field in embed.fields:
+                        content_to_check.append(field.name)
+                        content_to_check.append(field.value)
+                        if username.lower() in field.name.lower() or username.lower() in field.value.lower():
+                            match = True
+                            break
+
+                if match:
+                    found += 1
+                    shared_data["total_bans"] += 1
+
+                    for text in content_to_check:
+                        if any(perm in text.lower() for perm in ["навсегда", "перманентный бан"]):
+                            shared_data["permanent_ban_count"] += 1
+                            break
+
+                    short = f"• {created_at.strftime('%m/%d %H:%M')} — "
+                    issuer = "неизвестно"
+                    reason = ""
+
+                    for field in embed.fields:
+                        if "выдал" in field.name.lower():
+                            issuer = field.value
+                        elif "наказание" in field.name.lower():
+                            issuer = field.value
+                        elif "причина" in field.name.lower():
+                            reason = field.value.split("\n")[0].strip()
+
+                    if embed.description:
+                        for line in embed.description.splitlines():
+                            if "выдал" in line.lower():
+                                issuer = line.split(":", 1)[-1].strip()
+                            if username.lower() in line.lower() or "причина" in line.lower():
+                                reason = line.strip()
+
+                    short += f"{issuer}: {reason[:60]}".strip()
+                    compact_lines.append(short)
+
         if found == 0:
             shared_data["result"].append(f"🌐 {guild.name} — ✅ Чисто")
         else:
@@ -135,8 +175,7 @@ async def process_guild(guild_id_str, channel_id_str, username, bot, semaphore, 
 
         await asyncio.sleep(random.uniform(1, 2))
 
-
-async def search_bans_in_multiple_channels(username: str):
+async def search_bans_in_multiple_channels(username: str, force_update: bool = False):
     result = []
     shared_data = {
         "result": result,
@@ -151,7 +190,7 @@ async def search_bans_in_multiple_channels(username: str):
         semaphore = asyncio.Semaphore(SEMAPHORE_LIMIT)
 
         tasks = [
-            process_guild(guild_id, channel_id, username, temp_bot, semaphore, shared_data)
+            process_guild(guild_id, channel_id, username, temp_bot, semaphore, shared_data, force_update)
             for guild_id, channel_id in CHANNELS_TO_CHECK
         ]
 
