@@ -3,7 +3,8 @@ import time
 
 from bot_init import bot, db_sponsor, ss14_db
 from commands.github import check_workflows
-from commands.misc.search_bans_in_channel import search_bans_in_multiple_channels
+from commands.misc.search_bans_in_channel import \
+    search_bans_in_multiple_channels
 from config import LOG_CHANNEL_ID
 from events.shutdows_after_time import shutdown_after_time
 from tasks.check_end_vacation_task import check_end_vacation

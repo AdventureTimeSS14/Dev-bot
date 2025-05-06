@@ -440,6 +440,46 @@ class DatabaseManagerSS14:
             print(f"Ошибка при запросе к БД: {e}")
             return None
 
+    def get_user_id_by_username(self, last_seen_user_name, db_name='main'):
+        """
+        Получает user_id  игрока по его никнейму.
+
+        Производит поиск в указанной базе данных в таблице player,
+        возвращая значение user_id для заданного last_seen_user_name.
+
+        Parameters
+        ----------
+        last_seen_user_name. : str
+            Никнейм пользователя в системе.
+            Ожидается строковое значение.
+        
+        db_name : str, optional
+            Целевая база данных для поиска, по умолчанию 'main'.
+            Допустимые значения:
+            - 'main' - основная рабочая база данных
+            - 'dev' - тестовая база данных
+
+        Returns
+        -------
+        str | None
+            - user_id пользователя, если найден
+            - None, если пользователь не найден или произошла ошибка
+        """
+        try:
+            with self._get_connection(db_name) as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                    SELECT user_id 
+                    FROM player 
+                    WHERE last_seen_user_name = %s
+                    """
+                    cursor.execute(query, (last_seen_user_name,))
+                    result = cursor.fetchone()
+                    return result[0] if result else None
+        except psycopg2.Error as e:
+            print(f"Ошибка при запросе к БД: {e}")
+            return None
+
     def fetch_player_notes_by_username(self, username, db_name='main'):
         """
             Функция получения заметок из БД

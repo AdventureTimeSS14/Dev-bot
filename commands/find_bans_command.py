@@ -1,7 +1,9 @@
 import io
-import disnake
-from datetime import datetime
 import traceback
+from datetime import datetime
+
+import disnake
+
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 from commands.misc.search_bans_in_channel import \
