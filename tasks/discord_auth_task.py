@@ -117,14 +117,14 @@ class NicknameModal(disnake.ui.Modal):
             await discord_user.send(
                 embed=disnake.Embed(
                     title="✅ Привязка завершена!",
-                    description=f"Ваш SS14 user_id **{user_id}** успешно привязан.",
+                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
                     color=disnake.Color.green(),
                 )
             )
             await inter.send(
                 embed=disnake.Embed(
                     title="✅ Привязка завершена!",
-                    description=f"Ваш SS14 user_id **{user_id}** успешно привязан.",
+                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
                     color=disnake.Color.green(),
                 ),
                 ephemeral=True
