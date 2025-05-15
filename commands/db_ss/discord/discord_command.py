@@ -70,6 +70,7 @@ async def linc_dis(
 
     # Привязываем пользователя
     ss14_db.link_user_to_discord(user_id, discord_id)
+    ss14_db.link_user_to_discord(user_id, discord_id, "dev")
 
     await inter.response.send_message(
         f"✅ Игровой профиль `{nickname}` успешно "
@@ -90,8 +91,14 @@ async def unlink_dis(
     """
 
     result = ss14_db.unlink_user_from_discord(discord)
+    result_dev = ss14_db.unlink_user_from_discord(discord, "dev")
 
     if result:
         await inter.response.send_message(f"✅ Привязка для {discord.mention} удалена.")
     else:
         await inter.response.send_message(f"❌ Привязка для {discord.mention} не найдена.")
+
+    if result_dev:
+        await inter.response.send_message(f"✅ Привязка для {discord.mention} удалена. DEV server")
+    else:
+        await inter.response.send_message(f"❌ Привязка для {discord.mention} не найдена. DEV server")

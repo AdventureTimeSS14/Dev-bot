@@ -107,6 +107,7 @@ class NicknameModal(disnake.ui.Modal):
         creation_date = get_creation_date(user_id)
 
         ss14_db.link_user_to_discord(user_id, discord_id)
+        ss14_db.link_user_to_discord(user_id, discord_id, "dev")
 
         await tech_channel.send(
             f"✅ **Привязка аккаунта**\n"
