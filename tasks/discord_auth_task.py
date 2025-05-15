@@ -45,9 +45,13 @@ class NicknameModal(disnake.ui.Modal):
             print("Ошибка: tech_channel не найден. Проверь ID или права доступа.")
             return
 
-        # Проверяем, что user_id числовой
-        if not user_id_input.isdigit():
-            await inter.send("❌ Введите корректный числовой user_id SS14.", ephemeral=True)
+        # Проверяем user_id на валидность
+        if not user_id_input or not user_id_input.strip():
+            await inter.send(
+                "❌ Ошибка: User ID не может быть пустым.\n"
+                "Пожалуйста, введите ваш User ID.",
+                ephemeral=True
+            )
             return
 
         user_id = user_id_input
