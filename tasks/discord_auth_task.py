@@ -8,7 +8,7 @@ from modules.get_creation_date import get_creation_date
 
 CHANNEL_AUTH_DISCORD_SS14_ID = 1351213738774237184
 AUTH_MESSAGE_ID = 1352243068220342362
-TECH_CHANNEL_ID = 1352227442730864650  # ID техканала для логов
+TECH_CHANNEL_ID = 1372556297773256795  # ID техканала для логов привязки акков
 
 async def get_pinned_message(channel):
     """
@@ -57,7 +57,7 @@ class NicknameModal(disnake.ui.Modal):
         user_id = user_id_input
 
         # Проверяем, есть ли пользователь в базе по user_id
-        player_data = ss14_db.fetch_player_data_by_user_id(user_id)  # Понадобится метод для поиска по user_id
+        player_data = ss14_db.get_username_by_user_id(user_id)
         if not player_data:
             try:
                 user = await inter.bot.fetch_user(discord_id)
@@ -102,10 +102,13 @@ class NicknameModal(disnake.ui.Modal):
         ss14_db.link_user_to_discord(user_id, discord_id)
         ss14_db.link_user_to_discord(user_id, discord_id, "dev")
 
+        user = await bot.fetch_user(discord_id)
+        userNamePlayer = ss14_db.get_username_by_user_id(user_id)
+        
         await tech_channel.send(
             f"✅ **Привязка аккаунта**\n"
-            f"> **Discord ID:** {discord_id}\n"
-            f"> **SS14 ID:** `{user_id}`\n"
+            f"> **Discord ID:** {user.name} - {discord_id} \n"
+            f"> **SS14 ID:** {userNamePlayer} - `{user_id}`\n"
             f"> **Дата создания аккаунта SS14:** {creation_date}\n"
         )
 

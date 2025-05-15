@@ -86,19 +86,21 @@ async def unlink_dis(
 ):
     """
     Удаляет привязку Discord-аккаунта.
-    
-    Использование: /unlink_dis <пинг Discord>
     """
 
     result = ss14_db.unlink_user_from_discord(discord)
     result_dev = ss14_db.unlink_user_from_discord(discord, "dev")
 
+    message = ""
+
     if result:
-        await inter.response.send_message(f"✅ Привязка для {discord.mention} удалена.")
+        message += f"✅ Привязка для {discord.mention} удалена.\n"
     else:
-        await inter.response.send_message(f"❌ Привязка для {discord.mention} не найдена.")
+        message += f"❌ Привязка для {discord.mention} не найдена.\n"
 
     if result_dev:
-        await inter.response.send_message(f"✅ Привязка для {discord.mention} удалена. DEV server")
+        message += f"✅ Привязка для {discord.mention} удалена. DEV server\n"
     else:
-        await inter.response.send_message(f"❌ Привязка для {discord.mention} не найдена. DEV server")
+        message += f"❌ Привязка для {discord.mention} не найдена. DEV server\n"
+
+    await inter.response.send_message(message)
