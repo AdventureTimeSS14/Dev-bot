@@ -21,7 +21,7 @@ async def get_ckey(ctx, discordUser: disnake.Member):
             return
 
         await ctx.send(
-            f"🔹 **Discord:** {discordUser.nick} (ID: {discordUser.id})\n"
+            f"🔹 **Discord:** {discordUser.name} (ID: {discordUser.id})\n"
             f"🔹 **SS14 ник:** `{userName}`"
         )
     except Exception as e:
