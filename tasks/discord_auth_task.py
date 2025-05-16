@@ -42,36 +42,59 @@ class NicknameModal(disnake.ui.Modal):
         tech_channel = inter.bot.get_channel(TECH_CHANNEL_ID)
 
         if tech_channel is None:
-            print("Ошибка: tech_channel не найден.")
+            print("Ошибка: tech_channel не найден. Проверь ID или права доступа.")
             return
 
-        if not user_id_input:
-            await inter.send("❌ Ошибка: User ID не может быть пустым.", ephemeral=True)
+        # Проверяем user_id на валидность
+        if not user_id_input or not user_id_input.strip():
+            await inter.send(
+                "❌ Ошибка: User ID не может быть пустым.\n"
+                "Пожалуйста, введите ваш User ID.",
+                ephemeral=True
+            )
             return
 
         user_id = user_id_input
 
+        # Проверяем, есть ли пользователь в базе по user_id
         player_data = ss14_db.get_username_by_user_id(user_id)
         if not player_data:
             try:
                 user = await inter.bot.fetch_user(discord_id)
-                await user.send("❌ Ваш user_id не найден в базе данных. Попробуйте позже!")
+                await user.send(
+                    "❌ Ваш user_id не найден в базе данных. Попробуйте позже!"
+                )
+                await inter.send(
+                    "❌ Ваш user_id не найден в базе данных. Попробуйте позже!",
+                    ephemeral=True
+                )
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
 
-            await inter.send("❌ Ваш user_id не найден в базе данных. Попробуйте позже!", ephemeral=True)
-            await tech_channel.send(f"⚠️ Пользователь <@{discord_id}> пытался привязать несуществующий user_id {user_id}.")
+            await tech_channel.send(
+                f"⚠️ Пользователь <@{discord_id}> пытался привязать несуществующий user_id **{user_id}**."
+            )
             return
 
+        # Далее — логика привязки, аналогичная твоей, с использованием user_id
+
+        # Проверка, привязан ли уже
         if ss14_db.is_user_linked(user_id, discord_id):
             try:
-                user = await inter.bot.fetch_user(discord_id)
-                await user.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.")
+                discord_user = await inter.bot.fetch_user(discord_id)
+                await discord_user.send(
+                    "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна."
+                )
+                await inter.send(
+                    "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.",
+                    ephemeral=True
+                )
             except disnake.Forbidden:
                 print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
 
-            await inter.send("❌ Ваш аккаунт уже привязан! Повторная привязка невозможна.", ephemeral=True)
-            await tech_channel.send(f"⚠️ Пользователь <@{discord_id}> пытался повторно привязать user_id {user_id}.")
+            await tech_channel.send(
+                f"⚠️ Пользователь <@{discord_id}> пытался повторно привязать user_id **{user_id}**."
+            )
             return
 
         creation_date = get_creation_date(user_id)
@@ -79,45 +102,35 @@ class NicknameModal(disnake.ui.Modal):
         ss14_db.link_user_to_discord(user_id, discord_id)
         ss14_db.link_user_to_discord(user_id, discord_id, "dev")
 
+        user = await bot.fetch_user(discord_id)
         userNamePlayer = ss14_db.get_username_by_user_id(user_id)
+        
+        await tech_channel.send(
+            f"✅ **Привязка аккаунта**\n"
+            f"> **Discord ID:** {user.name} - {discord_id} \n"
+            f"> **SS14 ID:** {userNamePlayer} - `{user_id}`\n"
+            f"> **Дата создания аккаунта SS14:** {creation_date}\n"
+        )
 
-        # ⬇ Обернуто в отдельные try/except для устойчивости
         try:
             discord_user = await inter.bot.fetch_user(discord_id)
-            try:
-                await discord_user.send(
-                    embed=disnake.Embed(
-                        title="✅ Привязка завершена!",
-                        description=f"Ваш SS14 аккаунт {userNamePlayer} user_id {user_id} успешно привязан.",
-                        color=disnake.Color.green(),
-                    )
+            await discord_user.send(
+                embed=disnake.Embed(
+                    title="✅ Привязка завершена!",
+                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
+                    color=disnake.Color.green(),
                 )
-            except disnake.Forbidden:
-                print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
-        except Exception as e:
-            print(f"⚠️ Ошибка при fetch_user: {e}")
-
-        try:
+            )
             await inter.send(
                 embed=disnake.Embed(
                     title="✅ Привязка завершена!",
-                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id {user_id} успешно привязан.",
+                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
                     color=disnake.Color.green(),
                 ),
                 ephemeral=True
             )
-        except Exception as e:
-            print(f"⚠️ Ошибка при ответе в модалке: {e}")
-
-        try:
-            await tech_channel.send(
-                f"✅ Привязка аккаунта\n"
-                f"> Discord ID: {inter.author.name} - {discord_id} \n"
-                f"> SS14 ID: {userNamePlayer} - {user_id}\n"
-                f"> Дата создания аккаунта SS14: {creation_date}\n"
-            )
-        except Exception as e:
-            print(f"⚠️ Ошибка при логировании в техканал: {e}")
+        except disnake.Forbidden:
+            print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
 
 
 # Класс для кнопки
