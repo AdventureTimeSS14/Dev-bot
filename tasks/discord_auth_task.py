@@ -96,6 +96,24 @@ class NicknameModal(disnake.ui.Modal):
                 f"⚠️ Пользователь <@{discord_id}> пытался повторно привязать user_id **{user_id}**."
             )
             return
+        
+        if ss14_db.is_user_linked(user_id, discord_id, "dev"):
+            try:
+                discord_user = await inter.bot.fetch_user(discord_id)
+                await discord_user.send(
+                    "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна. DEV"
+                )
+                await inter.send(
+                    "❌ Ваш аккаунт уже привязан! Повторная привязка невозможна. DEV",
+                    ephemeral=True
+                )
+            except disnake.Forbidden:
+                print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
+
+            await tech_channel.send(
+                f"⚠️ Пользователь <@{discord_id}> пытался повторно привязать user_id **{user_id}**. DEV"
+            )
+            return
 
         creation_date = get_creation_date(user_id)
 
@@ -111,26 +129,15 @@ class NicknameModal(disnake.ui.Modal):
             f"> **SS14 ID:** {userNamePlayer} - `{user_id}`\n"
             f"> **Дата создания аккаунта SS14:** {creation_date}\n"
         )
+        await inter.send(
+            embed=disnake.Embed(
+                title="✅ Привязка завершена!",
+                description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
+                color=disnake.Color.green(),
+            ),
+            ephemeral=True
+        )
 
-        try:
-            discord_user = await inter.bot.fetch_user(discord_id)
-            await discord_user.send(
-                embed=disnake.Embed(
-                    title="✅ Привязка завершена!",
-                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
-                    color=disnake.Color.green(),
-                )
-            )
-            await inter.send(
-                embed=disnake.Embed(
-                    title="✅ Привязка завершена!",
-                    description=f"Ваш SS14 аккаунт {userNamePlayer} user_id **{user_id}** успешно привязан.",
-                    color=disnake.Color.green(),
-                ),
-                ephemeral=True
-            )
-        except disnake.Forbidden:
-            print(f"⚠️ Не удалось отправить ЛС пользователю {discord_id}")
 
 
 # Класс для кнопки

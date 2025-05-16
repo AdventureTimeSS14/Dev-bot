@@ -297,12 +297,17 @@ class DatabaseManagerSS14:
         """
         with self._get_connection(db_name) as conn:
             with conn.cursor() as cursor:
+                # Получаем текущий максимум discord_user_id
+                cursor.execute("SELECT COALESCE(MAX(discord_user_id), 0) FROM discord_user")
+                max_id = cursor.fetchone()[0]
+                next_id = max_id + 1
+
                 query = """
-                INSERT INTO discord_user (user_id, discord_id)
-                VALUES (%s, %s)
+                INSERT INTO discord_user (discord_user_id, user_id, discord_id)
+                VALUES (%s, %s, %s)
                 """
-                cursor.execute(query, (user_id, discord_id))
-                conn.commit()
+                cursor.execute(query, (next_id, user_id, discord_id))
+            conn.commit()
 
 
     def unlink_user_from_discord(self, discord: disnake.Member, db_name='main'):
