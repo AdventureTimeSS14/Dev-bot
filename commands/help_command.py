@@ -7,6 +7,7 @@ import disnake
 from bot_init import bot
 from components.button_help_components import (action_row_bug_report,
                                                action_row_button_help)
+from config import MY_USER_ID
 
 
 @bot.command(name="help")
@@ -15,6 +16,8 @@ async def help_command(ctx):
     Просто вызвается пользователем &help
     И отправляет embed
     """
+    author_bot = bot.get_user(MY_USER_ID)
+    
     # Данные для команды help
     # pylint: disable=C0301
     help_command_text = {
@@ -44,7 +47,7 @@ async def help_command(ctx):
             "\nПримеры:\n..[n213]..\n..[o3]..\n"
         ),
         "name_3": "Доп. информация:",
-        "context_3": "✨ Если у вас есть вопросы или вам нужна помощь, обращайтесь к создателю: Schrödinger's Cutie🖤👾",
+        "context_3": f"✨ Если у вас есть вопросы или вам нужна помощь, обращайтесь к создателю: {author_bot.display_name}",
         "name_4": "Разработчики:",
         "context_4": "👨‍💻 Автор: Schrodinger71\n🛠️ Maintainer: Schrodinger71\n🤝 Contributors: nixsilvam, xelasto, mskaktus\n📡 Хост: 🐈‍⬛github-actions[bot]",
         "name_5": "Репозиторий бота:",
