@@ -46,7 +46,7 @@ from commands.post_admin import (admin_info_command, admin_presets_command,
                                  server_ban_command, update_command)
 from config import DISCORD_KEY
 from events import (on_button_click, on_command, on_error, on_message,
-                    on_ready, update_status)
+                    on_ready, on_slash_command, update_status)
 
 # Настройка логирования
 logging.basicConfig(
