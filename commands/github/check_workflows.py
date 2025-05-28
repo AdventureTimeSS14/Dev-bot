@@ -7,7 +7,7 @@ from config import AUTHOR, GITHUB
 
 OWNER = AUTHOR
 REPO = 'Dev-bot'
-API_URL = f'https://api.github.com/repos/{OWNER}/{REPO}/actions/runs?workflow=deploy.yml' # !!!!!
+API_URL = f'https://api.github.com/repos/{OWNER}/{REPO}/actions/runs?workflow=run_on_github.yml' # !!!!!
 
 
 # Заголовки для аутентификации
