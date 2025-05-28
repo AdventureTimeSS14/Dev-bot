@@ -5,6 +5,7 @@
 import disnake
 
 from bot_init import bot
+from config import VACATION_ROLE
 
 
 @bot.command()
@@ -30,7 +31,7 @@ async def user_role(ctx, *role_names: str):
         return
 
     # ID роли "Отпуск"
-    vacation_role_id = 1312460496557047839
+    vacation_role_id = VACATION_ROLE
     vacation_role = ctx.guild.get_role(vacation_role_id)
 
     # Получаем список пользователей с этой ролью
