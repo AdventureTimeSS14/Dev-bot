@@ -3,15 +3,17 @@
 """
 
 # pylint: skip-file
-import asyncio
-import logging
-import sys
-import importlib
-import pkgutil
 import argparse
+import asyncio
+import importlib
+import logging
+import pkgutil
+import sys
 from pathlib import Path
+
 from bot_init import bot
 from config import DISCORD_KEY
+
 
 # Настройка логирования
 def setup_logging(log_level: str = "ERROR"):
