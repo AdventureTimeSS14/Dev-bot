@@ -51,10 +51,6 @@ async def on_ready():
 
     bot.start_time = time.time()  # Сохраняем время старта бота
 
-    # Проверка workflows на случай повторного запуска на GitHub Actions
-    await check_workflows.check_workflows()  # Завершает работу,
-                                             # если бот уже запущен на GitHub Actions
-
     # Запуск всех фоновых задач
     tasks_to_start = [
         (fetch_merged_pull_requests, "fetch merged pr"),
