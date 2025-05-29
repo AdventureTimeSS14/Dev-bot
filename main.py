@@ -65,17 +65,24 @@ def load_all_imports():
         dynamic_import(package)
 
 def parse_args():
-    """Парсинг аргументов командной строки"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--logger",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="ERROR",
-        help="Уровень логирования (по умолчанию: ERROR)"
+        help="Уровень логирования"
+    )
+    parser.add_argument(
+        "--no-tasks",
+        action="store_true",
+        help="Отключает запуск фоновых задач"
     )
     return parser.parse_args()
 
 if __name__ == "__main__":
+    args = parse_args()
+    setup_logging(args.logger)
+    
     # Загружаем все импорты динамически
     load_all_imports()
     
@@ -91,4 +98,5 @@ if __name__ == "__main__":
         logging.error("Not DISCORD_KEY. Programm Dev-bot shutdown!!")
         sys.exit(1)
     else:
+        bot.args = args
         bot.run(DISCORD_KEY)

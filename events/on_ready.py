@@ -1,4 +1,3 @@
-import argparse
 import logging
 import time
 
@@ -23,15 +22,6 @@ from tasks.update_status_server_message_eddit_task import \
 from tasks.update_time_shutdows_task import update_time_shutdows
 from tasks.whitelist_application_task import update_whitelist_application
 
-def parse_args():
-    """Парсинг аргументов командной строки"""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--no-tasks",
-        action="store_true",
-        help="Отключает запуск фоновых задач"
-    )
-    return parser.parse_args()
 
 async def start_task_if_not_running(task, task_name: str):
     """
@@ -49,7 +39,7 @@ async def on_ready():
     """
     Событие, которое выполняется при запуске бота.
     """
-    args = parse_args()  # Получаем аргументы
+    args = bot.args  # Получаем аргументы
 
     logging.info(
         "Bot %s (ID: %d) is ready to work!", bot.user.name, bot.user.id
