@@ -6,63 +6,73 @@
 import asyncio
 import logging
 import sys
-
+import importlib
+import pkgutil
+from pathlib import Path
 from bot_init import bot
-from commands import (admin_help_command, echo_command, find_bans_command,
-                      general_commands, gpt_command, help_command,
-                      media_clear_command, shutdown_command, status_command,
-                      uptime_command, user_role_command,
-                      user_role_mention_command)
-from commands.adt_team import (add_role_command, add_vacation_command,
-                               end_vacation_command, extend_vacation_command,
-                               new_team_command, remove_role_command,
-                               remove_team_command, slash_team_command,
-                               team_help_command, tweak_team_command,
-                               while_list_command)
-from commands.db_ss import (admin_command, admins_command, baninfo_id_command,
-                            banlist_command, multi_akk_db_command,
-                            pardon_command, permissions_command,
-                            player_notes_command, player_time_command,
-                            profiles_command, size_db_command, uploads_command)
-from commands.db_ss.discord import discord_command
-from commands.dbCommand import (get_vacations_command, help_command,
-                                info_command, status_command)
-from commands.github import (achang_command, branch_command, check_workflows,
-                             deploy_command, forks_command,
-                             git_cancel_invite_command, git_help_command,
-                             git_invite_command, git_logininfo_command,
-                             git_pending_invites_command, git_repoinfo_command,
-                             git_team_command, github_processor,
-                             milestones_command, pr_changelog_send,
-                             publish_command, publish_status_command,
-                             review_command)
-from commands.misc.shutdows_deff import \
-    shutdown_def  # Для выполнения завершающих операций
-from commands.post_admin import (admin_info_command, admin_presets_command,
-                                 bunker_command, game_rules_command,
-                                 kick_command, playtime_command,
-                                 replay_command, restart_command,
-                                 server_ban_command, update_command)
 from config import DISCORD_KEY
-from events import (on_button_click, on_command, on_error, on_message,
-                    on_ready, on_slash_command, update_status)
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.ERROR,  # Уровень логирования
-    format="%(asctime)s - %(levelname)s - %(message)s",  # Формат сообщений
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("bot_logs.log"),  # Логирование в файл
-        logging.StreamHandler(sys.stdout),  # Логирование в консоль
+        logging.FileHandler("bot_logs.log"),
+        logging.StreamHandler(sys.stdout),
     ],
 )
 
+def dynamic_import(package_path: str):
+    """Динамически импортирует все модули в указанном пакете"""
+    try:
+        package = importlib.import_module(package_path)
+        
+        # Пропускаем модули без файловой привязки
+        if not hasattr(package, '__file__') or package.__file__ is None:
+            logging.info(f"Skipping namespace package: {package_path}")
+            return
+            
+        package_dir = Path(package.__file__).parent
+        
+        for (_, module_name, _) in pkgutil.iter_modules([str(package_dir)]):
+            full_module_path = f"{package_path}.{module_name}"
+            try:
+                importlib.import_module(full_module_path)
+                logging.info(f"Successfully imported {full_module_path}")
+            except Exception as e:
+                logging.error(f"Failed to import {full_module_path}: {e}")
+    except ImportError as e:
+        logging.error(f"Failed to import package {package_path}: {e}")
+
+def load_all_imports():
+    """Загружает все команды из поддиректорий commands"""
+    base_packages = [
+        'commands',
+        'commands.adt_team',
+        'commands.db_ss',
+        'commands.db_ss.discord', 
+        'commands.github',
+        'commands.post_admin',
+        'events'
+    ]
+    
+    for package in base_packages:
+        dynamic_import(package)
 
 if __name__ == "__main__":
-    # Проверка workflows на случай повторного запуска на GitHub Actions
-    asyncio.run(check_workflows.check_workflows())  # Завершает работу,
-                                                    # если бот уже запущен на GitHub Actions
+    # Загружаем все импорты динамически
+    load_all_imports()
+    
+    # Проверка workflows
+    try:
+        check_workflows = importlib.import_module("commands.github.check_workflows")
+        asyncio.run(check_workflows.check_workflows())
+    except Exception as e:
+        logging.error(f"Failed to run workflow check: {e}")
+        sys.exit(1)
+    
     if DISCORD_KEY == "NULL":
         logging.error("Not DISCORD_KEY. Programm Dev-bot shutdown!!")
+        sys.exit(1)
     else:
-        bot.run(DISCORD_KEY)  # Запуск бота, без asyncio.run()
+        bot.run(DISCORD_KEY)
