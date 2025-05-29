@@ -2,7 +2,6 @@
 Модуль для запуска бота.
 """
 
-# pylint: skip-file
 import argparse
 import asyncio
 import importlib
