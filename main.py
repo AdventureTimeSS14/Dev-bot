@@ -8,19 +8,24 @@ import logging
 import sys
 import importlib
 import pkgutil
+import argparse
 from pathlib import Path
 from bot_init import bot
 from config import DISCORD_KEY
 
 # Настройка логирования
-logging.basicConfig(
-    level=logging.ERROR,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("bot_logs.log"),
-        logging.StreamHandler(sys.stdout),
-    ],
-)
+def setup_logging(log_level: str = "ERROR"):
+    """Настройка логирования в зависимости от переданного уровня"""
+    level = getattr(logging, log_level.upper(), logging.ERROR)
+    
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler("bot_logs.log"),
+            logging.StreamHandler(sys.stdout),
+        ],
+    )
 
 def dynamic_import(package_path: str):
     """Динамически импортирует все модули в указанном пакете"""
@@ -58,6 +63,17 @@ def load_all_imports():
     
     for package in base_packages:
         dynamic_import(package)
+
+def parse_args():
+    """Парсинг аргументов командной строки"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--logger",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="ERROR",
+        help="Уровень логирования (по умолчанию: ERROR)"
+    )
+    return parser.parse_args()
 
 if __name__ == "__main__":
     # Загружаем все импорты динамически

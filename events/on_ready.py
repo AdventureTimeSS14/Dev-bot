@@ -1,3 +1,4 @@
+import argparse
 import logging
 import time
 
@@ -22,6 +23,15 @@ from tasks.update_status_server_message_eddit_task import \
 from tasks.update_time_shutdows_task import update_time_shutdows
 from tasks.whitelist_application_task import update_whitelist_application
 
+def parse_args():
+    """Парсинг аргументов командной строки"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--no-tasks",
+        action="store_true",
+        help="Отключает запуск фоновых задач"
+    )
+    return parser.parse_args()
 
 async def start_task_if_not_running(task, task_name: str):
     """
@@ -39,6 +49,8 @@ async def on_ready():
     """
     Событие, которое выполняется при запуске бота.
     """
+    args = parse_args()  # Получаем аргументы
+
     logging.info(
         "Bot %s (ID: %d) is ready to work!", bot.user.name, bot.user.id
     )
@@ -52,24 +64,26 @@ async def on_ready():
     bot.start_time = time.time()  # Сохраняем время старта бота
 
     # Запуск всех фоновых задач
-    tasks_to_start = [
-        (fetch_merged_pull_requests, "fetch merged pr"),
-        (list_team_task, "list team"),
-        (monitor_commits, "monitor commits"),
-        (update_status_presence, "update status presence"),
-        (update_status_server_message_eddit, "update status server"),
-        (update_time_shutdows, "update time shutdows"),
-        (discord_auth_update, "Update Discord Auth"),
-        (update_whitelist_application, "Update WhiteList Application"),
-        (update_admin_stats, "Update Admin Stats"),
-        (check_end_vacation, "Check End Vacation"),
-        (update_permission_stats, "Update Permission Stats"),
-        (clear_doker_replay_ss14, "Clear Doker Replay"),
-        (check_size_log, "Check Adminlogs size")
-    ]
-    
-    # Для дебага
-    # tasks_to_start = []
+    # Определяем какие задачи запускать
+    if args.no_tasks:
+        tasks_to_start = []
+        print("⚠️ Запуск фоновых задач отключен (--no-tasks)")
+    else:
+        tasks_to_start = [
+            (fetch_merged_pull_requests, "fetch merged pr"),
+            (list_team_task, "list team"),
+            (monitor_commits, "monitor commits"),
+            (update_status_presence, "update status presence"),
+            (update_status_server_message_eddit, "update status server"),
+            (update_time_shutdows, "update time shutdows"),
+            (discord_auth_update, "Update Discord Auth"),
+            (update_whitelist_application, "Update WhiteList Application"),
+            (update_admin_stats, "Update Admin Stats"),
+            (check_end_vacation, "Check End Vacation"),
+            (update_permission_stats, "Update Permission Stats"),
+            (clear_doker_replay_ss14, "Clear Doker Replay"),
+            (check_size_log, "Check Adminlogs size")
+        ]
 
     for task, name in tasks_to_start:
         await start_task_if_not_running(task, name)
