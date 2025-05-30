@@ -1,10 +1,7 @@
-import getpass
-import platform
 import random
 from datetime import datetime
 
 import disnake
-import psutil
 from disnake.ext import tasks
 
 from bot_init import bot
@@ -17,7 +14,6 @@ class AnimatedStatus:
             self.get_help_message,
             self.get_fun_fact,
             self.get_date_message,
-            self.get_bot_stats
         ]
         
         self.fun_facts = [
@@ -91,35 +87,6 @@ class AnimatedStatus:
             "name": message if message else today.strftime("%d.%m.%Y"),
             "state": message or "Хорошего дня!"
         }
-
-    async def get_bot_stats(self):
-        # Uptime
-        uptime = datetime.now() - self.start_time
-        days = uptime.days
-        hours, remainder = divmod(uptime.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        uptime_str = f"{days}d {hours:02}:{minutes:02}:{seconds:02}"
-
-        # CPU и RAM usage
-        cpu_usage = psutil.cpu_percent(interval=None)
-        ram = psutil.virtual_memory()
-        ram_usage = ram.percent
-        ram_total = ram.total // (1024 ** 2)  # В МБ
-
-        # Дополнительно
-        threads = psutil.Process().num_threads()
-        username = getpass.getuser()
-        os_info = platform.system()
-
-        return {
-            "type": disnake.ActivityType.competing,
-            "name": f"Uptime: {uptime_str}",
-            "state": (
-                f"CPU: {cpu_usage:.0f}% | RAM: {ram_usage:.0f}% of {ram_total}MB | "
-                f"Threads: {threads} | User: {username} | OS: {os_info}"
-            )
-        }
-
 
 status_manager = AnimatedStatus()
 
