@@ -68,7 +68,7 @@ async def clear_replay():
 
         # Удаляем с Portainer если > 50
         if len(replay_files) > 50:
-            files_to_delete = replay_files[:-35]
+            files_to_delete = replay_files[:-50]
             for file in files_to_delete:
                 await async_delete_replay(token, file["Name"])
                 deleted_names.append(file["Name"])
