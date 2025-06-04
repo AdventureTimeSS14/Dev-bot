@@ -66,8 +66,8 @@ async def clear_replay():
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         deleted_names = []
 
-        # Удаляем с Portainer если > 35
-        if len(replay_files) > 35:
+        # Удаляем с Portainer если > 50
+        if len(replay_files) > 50:
             files_to_delete = replay_files[:-35]
             for file in files_to_delete:
                 await async_delete_replay(token, file["Name"])
