@@ -71,7 +71,7 @@ async def on_ready():
             (list_team_task, "list team"),
             (monitor_commits, "monitor commits"),
             (update_presence, "update status presence"),
-            (update_status_server_message_eddit, "update status server"),
+            # (update_status_server_message_eddit, "update status server"),
             (update_time_shutdows, "update time shutdows"),
             (discord_auth_update, "Update Discord Auth"),
             (update_whitelist_application, "Update WhiteList Application"),
