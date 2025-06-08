@@ -90,7 +90,7 @@ class AnimatedStatus:
 
 status_manager = AnimatedStatus()
 
-@tasks.loop(seconds=20)
+@tasks.loop(seconds=60)
 async def update_presence():
     """Анимированный статус бота"""
     try:
