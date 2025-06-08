@@ -25,8 +25,8 @@ class NicknameModal(disnake.ui.Modal):
     def __init__(self):
         components = [
             TextInput(
-                label="Введите ваш UID аккаунта SS14",
-                placeholder="Ваш UID SS14",
+                label="Введите UID SS14.(UID-ЭТО НЕ ИМЯ АККАУНТА)",
+                placeholder="Найти: MRP лобби → Привязать Discord → скопировать UID из окна",
                 custom_id="user_id_input",
                 style=TextInputStyle.short,
                 max_length=50,
