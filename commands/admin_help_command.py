@@ -77,7 +77,7 @@ ADMIN_COMMANDS = [
         "description": "Поиск никнейма игрока по имени персонажа.",
     },
     {
-        "name": "🔍 &find_bans <NickName>",
+        "name": "🔍 &find_bans <NickName> (НЕ РАБОТАЕТ)",
         "description": "Ищет баны по нику сразу на нескольких дискорд серверах.",
     },
     {

@@ -81,7 +81,8 @@ async def on_ready():
             (clear_doker_replay_ss14, "Clear Doker Replay"),
             (check_size_log, "Check Adminlogs size")
         ]
-        search_results = await search_bans_in_multiple_channels("TestSearch")
+        # TODO: Починить
+        # search_results = await search_bans_in_multiple_channels("TestSearch")
 
     for task, name in tasks_to_start:
         await start_task_if_not_running(task, name)

@@ -38,9 +38,10 @@ async def on_message(message):
     if message.channel.id == ADMIN_TEAM:
         await handle_message_deletion(message)
 
-    if message.channel.id == 1309262152586235964:
-        await send_ahat_message_post(message)
-        await check_new_player(message)
+    # TODO: Сломалось, отключаю поиск банов
+    # if message.channel.id == 1309262152586235964:
+    #     await send_ahat_message_post(message)
+    #     await check_new_player(message)
 
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
