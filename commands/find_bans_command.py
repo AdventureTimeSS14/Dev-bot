@@ -14,7 +14,7 @@ from commands.misc.search_bans_in_channel import \
 @has_any_role_by_keys("whitelist_role_id_administration_post")
 async def find_bans(ctx, username: str):
     await ctx.send(
-        "[⚠] Временно отключено из-за изменений в Discord API.\n" +
+        "[⚠] Отключено из-за изменений в Discord API.\n" +
         "Статус: Поддержка команды приостановлена."
     )
     
