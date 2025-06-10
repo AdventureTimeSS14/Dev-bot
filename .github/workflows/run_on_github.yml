@@ -31,6 +31,7 @@ jobs:
           pip install -r requirements.txt
           pip install discord.py
           pip install -U discord.py-self
+          pip install -U disnake discord.py
 
       - name: Load Environment Variables
         run: |
