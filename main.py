@@ -55,6 +55,7 @@ def load_all_imports():
     base_packages = [
         'commands',
         'commands.adt_team',
+        'commands.dbCommand',
         'commands.db_ss',
         'commands.db_ss.discord', 
         'commands.github',
