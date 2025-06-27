@@ -49,7 +49,7 @@ class AnimatedStatus:
     async def get_vpn_fact(self):
         return {
             "type": disnake.ActivityType.listening,
-            "name": "Telegram `@HellflareVPN_Bot.` 🛡 HellflareVPN 🔥",
+            "name": "Telegram `@HellflareVPN_Bot`. 🛡 HellflareVPN 🔥",
             "state": "Наш VPN - сервис обеспечивает конфиденциальность, надежное шифрование и безопасный интернет. Установить просто — пишите в Telegram @HellflareVPN_Bot."
         }
 

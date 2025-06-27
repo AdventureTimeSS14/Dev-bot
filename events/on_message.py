@@ -311,7 +311,7 @@ async def check_vpn_promotion(message):
                 "Упоминаете VPN? Могу порекомендовать\n"
                 "**🛡 HellflareVPN 🔥 — щит и огонь из Нидерландов!**\n"
                 "Наш VPN‑сервис обеспечивает **конфиденциальность**, **надежное шифрование** и безопасный интернет.\n"
-                "Установить просто — пишите в Telegram @HellflareVPN_Bot."
+                "Установить просто — пишите в Telegram `@HellflareVPN_Bot`."
             )
             await message.channel.send(response)
             break
