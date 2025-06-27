@@ -48,7 +48,7 @@ async def on_message(message):
 
     await check_time_transfer_with_fuzz(message)
 
-    await check_vpn_promotion(message)
+    # await check_vpn_promotion(message) # ЗАпрещено 6-ым правилом политики Разработчиков
 
 
 async def send_ahat_message_post(message):
