@@ -48,6 +48,8 @@ async def on_message(message):
 
     await check_time_transfer_with_fuzz(message)
 
+    await check_vpn_promotion(message)
+
 
 async def send_ahat_message_post(message):
     """
@@ -278,6 +280,40 @@ async def handle_mention(message):
             await message.channel.send("*Обнимает в ответ.*")
             break
 
+async def check_vpn_promotion(message):
+    """
+    Проверяет наличие фраз, связанных с VPN, используя fuzz.partial_token_sort_ratio.
+    Если найдено совпадение — предлагает написать в Telegram-бота.
+    """
+    vpn_phrases = [
+        "vpn",
+        "хочу vpn",
+        "ищу vpn",
+        "нужен vpn",
+        "рекомендую vpn",
+        "что за vpn",
+        "посоветуйте vpn",
+        "впн",
+        "хочу впн",
+        "ищу впн",
+        "нужен впн",
+        "рекомендую впн",
+        "что за впн",
+        "посоветуйте впн",
+        "в п н",
+        "v p n",
+    ]
+
+    for phrase in vpn_phrases:
+        if fuzz.partial_token_sort_ratio(message.content.lower(), phrase) > 80:
+            response = (
+                "Упоминаете VPN? Могу порекомендовать\n"
+                "**🛡 HellflareVPN 🔥 — щит и огонь из Нидерландов!**\n"
+                "Наш VPN — сервис обеспечивает **конфиденциальность**, **надежное шифрование** и безопасный интернет.\n"
+                "Установить просто — пишите в Telegram `@HellflareVPN_Bot.`"
+            )
+            await message.channel.send(response)
+            break
 
 async def handle_github_pattern(message):
     """
