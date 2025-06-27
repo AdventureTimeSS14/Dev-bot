@@ -14,6 +14,7 @@ class AnimatedStatus:
             self.get_help_message,
             self.get_fun_fact,
             self.get_date_message,
+            self.get_vpn_fact,
         ]
         
         self.fun_facts = [
@@ -43,6 +44,13 @@ class AnimatedStatus:
             "type": disnake.ActivityType.listening,
             "name": random.choice(self.fun_facts),
             "state": "Интересный факт!"
+        }
+    
+    async def get_vpn_fact(self):
+        return {
+            "type": disnake.ActivityType.listening,
+            "name": "Telegram @HellflareVPN_Bot. 🛡 HellflareVPN 🔥",
+            "state": "Наш VPN - сервис обеспечивает конфиденциальность, надежное шифрование и безопасный интернет. Установить просто — пишите в Telegram @HellflareVPN_Bot."
         }
 
     async def get_date_message(self):
