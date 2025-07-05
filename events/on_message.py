@@ -38,10 +38,10 @@ async def on_message(message):
     if message.channel.id == ADMIN_TEAM:
         await handle_message_deletion(message)
 
-    # TODO: Сломалось, отключаю поиск банов
-    # if message.channel.id == 1309262152586235964:
-    #     await send_ahat_message_post(message)
-    #     await check_new_player(message)
+    if message.channel.id == 1309262152586235964:
+        await send_ahat_message_post(message)
+        # TODO: Сломалось, отключаю поиск банов
+        # await check_new_player(message)
 
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
@@ -66,7 +66,7 @@ async def send_ahat_message_post(message):
     }
     try:
         response = requests.post(url, json=post_data, headers=POST_ADMIN_HEADERS, timeout=5)
-        response.raise_for_status()  # Если статус код 4xx или 5xx, будет сгенерировано исключение
+        response.raise_for_status()
     except requests.exceptions.Timeout:
         print("Request timed out")
     except requests.exceptions.RequestException as e:
