@@ -6,7 +6,7 @@ from disnake.ui import View
 
 from bot_init import bot
 from components.button_help_components import button_bug_report
-from config import LOG_CHANNEL_ID
+from config import LOG_CHANNEL_ID, MY_USER_ID
 
 
 @bot.event
@@ -22,6 +22,9 @@ async def on_command(ctx):
 
     # Получаем текущее время
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    if isinstance(ctx.channel, disnake.DMChannel) and ctx.author.id == MY_USER_ID:
+        return
 
     # Определяем, был ли вызов команды в ЛС или в канале сервера
     if isinstance(ctx.channel, disnake.DMChannel):
