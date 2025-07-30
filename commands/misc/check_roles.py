@@ -4,6 +4,9 @@ from config import MY_USER_ID, ROLE_WHITELISTS
 
 GUILD_ID = 901772674865455115  # ID твоего сервера
 
+BLOCKED_USER_ID = 725633890726838282 # Каш
+BLOCKED_KEYS_FOR_USER = {"whitelist_role_id_administration_post", "general_adminisration_role"}
+
 def has_any_role_by_keys(*whitelist_keys):
     """
     Декоратор для проверки, имеет ли пользователь одну из указанных ролей по ключам.
@@ -13,6 +16,12 @@ def has_any_role_by_keys(*whitelist_keys):
     async def predicate(ctx):
         if ctx.author.id == MY_USER_ID:
             return True
+
+        # Блокируем пользователя, если ключи команды пересекаются с запрещёнными
+        if ctx.author.id == BLOCKED_USER_ID:
+            if any(key in BLOCKED_KEYS_FOR_USER for key in whitelist_keys):
+                await ctx.send("❌ У вас нет доступа к этой команде.")
+                return False
 
         user_role_ids = [role.id for role in ctx.author.roles]
 
