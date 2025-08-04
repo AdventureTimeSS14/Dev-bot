@@ -564,15 +564,13 @@ async def contribution_add_slash(
     ),
 ):
     """
-        Команда для назначения пользователя на должность контрибьютера.
+    Команда для выдачи роли контрибьютера.
     """
-    # Получаем роль отпуска
     role_contribute = inter.guild.get_role(1348226466227163176)
     if not role_contribute:
         await inter.response.send_message("❌ Ошибка: Роль Контрибьютера не найдена на сервере.")
         return
 
-    # Проверяем, есть ли у пользователя уже роль отпуска
     if role_contribute in user.roles:
         await inter.response.send_message(
             f"❌ {user.mention} уже имеет роль {role_contribute.name}."
@@ -580,10 +578,20 @@ async def contribution_add_slash(
         return
 
     try:
-        # Добавляем роль контрибьюта пользователю
         await user.add_roles(role_contribute)
+
+        # Отправляем основное сообщение
         await inter.response.send_message(
-            f"✅ Роль {role_contribute.name} успешно добавлена {user.mention}."
+            f"✅ Роль {role_contribute.name} успешно выдана {user.mention}."
+        )
+
+        # Отправляем пикчу
+        await inter.followup.send(
+            "https://media.discordapp.net/attachments/13482296533026079"
+            "12/1401997459810422854/contributer.png?ex=68924f62&is=6890f"
+            "de2&hm=7081ae776d0eecaacbe69a014d4a7c6d64343b4c7b2cbeeb7bc7"
+            "6b84bc083dbb&=&format=webp&quality=lossless&width=1091&heig"
+            "ht=794"
         )
 
     except disnake.Forbidden:
