@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
-
+import tempfile
 import disnake
 import psycopg2
+import os
 
 from bot_init import bot, ss14_db
 from commands.misc.check_roles import has_any_role_by_keys
@@ -111,3 +112,22 @@ async def player_stats(ctx, *, user_name: str):
 
     view = PlayerStatsView(ctx, stats, user_name)
     await ctx.send(embed=view.get_page_embed(), view=view)
+
+    # Формируем полный текст статистики ДЛЯ ОТПРАВКИ ФАЙЛОМ
+    full_text = f"🕒 Полная временная статистика игрока {user_name}\n\n"
+    full_text += f"{'Роль'.ljust(35)} | {'Наиграно'.rjust(12)}\n"
+    full_text += "-" * 50 + "\n"
+
+    for tracker, time_spent in stats:
+        time_str = view.format_time(time_spent)
+        full_text += f"{tracker.ljust(35)} | {time_str.rjust(12)}\n"
+
+    with tempfile.NamedTemporaryFile(mode="w+", encoding="utf-8", suffix=".txt", delete=False) as tmp_file:
+        tmp_file.write(full_text)
+        tmp_file_path = tmp_file.name  # Получаем путь
+
+    await ctx.send(
+        content=f"📄 Полная статистика игрока {user_name} в виде файла:",
+        file=disnake.File(tmp_file_path, filename=f"stats_{user_name}.txt")
+    )
+    os.remove(tmp_file_path)
