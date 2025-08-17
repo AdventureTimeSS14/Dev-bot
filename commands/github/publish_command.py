@@ -33,7 +33,7 @@ def trigger_github_action(repository, branch):
     name="publish",
     help="Запускает GitHub Actions workflow для указанной ветки репозитория. По умолчанию используется репозиторий 'n'."
 )
-@has_any_role_by_keys("whitelist_role_id")
+@has_any_role_by_keys("server_admin_post")
 async def publish(ctx, branch: str, repository: str = "n"):
     """
     Команда для запуска GitHub Actions для репозитория 'n' или 'o'. 
