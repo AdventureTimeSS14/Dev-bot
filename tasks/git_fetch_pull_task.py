@@ -121,7 +121,8 @@ async def fetch_merged_pull_requests():
     """
     global LAST_CHECK_TIME # pylint: disable=W0603
 
-    url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed'
+    # url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed'
+    url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed&sort=updated&direction=desc&per_page=30'
     pull_requests = await fetch_github_data(url, {"Accept": "application/vnd.github.v3+json"})
 
     if not pull_requests:
