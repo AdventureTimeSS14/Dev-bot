@@ -57,7 +57,7 @@ async def perm_tweak(ctx, nickname: str, title: str, admin_rank: str, server: st
         await ctx.send(f"❌ Ранг `{admin_rank}` не найден.")
         return
 
-    ss14_db.permission_tweak_admin(title, rank[0], admin_id[0])
+    ss14_db.permission_tweak_admin(title, rank[0], admin_id[0], server)
     await ctx.send(f"✅ `{nickname}` обновлен: `{title}` ({admin_rank}).")
 
 @bot.command()
