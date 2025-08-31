@@ -43,8 +43,7 @@ async def on_message(message):
 
     if message.channel.id == 1309262152586235964:
         await send_ahat_message_post(message)
-        # TODO: Сломалось, отключаю поиск банов
-        # await check_new_player(message)
+        await check_new_player(message)
 
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
