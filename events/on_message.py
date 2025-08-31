@@ -8,7 +8,7 @@ from fuzzywuzzy import fuzz
 from bot_init import bot, ss14_db
 from commands.misc.search_bans_in_channel import \
     search_bans_in_multiple_channels
-from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS
+from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS, VACATION_ROLE
 from data import JsonData
 from events.utils import get_github_link
 from modules.get_creation_date import get_creation_date
@@ -27,6 +27,9 @@ async def on_message(message):
     if message.content.startswith(bot.command_prefix):
         await bot.process_commands(message)
         return
+
+    # Проверка пингов отпускников
+    await check_vacation_pings(message)
 
     # Ответ на упоминание бота
     if f"<@{bot.user.id}>" in message.content:
@@ -369,3 +372,113 @@ async def check_time_transfer_with_fuzz(message):
             # Отправляем ответ в канал
             await message.channel.send(response)
             break
+
+
+async def check_vacation_pings(message):
+    """
+    Проверяет сообщения на пинги людей с ролью VACATION_ROLE.
+    Удаляет такие сообщения, логирует попытки и предупреждает отправителя.
+    """
+    # Игнорируем сообщения от ботов
+    if message.author.bot:
+        return
+    
+    # Получаем упомянутых пользователей
+    mentioned_users = message.mentions
+    
+    # Проверяем, есть ли упоминания
+    if not mentioned_users:
+        return
+    
+    # Проверяем, есть ли упоминания пользователей с ролью VACATION_ROLE
+    vacation_users = []
+    for user in mentioned_users:
+        # Получаем участника сервера
+        member = message.guild.get_member(user.id)
+        if member and any(role.id == VACATION_ROLE for role in member.roles):
+            vacation_users.append(user)
+    
+    # Если нет пользователей в отпуске, выходим
+    if not vacation_users:
+        return
+    
+    # Удаляем сообщение
+    try:
+        await message.delete()
+    except disnake.Forbidden:
+        # Если нет прав на удаление, логируем это
+        print(f"Нет прав на удаление сообщения от {message.author.name}")
+        return
+    except Exception as e:
+        print(f"Ошибка при удалении сообщения: {e}")
+        return
+    
+    # Формируем список имен пользователей в отпуске
+    vacation_names = [user.name for user in vacation_users]
+    
+    # Логируем попытку пинга в канал логов
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
+    if log_channel:
+        log_embed = disnake.Embed(
+            title="🚫 Попытка пинга отпускника",
+            description=f"Пользователь {message.author.mention} попытался пингануть людей в отпуске",
+            color=0xFF0000,
+            timestamp=message.created_at
+        )
+        log_embed.add_field(
+            name="Отправитель",
+            value=f"{message.author.mention} ({message.author.name}#{message.author.discriminator})",
+            inline=True
+        )
+        log_embed.add_field(
+            name="Канал",
+            value=message.channel.mention,
+            inline=True
+        )
+        log_embed.add_field(
+            name="Пользователи в отпуске",
+            value=", ".join([f"{user.mention} ({user.name})" for user in vacation_users]),
+            inline=False
+        )
+        log_embed.add_field(
+            name="Содержание сообщения",
+            value=f"```{message.content[:1000]}```" if len(message.content) <= 1000 else f"```{message.content[:997]}...```",
+            inline=False
+        )
+        
+        await log_channel.send(embed=log_embed)
+    
+    # Отправляем предупреждение отправителю в личные сообщения
+    try:
+        warning_embed = disnake.Embed(
+            title="⚠️ Внимание!",
+            description="Вы попытались пингануть пользователя(ей), который(ые) находится(ятся) в отпуске.",
+            color=0xFFFF00
+        )
+        warning_embed.add_field(
+            name="Пользователи в отпуске",
+            value=", ".join(vacation_names),
+            inline=False
+        )
+        warning_embed.add_field(
+            name="Ваше сообщение было удалено",
+            value="Пожалуйста, дождитесь возвращения пользователя(ей) из отпуска.",
+            inline=False
+        )
+        
+        # Отправляем предупреждение в личные сообщения (скрыто от всех)
+        try:
+            await message.author.send(embed=warning_embed)
+        except disnake.Forbidden:
+            # Если не удается отправить ЛС (например, заблокировали бота)
+            # Отправляем временное сообщение в канал, но только для отправителя
+            temp_warning = await message.channel.send(
+                f"{message.author.mention} - ваше сообщение было удалено за пинг отпускника. Подробности в ЛС.",
+                delete_after=5
+            )
+        
+    except Exception as e:
+        print(f"Ошибка при отправке предупреждения: {e}")
+        # Если не удалось отправить предупреждение, логируем это
+        if log_channel:
+            await log_channel.send(f"⚠️ Не удалось отправить предупреждение пользователю {message.author.mention}: {e}")
