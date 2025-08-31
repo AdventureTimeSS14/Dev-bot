@@ -76,27 +76,49 @@ async def get_github_pull_requests_graphql(username, repo):
                         print(f"❌ Ошибка API: нет данных в ответе. Ответ: {result}")
                         return []
 
+                    # Проверяем наличие репозитория
+                    if not result['data'].get('repository'):
+                        print(f"❌ Репозиторий {repo} не найден")
+                        return []
+
+                    # Проверяем наличие пулл-реквестов
+                    if not result['data']['repository'].get('pullRequests'):
+                        print(f"❌ Нет пулл-реквестов в репозитории {repo}")
+                        return []
+
                     # Обрабатываем пулл-реквесты
                     pull_requests = result['data']['repository']['pullRequests']['edges']
                     for pr in pull_requests:
-                        node = pr['node']
-                        if node['author']['login'] == username:
+                        node = pr.get('node')
+                        if not node:
+                            continue
+                            
+                        # Проверяем наличие автора и его логина
+                        author = node.get('author')
+                        if not author or not author.get('login'):
+                            continue
+                            
+                        # Проверяем, что это нужный пользователь
+                        if author['login'] == username:
                             pr_data = {
-                                'url': node['url'],
-                                'state': node['state'],
-                                'merged_at': node['mergedAt'],
-                                'reviews': node['reviews']['totalCount'],
-                                'comments': node['comments']['totalCount']
+                                'url': node.get('url', ''),
+                                'state': node.get('state', 'UNKNOWN'),
+                                'merged_at': node.get('mergedAt'),
+                                'reviews': node.get('reviews', {}).get('totalCount', 0),
+                                'comments': node.get('comments', {}).get('totalCount', 0)
                             }
                             all_pull_requests.append(pr_data)
 
                     # Обновляем курсор для следующей страницы
                     page_info = result['data']['repository']['pullRequests']['pageInfo']
-                    has_next_page = page_info['hasNextPage']
-                    cursor = page_info['endCursor']
+                    has_next_page = page_info.get('hasNextPage', False)
+                    cursor = page_info.get('endCursor')
 
             except aiohttp.ClientError as e:
                 print(f"❌ Ошибка при выполнении запроса: {e}")
+                return []
+            except Exception as e:
+                print(f"❌ Неожиданная ошибка: {e}")
                 return []
 
     return all_pull_requests
@@ -114,6 +136,9 @@ async def get_github_user_info(username):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
+                if response.status == 404:
+                    print(f"❌ Пользователь {username} не найден")
+                    return None
                 response.raise_for_status()
                 user_info = await response.json()
                 if not user_info:
@@ -122,6 +147,9 @@ async def get_github_user_info(username):
                 return user_info
     except aiohttp.ClientError as e:
         print(f"❌ Ошибка при получении информации о пользователе: {e}")
+        return None
+    except Exception as e:
+        print(f"❌ Неожиданная ошибка при получении информации о пользователе: {e}")
         return None
 
 @bot.command(
@@ -147,11 +175,6 @@ async def git_logininfo(ctx, username: str):
 
     user_pull_requests = await get_github_pull_requests_graphql(username, repo)
 
-    if not user_pull_requests:
-        print(f"❌ Нет пулл-реквестов для пользователя {username} в репозитории {repo}.")
-        await ctx.send(f"❌ Нет пулл-реквестов для пользователя {username} в репозитории {repo}.")
-        return
-
     # Инициализируем счетчики для различных типов пулл-реквестов
     merged_prs = 0
     closed_prs = 0
@@ -159,26 +182,27 @@ async def git_logininfo(ctx, username: str):
     draft_prs = 0
     total_reviews = 0
     total_discussions = 0
-    total_prs = len(user_pull_requests)
+    total_prs = len(user_pull_requests) if user_pull_requests else 0
 
-    # Обрабатываем пулл-реквесты
-    for pr in user_pull_requests:
-        pr_state = pr['state']
-        pr_url = pr['url']
-        print(f"Обрабатываем пулл-реквест: {pr_url}, состояние: {pr_state}")
+    # Обрабатываем пулл-реквесты, если они есть
+    if user_pull_requests:
+        for pr in user_pull_requests:
+            pr_state = pr.get('state', 'UNKNOWN')
+            pr_url = pr.get('url', '')
+            print(f"Обрабатываем пулл-реквест: {pr_url}, состояние: {pr_state}")
 
-        # Подсчитываем количество пулл-реквестов по состояниям
-        if pr_state == 'MERGED':
-            merged_prs += 1
-        if pr_state == 'CLOSED':  # Если пулл-реквест был закрыт
-            closed_prs += 1
-        if pr_state == 'OPEN':  # Если пулл-реквест открыт
-            open_prs += 1
-        if pr_state == 'DRAFT':  # Если пулл-реквест в драфте
-            draft_prs += 1
+            # Подсчитываем количество пулл-реквестов по состояниям
+            if pr_state == 'MERGED':
+                merged_prs += 1
+            elif pr_state == 'CLOSED':  # Если пулл-реквест был закрыт
+                closed_prs += 1
+            elif pr_state == 'OPEN':  # Если пулл-реквест открыт
+                open_prs += 1
+            elif pr_state == 'DRAFT':  # Если пулл-реквест в драфте
+                draft_prs += 1
 
-        total_reviews += pr['reviews']
-        total_discussions += pr['comments']
+            total_reviews += pr.get('reviews', 0)
+            total_discussions += pr.get('comments', 0)
 
     # Создаём Embed с красивым дизайном
     embed = disnake.Embed(
@@ -212,8 +236,16 @@ async def git_logininfo(ctx, username: str):
     )
 
     # Добавляем аватар пользователя
-    embed.set_thumbnail(url=user_info.get('avatar_url', 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'))
-    embed.set_footer(text=f"Запрос от {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
+    avatar_url = user_info.get('avatar_url')
+    if avatar_url:
+        embed.set_thumbnail(url=avatar_url)
+    else:
+        embed.set_thumbnail(url='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
+    
+    # Добавляем футер
+    footer_text = f"Запрос от {ctx.author.display_name}"
+    footer_icon = ctx.author.avatar.url if ctx.author.avatar else None
+    embed.set_footer(text=footer_text, icon_url=footer_icon)
     
     # Отправляем Embed в канал
     await ctx.send(embed=embed)
