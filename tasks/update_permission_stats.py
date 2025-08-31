@@ -198,6 +198,12 @@ ROLES_CONFIG = [
         "role_name": "Сторожилы",
         "message_id": 1357326950225543298,
         "color": disnake.Color.dark_grey()
+    },
+    {
+        "role_id": 1395296010573582437,
+        "role_name": "Ивентология",
+        "message_id": 1409978489578197004,
+        "color": disnake.Color.blurple()
     }
 ]
 
