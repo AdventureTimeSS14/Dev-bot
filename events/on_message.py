@@ -29,7 +29,8 @@ async def on_message(message):
         return
 
     # Проверка пингов отпускников
-    await check_vacation_pings(message)
+    # TODO: дрделать
+    # await check_vacation_pings(message)
 
     # Ответ на упоминание бота
     if f"<@{bot.user.id}>" in message.content:
