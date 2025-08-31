@@ -12,6 +12,9 @@ from modules.database_manager_sponsor import SponsorDatabaseManager
 intents = disnake.Intents.all()
 intents.message_content = True
 intents.members = True
+intents.guilds = True
+intents.guild_messages = True
+intents.guild_reactions = True
 
 bot = commands.Bot(
     command_prefix="&",

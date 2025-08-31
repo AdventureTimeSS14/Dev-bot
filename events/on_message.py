@@ -48,6 +48,9 @@ async def on_message(message):
     # Проверка на шаблон GitHub issue/PR
     await handle_github_pattern(message)
 
+    # Проверка сообщений в темах форума
+    await check_forum_thread_messages(message)
+
     await check_time_transfer_with_fuzz(message)
 
     # await check_vpn_promotion(message) # ЗАпрещено 6-ым правилом политики Разработчиков
@@ -481,3 +484,40 @@ async def check_vacation_pings(message):
         # Если не удалось отправить предупреждение, логируем это
         if log_channel:
             await log_channel.send(f"⚠️ Не удалось отправить предупреждение пользователю {message.author.mention}: {e}")
+
+
+async def check_forum_thread_messages(message):
+    """
+    Проверяет сообщения в темах форума и добавляет автоматические реакции только на публикации.
+    """
+    try:
+        # Проверяем, что сообщение находится в теме форума с нужным ID
+        if (hasattr(message.channel, 'type') and 
+            message.channel.type == disnake.ChannelType.public_thread and 
+            hasattr(message.channel, 'parent_id') and
+            message.channel.parent_id == 1245787985891561544):
+            
+            # Игнорируем сообщения от самого бота
+            if message.author == bot.user:
+                return
+                
+            # Проверяем, является ли это первым сообщением в теме (публикацией)
+            async for msg in message.channel.history(limit=1, oldest_first=True):
+                if msg.id == message.id:
+                    # Это первое сообщение в теме - добавляем реакции
+                    bot_reactions = [reaction for reaction in message.reactions if reaction.me]
+                    if not bot_reactions:
+                        # Добавляем реакцию 👍 (thumbsup)
+                        await message.add_reaction("👍")
+                        
+                        # Добавляем реакцию 👎 (thumbsdown)
+                        await message.add_reaction("👎")
+                        
+                        print(f"✅ Добавлены реакции на публикацию '{message.channel.name}' от {message.author.name}")
+                break  # Выходим из цикла после первого сообщения
+            # Если это не первое сообщение - ничего не делаем
+                
+    except Exception as e:
+        print(f"❌ Ошибка при обработке сообщения в теме форума: {e}")
+
+
