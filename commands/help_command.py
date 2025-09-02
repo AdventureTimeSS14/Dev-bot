@@ -48,11 +48,7 @@ async def help_command(ctx):
         ),
         "name_3": "Доп. информация:",
         "context_3": (
-            f"✨ Если у вас есть вопросы или вам нужна помощь, обращайтесь к создателю: {author_bot.display_name}\n\n"
-            "**🛡 HellflareVPN 🔥 — щит и огонь из Нидерландов!**\n"
-            "Наш VPN‑сервис обеспечивает **конфиденциальность**, **надежное шифрование** и безопасный интернет. "
-            "Установить просто — пишите в Telegram `@HellflareVPN_Bot`.\n"
-            f"— От автора этого же бота: {author_bot.display_name}\n\n"
+            f"✨ Если у вас есть вопросы или вам нужна помощь, обращайтесь к создателю: {author_bot.display_name}\n"
         ),
         "name_4": "Разработчики:",
         "context_4": "👨‍💻 Автор: Schrodinger71\n🛠️ Maintainer: Schrodinger71\n🤝 Contributors: nixsilvam, xelasto, mskaktus\n📡 Хост: 🐈‍⬛github-actions[bot]",
