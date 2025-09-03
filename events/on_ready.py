@@ -67,7 +67,7 @@ async def on_ready():
         )
     else:
         tasks_to_start = [
-            (fetch_merged_pull_requests, "fetch merged pr"),
+            # (fetch_merged_pull_requests, "fetch merged pr"),
             (list_team_task, "list team"),
             (monitor_commits, "monitor commits"),
             (update_presence, "update status presence"),
