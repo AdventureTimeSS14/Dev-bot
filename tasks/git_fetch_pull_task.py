@@ -114,47 +114,47 @@ async def log_pull_request(pr, pr_title, pr_url, merged_at):
         print(f"⚠️ Лог-канал с ID {LOG_CHANNEL_ID} не найден.")
 
 
-@tasks.loop(seconds=SECOND_UPDATE_CHANGELOG)
-async def fetch_merged_pull_requests():
-    """
-    Фоновая задача для проверки замерженных пулл-реквестов и публикации их в канале CHANGELOG.
-    """
-    global LAST_CHECK_TIME # pylint: disable=W0603
+# @tasks.loop(seconds=SECOND_UPDATE_CHANGELOG)
+# async def fetch_merged_pull_requests():
+#     """
+#     Фоновая задача для проверки замерженных пулл-реквестов и публикации их в канале CHANGELOG.
+#     """
+#     global LAST_CHECK_TIME # pylint: disable=W0603
 
-    # url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed'
-    url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed&sort=updated&direction=desc&per_page=30'
-    pull_requests = await fetch_github_data(url, {"Accept": "application/vnd.github.v3+json"})
+#     # url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed'
+#     url = f'https://api.github.com/repos/{AUTHOR}/{REPOSITORIES["n"]}/pulls?state=closed&sort=updated&direction=desc&per_page=30'
+#     pull_requests = await fetch_github_data(url, {"Accept": "application/vnd.github.v3+json"})
 
-    if not pull_requests:
-        print("❌ Пулл-реквесты не найдены или произошла ошибка при запросе.")
-        return
+#     if not pull_requests:
+#         print("❌ Пулл-реквесты не найдены или произошла ошибка при запросе.")
+#         return
 
-    for pr in pull_requests:
-        merged_at = pr.get("merged_at")
-        if not merged_at:
-            continue
+#     for pr in pull_requests:
+#         merged_at = pr.get("merged_at")
+#         if not merged_at:
+#             continue
 
-        merged_at = datetime.strptime(merged_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+#         merged_at = datetime.strptime(merged_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
-        if LAST_CHECK_TIME and merged_at > LAST_CHECK_TIME:
-            pr_title = pr["title"]
-            pr_url = pr["html_url"]
-            description = pr.get("body", "").strip()
-            # author_name = pr["user"]["login"]
-            coauthors = pr.get("coauthors", [])
+#         if LAST_CHECK_TIME and merged_at > LAST_CHECK_TIME:
+#             pr_title = pr["title"]
+#             pr_url = pr["html_url"]
+#             description = pr.get("body", "").strip()
+#             # author_name = pr["user"]["login"]
+#             coauthors = pr.get("coauthors", [])
 
-            # Извлекаем изменения из описания
-            description, _ = extract_pull_request_changes(description)
-            if not description:
-                print(f"⚠️ Описание изменений для PR #{pr['number']} не найдено.")
-                continue
+#             # Извлекаем изменения из описания
+#             description, _ = extract_pull_request_changes(description)
+#             if not description:
+#                 print(f"⚠️ Описание изменений для PR #{pr['number']} не найдено.")
+#                 continue
 
-            # Умная обрезка текста, если описание слишком длинное
-            description = smart_truncate(description, MAX_FIELD_LENGTH)
+#             # Умная обрезка текста, если описание слишком длинное
+#             description = smart_truncate(description, MAX_FIELD_LENGTH)
 
-            # Отправка PR в Discord и логирование
-            await send_pull_request_to_disnake(pr, description, pr_title, pr_url, coauthors)
-            await log_pull_request(pr, pr_title, pr_url, merged_at)
+#             # Отправка PR в Discord и логирование
+#             await send_pull_request_to_disnake(pr, description, pr_title, pr_url, coauthors)
+#             await log_pull_request(pr, pr_title, pr_url, merged_at)
 
-    # Обновляем время последней проверки
-    LAST_CHECK_TIME = datetime.now(timezone.utc)
+#     # Обновляем время последней проверки
+#     LAST_CHECK_TIME = datetime.now(timezone.utc)
