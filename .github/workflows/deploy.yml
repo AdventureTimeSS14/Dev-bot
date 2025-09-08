@@ -8,6 +8,7 @@ on:
 
 jobs:
   deploy:
+    if: ${{ vars.DEPLOY_ENABLED != 'false' }}
     runs-on: ubuntu-latest
 
     steps:
