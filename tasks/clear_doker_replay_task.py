@@ -49,6 +49,7 @@ async def clear_google_drive_replays():
         return 0
 
 async def clear_replay():
+    log_channel = None
     try:
         token = await async_get_jwt_token()
         files = await async_list_files(token)
