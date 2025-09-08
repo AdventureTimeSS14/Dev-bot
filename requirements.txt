@@ -4,6 +4,7 @@ curl_cffi
 pycurl
 aiohttp
 psycopg2
+psycopg2-binary
 beautifulsoup4
 pytz
 fuzzywuzzy==0.18.0
