@@ -13,7 +13,7 @@ from tasks.check_new_commit_task import monitor_commits
 from tasks.check_size_adminlog_ss14_task import check_size_log
 from tasks.clear_doker_replay_task import clear_doker_replay_ss14
 from tasks.discord_auth_task import discord_auth_update
-from tasks.git_fetch_pull_task import fetch_merged_pull_requests
+# from tasks.git_fetch_pull_task import fetch_merged_pull_requests
 from tasks.list_team_task import list_team_task
 from tasks.update_admin_stats import update_admin_stats
 from tasks.update_permission_stats import update_permission_stats
