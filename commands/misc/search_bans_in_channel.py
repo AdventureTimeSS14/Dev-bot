@@ -183,6 +183,7 @@ async def search_bans_in_multiple_channels(username: str, force_update: bool = F
         "total_bans": 0,
     }
 
+    # Обязательные intents для discord.py v2+
     temp_bot = commands.Bot(command_prefix="!", self_bot=True)
 
     @temp_bot.event
