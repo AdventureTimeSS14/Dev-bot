@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 import disnake
 from disnake.ext import tasks
@@ -51,7 +51,13 @@ async def check_end_vacation():
             print(f"Пользователь {user_id}: дата окончания отпуска {data_end_vacation}")
 
             # Проверяем, прошла ли дата окончания отпуска или наступила
-            if data_end_vacation < current_date or (data_end_vacation == current_date and current_hour >= 11):
+            try:
+                end_date = date.fromisoformat(str(data_end_vacation))
+            except Exception:
+                # Если формат неожиданный, пробуем обрезать время, если есть
+                end_date = date.fromisoformat(str(data_end_vacation).split(" ")[0])
+
+            if end_date < current_date or (end_date == current_date and current_hour >= 11):
                 print(f"✅ Отпуск для пользователя {user_id} завершён: дата {data_end_vacation}, текущее время {current_time}")
 
                 try:
