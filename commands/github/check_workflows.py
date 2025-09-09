@@ -1,10 +1,10 @@
 import sys
 
 import aiohttp
-from Tools import get_http_session
 
 from bot_init import bot
 from config import AUTHOR, GITHUB
+from Tools import get_http_session
 
 OWNER = AUTHOR
 REPO = 'Dev-bot'

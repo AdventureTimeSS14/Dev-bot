@@ -2,13 +2,13 @@
 Модуль для запуска бота.
 """
 
-from argparse import ArgumentParser
 import asyncio
 import importlib
 import logging
-from logging.handlers import RotatingFileHandler
 import pkgutil
 import sys
+from argparse import ArgumentParser
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from bot_init import bot

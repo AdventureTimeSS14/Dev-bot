@@ -8,7 +8,8 @@ from fuzzywuzzy import fuzz
 from bot_init import bot, ss14_db
 from commands.misc.search_bans_in_channel import \
     search_bans_in_multiple_channels
-from config import ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID, POST_ADMIN_HEADERS, VACATION_ROLE
+from config import (ADDRESS_MRP, ADMIN_TEAM, LOG_CHANNEL_ID,
+                    POST_ADMIN_HEADERS, VACATION_ROLE)
 from data import JsonData
 from events.utils import get_github_link
 from modules.get_creation_date import get_creation_date

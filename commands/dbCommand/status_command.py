@@ -1,5 +1,6 @@
-import disnake
 import sqlite3
+
+import disnake
 
 from bot_init import bot
 from commands.dbCommand.get_sqlite_connection import get_sqlite_connection

@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 
