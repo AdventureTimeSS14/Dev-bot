@@ -8,9 +8,14 @@ from commands.dbCommand.get_db_connection import get_db_connection
 
 @bot.command(name="show_vacation", description="Показать информацию о всех отпусках.")
 async def show_vacation(ctx):
+    conn = None
+    cursor = None
     try:
         # Подключаемся к базе данных
         conn = get_db_connection()
+        if not conn:
+            await ctx.send("❌ Ошибка: Не удалось установить соединение с базой данных.")
+            return
         cursor = conn.cursor()
 
         # Получаем все записи из таблицы vacation_team
@@ -113,5 +118,7 @@ async def show_vacation(ctx):
     except Exception as e:
         await ctx.send(f"Неожиданная ошибка: {e}")
     finally:
-        cursor.close() if cursor else None
-        conn.close() if conn else None
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
