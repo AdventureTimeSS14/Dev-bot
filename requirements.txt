@@ -13,8 +13,7 @@ nest-asyncio==1.6.0
 python-dotenv==1.0.1
 # python-Levenshtein==0.25.1
 requests==2.32.3
-mariadb==1.1.11
-mysql-connector-python==9.1.0
+## Removed: MariaDB/MySQL deps after migration to SQLite
 python-dateutil==2.9.0
 aiofiles
 google-api-python-client
