@@ -5,7 +5,7 @@ import aiohttp
 import dateutil.parser
 import disnake
 
-from Tools import get_http_session
+# Не используем глобальную сессию, чтобы избежать привязки к закрытой event loop
 
 # Определение уровней игры для SS14
 SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончание раунда..."}
@@ -14,29 +14,30 @@ SS14_RUN_LEVELS = {0: "Лобби", 1: "Раунд идёт", 2: "Окончан
 async def get_ss14_server_status_second(address: str) -> dict:
     """
     Получает статус игры с сервера SS14.
-    Если сервер не отвечает на порту 1212, пытается на порту 1211.
+    Пробует комбинации портов (1212, 1211) и схем (http, https).
     """
-    url = get_ss14_status_url(address, 1212)
-    try:
-        # Пытаемся запросить с порта 1212
-        status = await fetch_status(url)
-        if status is None:
-            # Если не удалось получить статус с порта 1212, пробуем порт 1211
-            print("Пробуем подключиться к порту 1211...")
-            url = get_ss14_status_url(address, 1211)
-            status = await fetch_status(url)
-        return status
-    except Exception as e:
-        print(f"Ошибка при получении статуса с сервера SS14: {e}")
-        return None
+    for port in (1212, 1211):
+        for scheme in ("http", "https"):
+            url = get_ss14_status_url(address, port, scheme)
+            print(f"Пробуем получить статус: {url}/status")
+            try:
+                status = await fetch_status(url)
+                if status is not None:
+                    return status
+            except Exception as e:
+                # Логируем и пробуем следующую комбинацию
+                print(f"Ошибка при попытке {scheme} {port}: {e}")
+                continue
+    return None
 
 async def fetch_status(url: str) -> dict:
     """
     Функция для запроса статуса с указанного URL.
     """
     try:
-        session = await get_http_session()
-        async with session.get(url + "/status") as resp:
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.get(url + "/status") as resp:
                 if resp.status != 200:
                     raise aiohttp.ClientResponseError(
                         resp.request_info,
@@ -47,18 +48,23 @@ async def fetch_status(url: str) -> dict:
     except aiohttp.ClientError as e:
         print(f"Ошибка при получении статуса с сервера SS14: {e}")
         return None
+    except Exception as e:
+        # Подхватываем, например, RuntimeError: Event loop is closed
+        print(f"Неожиданная ошибка при получении статуса: {e}")
+        return None
 
-def get_ss14_status_url(url: str, port: int) -> str:
+def get_ss14_status_url(url: str, port: int, scheme: str = "http") -> str:
     """
     Преобразует адрес сервера в корректный URL с указанным портом.
     """
     # Если адрес начинается с ss14://, преобразуем в http://
     if url.startswith("ss14://"):
-        url = "http://" + url[7:]
+        url = url[7:]
 
     parsed = urlparse(url, allow_fragments=False)
+    hostname = parsed.hostname or parsed.path  # поддержка простого IP без схемы
     return urlunparse(
-        ("http", f"{parsed.hostname}:{port}", parsed.path, "", "", "")
+        (scheme, f"{hostname}:{port}", "", "", "", "")
     )
 
 # async def fetch_metrics(url: str, retries=3, delay=15) -> dict:
@@ -147,10 +153,11 @@ def format_time_delta(delta) -> list:
     time_str = []
     if delta.days > 0:
         time_str.append(f"{delta.days} дней")
-    hours, minutes = divmod(delta.seconds, 3600)
+    hours, remainder = divmod(delta.seconds, 3600)
     if hours > 0:
         time_str.append(f"{hours} часов")
-    time_str.append(f"{minutes // 60} минут")
+    minutes, _ = divmod(remainder, 60)
+    time_str.append(f"{minutes} минут")
     return time_str
 
 
