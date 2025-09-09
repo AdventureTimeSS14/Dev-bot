@@ -33,8 +33,7 @@ async def uptime(ctx):
 
     # Отправляем сообщение с информацией
     await ctx.send(
-        f"⏱ **Время работы бота:** {elapsed_time_str}\n"
-        f"⌛ **Оставшееся время до отключения:** {remaining_time_str}"
+        f"⏱ **Время работы бота:** {elapsed_time_str}"
     )
 
 
