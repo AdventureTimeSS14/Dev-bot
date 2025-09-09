@@ -165,5 +165,4 @@ pylint_report.txt
 /cache
 update_container.sh
 data/vacations.sqlite3
-
-# commands\misc\search_bans_in_channel.py
+commands/misc/search_bans_in_channel.py
