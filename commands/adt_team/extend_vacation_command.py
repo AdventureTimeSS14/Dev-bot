@@ -6,8 +6,7 @@ from datetime import date
 
 import disnake
 
-from bot_init import bot
-from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
+from bot_init import bot, sqlite_vacations_db
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -62,16 +61,8 @@ async def extend_vacation(ctx, user: disnake.Member, new_end_date: str, *, reaso
     cursor = None
 
     try:
-        # Подключение к SQLite
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Обновление записи в БД
-        cursor.execute(
-            "UPDATE vacation_team SET data_end_vacation = ?, reason = ? WHERE discord_id = ?",
-            (sql_date, reason, user.id)
-        )
-        conn.commit()
+        # Обновление записи через менеджер
+        sqlite_vacations_db.extend_vacation(user.id, sql_date, reason)
 
         # Создаем Embed для уведомления в админ-канале
         embed = disnake.Embed(

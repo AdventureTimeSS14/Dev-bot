@@ -4,8 +4,7 @@ import disnake
 from disnake.ext import tasks
 from pytz import timezone
 
-from bot_init import bot
-from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
+from bot_init import bot, sqlite_vacations_db
 from config import ADMIN_TEAM, LOG_CHANNEL_ID, VACATION_ROLE
 
 
@@ -20,16 +19,8 @@ async def check_end_vacation():
     current_date = current_time.date()  # Получаем дату без времени
     current_hour = current_time.hour
 
-    # Подключаемся к базе данных
-    conn = None
-    cursor = None
     try:
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Находим пользователей, у которых дата окончания отпуска совпадает с текущей или прошла
-        cursor.execute("SELECT discord_id, data_end_vacation FROM vacation_team WHERE date(data_end_vacation) <= date(?)", (str(current_date),))
-        users_to_end_vacation = cursor.fetchall()
+        users_to_end_vacation = sqlite_vacations_db.get_due_vacations(str(current_date))
 
         if not users_to_end_vacation:
             print("❌ Нет пользователей с завершившимся отпуском.")
@@ -74,8 +65,7 @@ async def check_end_vacation():
                     continue
 
                 # Удаляем запись из базы данных
-                cursor.execute("DELETE FROM vacation_team WHERE discord_id = ?", (user_id,))
-                conn.commit()
+                sqlite_vacations_db.remove_vacation(user_id)
 
                 if vacation_role in member.roles:
                     await member.remove_roles(vacation_role)
@@ -111,7 +101,4 @@ async def check_end_vacation():
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
     finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        pass

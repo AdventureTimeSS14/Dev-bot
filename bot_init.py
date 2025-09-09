@@ -8,6 +8,7 @@ from disnake.ext import commands
 
 from modules.database_manager_class import DatabaseManagerSS14
 from modules.database_manager_sponsor import SponsorDatabaseManager
+from modules.database_manager_sqlite import DatabaseManagerSQLite
 
 intents = disnake.Intents.all()
 intents.message_content = True
@@ -27,3 +28,4 @@ bot = commands.Bot(
 # Инициализация менеджеров БД
 ss14_db = DatabaseManagerSS14()
 db_sponsor = SponsorDatabaseManager()
+sqlite_vacations_db = DatabaseManagerSQLite()

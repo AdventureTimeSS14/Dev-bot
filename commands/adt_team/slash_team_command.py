@@ -3,8 +3,7 @@ from datetime import date
 import disnake
 from disnake import Option
 
-from bot_init import bot
-from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
+from bot_init import bot, sqlite_vacations_db
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -72,16 +71,8 @@ async def team_add_vacation_slash(
     cursor = None
 
     try:
-        # Подключение к БД (без await, так как mariadb синхронный)
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Вставка данных
-        cursor.execute(
-            "INSERT OR REPLACE INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (?, ?, ?)",
-            (user.id, sql_date, reason)
-        )
-        conn.commit()
+        # Сохранение через менеджер
+        sqlite_vacations_db.add_or_update_vacation(user.id, sql_date, reason)
 
         # Добавляем роль отпуска пользователю
         await user.add_roles(role_vacation)
@@ -159,12 +150,8 @@ async def team_end_vacation_slash(
     cursor = None
 
     try:
-        # Подключение к базе данных
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-        # Удаление записи из БД
-        cursor.execute("DELETE FROM vacation_team WHERE discord_id = ?", (user.id,))
-        conn.commit()
+        # Удаление записи через менеджер
+        sqlite_vacations_db.remove_vacation(user.id)
         
         # Удаляем роль отпуска у пользователя
         await user.remove_roles(role_vacation)
@@ -263,16 +250,8 @@ async def team_extend_vacation_slash(
     cursor = None
 
     try:
-        # Подключение к базе данных
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Обновление записи в БД
-        cursor.execute(
-            "UPDATE vacation_team SET data_end_vacation = ?, reason = ? WHERE discord_id = ?",
-            (sql_date, reason, user.id)
-        )
-        conn.commit()
+        # Обновление записи через менеджер
+        sqlite_vacations_db.extend_vacation(user.id, sql_date, reason)
 
         # Создаем Embed для уведомления в админ-канале
         embed = disnake.Embed(

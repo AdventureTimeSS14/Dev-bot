@@ -2,22 +2,13 @@ import disnake
 from disnake.ext import commands
 from disnake.ui import Button, View
 
-from bot_init import bot
-from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
+from bot_init import bot, sqlite_vacations_db
 
 
 @bot.command(name="show_vacation", description="Показать информацию о всех отпусках.")
 async def show_vacation(ctx):
-    conn = None
-    cursor = None
     try:
-        # Подключаемся к SQLite
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Получаем все записи из таблицы vacation_team
-        cursor.execute("SELECT discord_id, data_end_vacation, reason, created_at FROM vacation_team")
-        users_vacation_info = cursor.fetchall()
+        users_vacation_info = sqlite_vacations_db.list_vacations()
 
         if not users_vacation_info:
             await ctx.send("❌ Нет пользователей с данными отпуска.")
@@ -115,7 +106,4 @@ async def show_vacation(ctx):
     except Exception as e:
         await ctx.send(f"Неожиданная ошибка: {e}")
     finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        pass

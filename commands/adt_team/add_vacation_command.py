@@ -3,8 +3,7 @@ from datetime import date
 
 import disnake
 
-from bot_init import bot
-from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
+from bot_init import bot, sqlite_vacations_db
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -59,16 +58,8 @@ async def add_vacation(ctx, user: disnake.Member, end_date: str, *, reason: str)
     cursor = None
 
     try:
-        # Подключение к SQLite
-        conn = get_sqlite_connection()
-        cursor = conn.cursor()
-
-        # Вставка данных
-        cursor.execute(
-            "INSERT OR REPLACE INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (?, ?, ?)",
-            (user.id, sql_date, reason)
-        )
-        conn.commit()
+        # Сохранение через менеджер
+        sqlite_vacations_db.add_or_update_vacation(user.id, sql_date, reason)
 
         # Добавляем роль пользователю
         await user.add_roles(role_vacation)
