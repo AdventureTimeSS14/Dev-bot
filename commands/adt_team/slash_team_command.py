@@ -23,46 +23,49 @@ async def team_add_vacation_slash(
     """
     Выдача отпуска пользователю. Добавляется роль отпуска с указанием срока и причины.
     """
+    # Всегда мгновенно подтверждаем интеракцию, чтобы избежать таймаута
+    if not inter.response.is_done():
+        await inter.response.defer()
 
     try:
         # Очистка и проверка формата даты
-        end_date = end_date.strip('"\' ')
+        end_date = end_date.strip("'\" ")
         day, month, year = map(int, end_date.split('.'))
         vacation_end = date(year, month, day) 
 
         # Проверяем, что дата не в прошлом
         if vacation_end < date.today():
-            await inter.response.send_message("❌ Ошибка: Дата окончания отпуска не может быть в прошлом.")
+            await inter.edit_original_response(content="❌ Ошибка: Дата окончания отпуска не может быть в прошлом.")
             return
         
         # Форматируем для SQL
         sql_date = vacation_end.strftime('%Y-%m-%d')
 
     except ValueError:
-        await inter.response.send_message("❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
+        await inter.edit_original_response(content="❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
         return
     except Exception as e:
-        await inter.response.send_message(f"❌ Критическая ошибка: {str(e)}")
+        await inter.edit_original_response(content=f"❌ Критическая ошибка: {str(e)}")
         print(f"[add_vacation] Ошибка парсинга даты: {str(e)}")
         return
 
     # Получаем роль отпуска
     role_vacation = inter.guild.get_role(VACATION_ROLE)
     if not role_vacation:
-        await inter.response.send_message("❌ Ошибка: Роль отпуска не найдена на сервере.")
+        await inter.edit_original_response(content="❌ Ошибка: Роль отпуска не найдена на сервере.")
         return
 
     # Проверяем, есть ли у пользователя уже роль отпуска
     if role_vacation in user.roles:
-        await inter.response.send_message(
-            f"❌ {user.mention} уже имеет роль {role_vacation.name}."
+        await inter.edit_original_response(
+            content=f"❌ {user.mention} уже имеет роль {role_vacation.name}."
         )
         return
 
     # Получаем канал для уведомлений
     admin_channel = bot.get_channel(ADMIN_TEAM)
     if not admin_channel:
-        await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
+        await inter.edit_original_response(content="❌ Ошибка: Канал уведомлений не найден.")
         return
 
     conn = None
@@ -82,8 +85,8 @@ async def team_add_vacation_slash(
 
         # Добавляем роль отпуска пользователю
         await user.add_roles(role_vacation)
-        await inter.response.send_message(
-            f"✅ Роль {role_vacation.name} успешно добавлена {user.mention}."
+        await inter.edit_original_response(
+            content=f"✅ Роль {role_vacation.name} успешно добавлена {user.mention}."
         )
 
         # Создаем Embed для уведомления в админ-канале
@@ -105,14 +108,14 @@ async def team_add_vacation_slash(
         await admin_channel.send(embed=embed)
 
     except disnake.Forbidden:
-        await inter.response.send_message(
-            "⚠️ Ошибка: У бота недостаточно прав для добавления роли."
+        await inter.edit_original_response(
+            content="⚠️ Ошибка: У бота недостаточно прав для добавления роли."
         )
     except disnake.HTTPException as e:
-        await inter.response.send_message(f"❌ Ошибка: Не удалось добавить роль. Подробнее: {e}")
+        await inter.edit_original_response(content=f"❌ Ошибка: Не удалось добавить роль. Подробнее: {e}")
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
-        await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+        await inter.edit_original_response(content="❌ Произошла непредвиденная ошибка.")
     finally:
         if cursor:
             cursor.close()
@@ -132,22 +135,24 @@ async def team_end_vacation_slash(
     """
     Завершает отпуск указанного пользователя, удаляя роль отпуска.
     """
+    if not inter.response.is_done():
+        await inter.response.defer()
 
     # Получаем роль отпуска
     role_vacation = inter.guild.get_role(VACATION_ROLE)
     if not role_vacation:
-        await inter.response.send_message("❌ Ошибка: Роль отпуска не найдена на сервере.")
+        await inter.edit_original_response(content="❌ Ошибка: Роль отпуска не найдена на сервере.")
         return
 
     # Проверяем, есть ли у пользователя роль отпуска
     if role_vacation not in user.roles:
-        await inter.response.send_message(f"❌ У {user.mention} нет роли {role_vacation.name}.")
+        await inter.edit_original_response(content=f"❌ У {user.mention} нет роли {role_vacation.name}.")
         return
 
     # Получаем канал для уведомлений
     admin_channel = bot.get_channel(ADMIN_TEAM)
     if not admin_channel:
-        await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
+        await inter.edit_original_response(content="❌ Ошибка: Канал уведомлений не найден.")
         return
 
     conn = None
@@ -163,8 +168,8 @@ async def team_end_vacation_slash(
         
         # Удаляем роль отпуска у пользователя
         await user.remove_roles(role_vacation)
-        await inter.response.send_message(
-            f"✅ Роль {role_vacation.name} успешно снята с {user.mention}."
+        await inter.edit_original_response(
+            content=f"✅ Роль {role_vacation.name} успешно снята с {user.mention}."
         )
 
         # Создаем Embed для уведомления в админ-канал
@@ -184,12 +189,12 @@ async def team_end_vacation_slash(
         await admin_channel.send(embed=embed)
 
     except disnake.Forbidden:
-        await inter.response.send_message("⚠️ Ошибка: У бота недостаточно прав для снятия роли.")
+        await inter.edit_original_response(content="⚠️ Ошибка: У бота недостаточно прав для снятия роли.")
     except disnake.HTTPException as e:
-        await inter.response.send_message(f"❌ Ошибка: Не удалось снять роль. Подробнее: {e}")
+        await inter.edit_original_response(content=f"❌ Ошибка: Не удалось снять роль. Подробнее: {e}")
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
-        await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+        await inter.edit_original_response(content="❌ Произошла непредвиденная ошибка.")
     finally:
         if cursor:
             cursor.close()
@@ -211,46 +216,47 @@ async def team_extend_vacation_slash(
     """
     Продление отпуска пользователю. Обновляется срок отпуска и причина.
     """
+    if not inter.response.is_done():
+        await inter.response.defer()
     try:
         # Очистка и проверка формата даты
-        new_end_date = new_end_date.strip('"\' ')
+        new_end_date = new_end_date.strip("'\" ")
         day, month, year = map(int, new_end_date.split('.'))
         vacation_end = date(year, month, day)
 
         # Проверяем, что дата не в прошлом
         if vacation_end < date.today():
-            await inter.response.send_message("❌ Ошибка: Новая дата окончания отпуска не может быть в прошлом.")
+            await inter.edit_original_response(content="❌ Ошибка: Новая дата окончания отпуска не может быть в прошлом.")
             return
 
         # Форматируем для SQL
         sql_date = vacation_end.strftime('%Y-%m-%d')
 
     except ValueError:
-        await inter.response.send_message("❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
+        await inter.edit_original_response(content="❌ Ошибка: Неверный формат даты. Используйте дд.мм.гггг (например, 22.02.2025)")
         return
     except Exception as e:
-        await inter.response.send_message(f"❌ Критическая ошибка: {str(e)}")
+        await inter.edit_original_response(content=f"❌ Критическая ошибка: {str(e)}")
         print(f"[extend_vacation] Ошибка парсинга даты: {str(e)}")
         return
 
     # Получаем роль отпуска
     role_vacation = inter.guild.get_role(VACATION_ROLE)
     if not role_vacation:
-        await inter.response.send_message("❌ Ошибка: Роль отпуска не найдена на сервере.")
+        await inter.edit_original_response(content="❌ Ошибка: Роль отпуска не найдена на сервере.")
         return
 
     # Проверяем, есть ли у пользователя роль отпуска
     if role_vacation not in user.roles:
-        await inter.response.send_message(
-            f"❌ {user.mention} не имеет роли {role_vacation.name}, поэтому продлить отпуск невозможно.", 
-            ephemeral=True
+        await inter.edit_original_response(
+            content=f"❌ {user.mention} не имеет роли {role_vacation.name}, поэтому продлить отпуск невозможно."
         )
         return
 
     # Получаем канал для уведомлений
     admin_channel = bot.get_channel(ADMIN_TEAM)
     if not admin_channel:
-        await inter.response.send_message("❌ Ошибка: Канал уведомлений не найден.")
+        await inter.edit_original_response(content="❌ Ошибка: Канал уведомлений не найден.")
         return
 
     conn = None
@@ -285,23 +291,22 @@ async def team_extend_vacation_slash(
         await admin_channel.send(embed=embed)
 
         # Ответ пользователю
-        await inter.response.send_message(
-            f"✅ Срок отпуска {user.mention} был успешно продлен до {new_end_date}."
+        await inter.edit_original_response(
+            content=f"✅ Срок отпуска {user.mention} был успешно продлен до {new_end_date}."
         )
 
     except disnake.Forbidden:
-        await inter.response.send_message("⚠️ Ошибка: У бота недостаточно прав для отправки уведомлений.")
+        await inter.edit_original_response(content="⚠️ Ошибка: У бота недостаточно прав для отправки уведомлений.")
     except disnake.HTTPException as e:
-        await inter.response.send_message(f"❌ Ошибка: Не удалось продлить отпуск. Подробнее: {e}")
+        await inter.edit_original_response(content=f"❌ Ошибка: Не удалось продлить отпуск. Подробнее: {e}")
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
-        await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+        await inter.edit_original_response(content="❌ Произошла непредвиденная ошибка.")
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
-
 
 
 @bot.slash_command(
@@ -319,25 +324,26 @@ async def tweak_team_slash(
     """
     Изменение роли пользователя. Позволяет заменить одну роль на другую с указанием причины.
     """
+    if not inter.response.is_done():
+        await inter.response.defer(ephemeral=True)
 
     # Проверка канала для логирования
     admin_channel = bot.get_channel(ADMIN_TEAM)
     if not admin_channel:
-        await inter.response.send_message("❌ Не удалось найти канал для логирования.")
+        await inter.edit_original_response(content="❌ Не удалось найти канал для логирования.")
         return
 
     # Проверка наличия старой роли у пользователя
     if old_role not in user.roles:
-        await inter.response.send_message(
-            f"❌ У {user.mention} нет роли **{old_role.name}**. Убедитесь, что роль указана верно.",
-            ephemeral=True
+        await inter.edit_original_response(
+            content=f"❌ У {user.mention} нет роли **{old_role.name}**. Убедитесь, что роль указана верно."
         )
         return
 
     # Проверка на допустимость причины
     if len(reason.strip()) < 5:
-        await inter.response.send_message(
-            "❌ Причина должна содержать не менее 5 символов."
+        await inter.edit_original_response(
+            content="❌ Причина должна содержать не менее 5 символов."
         )
         return
 
@@ -373,23 +379,25 @@ async def tweak_team_slash(
         await admin_channel.send(embed=embed)
 
         # Ответ пользователю
-        await inter.response.send_message(
-            f"✅ Роль **{old_role.name}** была успешно заменена на **{new_role.name}** у {user.mention}. Причина: {reason}",
-            ephemeral=True
+        await inter.edit_original_response(
+            content=(
+                f"✅ Роль **{old_role.name}** была успешно заменена на **{new_role.name}** "
+                f"у {user.mention}. Причина: {reason}"
+            )
         )
 
     except disnake.Forbidden:
-        await inter.response.send_message(
-            "⚠️ У бота нет прав для изменения ролей. Проверьте права бота."
+        await inter.edit_original_response(
+            content="⚠️ У бота нет прав для изменения ролей. Проверьте права бота."
         )
     except disnake.HTTPException as e:
-        await inter.response.send_message(
-            f"❌ Произошла ошибка при изменении ролей: {e}"
+        await inter.edit_original_response(
+            content=f"❌ Произошла ошибка при изменении ролей: {e}"
         )
         print(f"Ошибка при изменении ролей: {e}")
     except Exception as e:
-        await inter.response.send_message(
-            f"❌ Возникла ошибка: {e}"
+        await inter.edit_original_response(
+            content=f"❌ Возникла ошибка: {e}"
         )
         print("Ошибка при выполнении команды tweak_team:", e)
 
@@ -402,8 +410,8 @@ async def get_log_channel():
 async def check_reason(inter, reason):
     """ Проверяет, что причина указана и содержит хотя бы 5 символов. """
     if not reason or len(reason.strip()) < 5:
-        await inter.response.send_message(
-            "❌ Причина должна быть указана и содержать хотя бы 5 символов."
+        await inter.edit_original_response(
+            content="❌ Причина должна быть указана и содержать хотя бы 5 символов."
         )
         return False
     return True
@@ -435,7 +443,7 @@ async def send_results(user, removed_roles, errors, inter):
     if errors:
         messages.extend(errors)
 
-    await inter.response.send_message("\n".join(messages))
+    await inter.edit_original_response(content="\n".join(messages))
 
 
 @bot.slash_command(
@@ -453,11 +461,13 @@ async def team_remove_slash(
     """
     Команда для снятия сотрудника с должности. Удаляет роли отдела и должности.
     """
+    if not inter.response.is_done():
+        await inter.response.defer(ephemeral=True)
 
     # Проверяем канал для логирования
     channel_get = await get_log_channel()
     if not channel_get:
-        await inter.response.send_message("❌ Не удалось найти канал для логирования действий.")
+        await inter.edit_original_response(content="❌ Не удалось найти канал для логирования действий.")
         return
 
     # Проверка причины
@@ -500,39 +510,42 @@ async def new_team(
     Команда для назначения пользователя на новую должность.
     Требуется передать две роли: <роль отдела> и <роль должности>.
     """
+    if not inter.response.is_done():
+        await inter.response.defer()
 
     assigned_roles = []
 
     # Проверяем и добавляем роли
     for role in [role_department, role_position]:
         if role in user.roles:
-            await inter.response.send_message(
-                f"❌ У {user.mention} уже есть роль **{role.name}**."
+            await inter.edit_original_response(
+                content=f"❌ У {user.mention} уже есть роль **{role.name}**."
             )
+            return
         else:
             try:
                 await user.add_roles(role)
                 assigned_roles.append(role.name)
             except disnake.Forbidden:
-                await inter.response.send_message(
-                    f"⚠️ У бота нет прав для добавления роли **{role.name}**."
+                await inter.edit_original_response(
+                    content=f"⚠️ У бота нет прав для добавления роли **{role.name}**."
                 )
                 return
             except disnake.HTTPException as e:
-                await inter.response.send_message(
-                    f"❌ Ошибка при добавлении роли **{role.name}**: {str(e)}"
+                await inter.edit_original_response(
+                    content=f"❌ Ошибка при добавлении роли **{role.name}**: {str(e)}"
                 )
                 return
             except Exception as e:
-                await inter.response.send_message(
-                    f"❌ Произошла ошибка при добавлении роли **{role.name}**: {str(e)}"
+                await inter.edit_original_response(
+                    content=f"❌ Произошла ошибка при добавлении роли **{role.name}**: {str(e)}"
                 )
                 return
 
     # Отправляем сообщение об успешных действиях
     if assigned_roles:
-        await inter.response.send_message(
-            f"✅ Роли успешно добавлены для {user.mention}: {', '.join(assigned_roles)}."
+        await inter.edit_original_response(
+            content=f"✅ Роли успешно добавлены для {user.mention}: {', '.join(assigned_roles)}."
         )
 
     # Если обе роли успешно добавлены, отправляем Embed в лог-канал
@@ -550,6 +563,7 @@ async def new_team(
 
             await admin_channel.send(embed=embed)
 
+
 @bot.slash_command(
     name="contribute",
     description="Добавляет роль контрибьютера указанному пользователю."
@@ -566,26 +580,29 @@ async def contribution_add_slash(
     """
     Команда для выдачи роли контрибьютера.
     """
+    if not inter.response.is_done():
+        await inter.response.defer()
+
     role_contribute = inter.guild.get_role(1348226466227163176)
     if not role_contribute:
-        await inter.response.send_message("❌ Ошибка: Роль Контрибьютера не найдена на сервере.")
+        await inter.edit_original_response(content="❌ Ошибка: Роль Контрибьютера не найдена на сервере.")
         return
 
     if role_contribute in user.roles:
-        await inter.response.send_message(
-            f"❌ {user.mention} уже имеет роль {role_contribute.name}."
+        await inter.edit_original_response(
+            content=f"❌ {user.mention} уже имеет роль {role_contribute.name}."
         )
         return
 
     try:
         await user.add_roles(role_contribute)
 
-        # Отправляем основное сообщение
-        await inter.response.send_message(
-            f"✅ Роль {role_contribute.name} успешно выдана {user.mention}."
+        # Основной ответ
+        await inter.edit_original_response(
+            content=f"✅ Роль {role_contribute.name} успешно выдана {user.mention}."
         )
 
-        # Отправляем пикчу
+        # Доп. сообщение (картинка) — followup после defer
         await inter.followup.send(
             "https://media.discordapp.net/attachments/13482296533026079"
             "12/1401997459810422854/contributer.png?ex=68924f62&is=6890f"
@@ -595,11 +612,11 @@ async def contribution_add_slash(
         )
 
     except disnake.Forbidden:
-        await inter.response.send_message(
-            "⚠️ Ошибка: У бота недостаточно прав для добавления роли."
+        await inter.edit_original_response(
+            content="⚠️ Ошибка: У бота недостаточно прав для добавления роли."
         )
     except disnake.HTTPException as e:
-        await inter.response.send_message(f"❌ Ошибка: Не удалось добавить роль. Подробнее: {e}")
+        await inter.edit_original_response(content=f"❌ Ошибка: Не удалось добавить роль. Подробнее: {e}")
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
-        await inter.response.send_message("❌ Произошла непредвиденная ошибка.")
+        await inter.edit_original_response(content="❌ Произошла непредвиденная ошибка.")
