@@ -1,13 +1,14 @@
 import sys
 
 import aiohttp
+from Tools import get_http_session
 
 from bot_init import bot
 from config import AUTHOR, GITHUB
 
 OWNER = AUTHOR
 REPO = 'Dev-bot'
-API_URL = f'https://api.github.com/repos/{OWNER}/{REPO}/actions/runs?workflow=run_on_github.yml' # !!!!!
+API_URL = f'https://api.github.com/repos/{OWNER}/{REPO}/actions/runs?workflow=run_on_github.yml' # !!!!!!
 
 
 # Заголовки для аутентификации
@@ -25,15 +26,15 @@ async def check_workflows():
     'in_progress' для workflow с именем 'Deploy Discord-Bot'.
     """
     try:
-        async with aiohttp.ClientSession(headers=HEADERS) as session:
-            async with session.get(API_URL) as response:
-                if response.status != 200:
-                    print(
-                        f"❌ Ошибка при подключении к GitHub API. Статус: {response.status}"
-                    )
-                    sys.exit(1)
+        session = await get_http_session()
+        async with session.get(API_URL, headers=HEADERS) as response:
+            if response.status != 200:
+                print(
+                    f"❌ Ошибка при подключении к GitHub API. Статус: {response.status}"
+                )
+                sys.exit(1)
 
-                workflows = await response.json()
+            workflows = await response.json()
 
         # Счётчик для процессов 'in_progress'
         in_progress_count = 0  # Количество процессов со статусом 'in_progress'

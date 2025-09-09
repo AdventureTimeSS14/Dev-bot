@@ -3,21 +3,21 @@
 Настроены необходимые параметры для запуска и обработки команд.
 И инициализация менеджеров для работы с БД
 """
-import disnake
-from disnake.ext import commands
+from disnake import Intents
+from disnake.ext.commands import Bot
 
 from modules.database_manager_class import DatabaseManagerSS14
 from modules.database_manager_sponsor import SponsorDatabaseManager
 from modules.database_manager_sqlite import DatabaseManagerSQLite
 
-intents = disnake.Intents.all()
+intents = Intents.all()
 intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.guild_messages = True
 intents.guild_reactions = True
 
-bot = commands.Bot(
+bot = Bot(
     command_prefix="&",
     help_command=None,
     intents=intents,

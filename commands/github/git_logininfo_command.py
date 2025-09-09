@@ -6,6 +6,7 @@ from disnake.ext import commands
 
 from bot_init import bot
 from config import ACTION_GITHUB, AUTHOR, REPOSITORIES
+from Tools import get_http_session
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 
@@ -65,61 +66,61 @@ async def get_github_pull_requests_graphql(username, repo):
             "variables": variables
         }
 
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(GRAPHQL_URL, json=data, headers=headers) as response:
-                    response.raise_for_status()
-                    result = await response.json()
-                    
-                    # Проверяем наличие ключа 'data'
-                    if 'data' not in result:
-                        print(f"❌ Ошибка API: нет данных в ответе. Ответ: {result}")
-                        return []
+        session = await get_http_session()
+        try:
+            async with session.post(GRAPHQL_URL, json=data, headers=headers) as response:
+                response.raise_for_status()
+                result = await response.json()
+                
+                # Проверяем наличие ключа 'data'
+                if 'data' not in result:
+                    print(f"❌ Ошибка API: нет данных в ответе. Ответ: {result}")
+                    return []
 
-                    # Проверяем наличие репозитория
-                    if not result['data'].get('repository'):
-                        print(f"❌ Репозиторий {repo} не найден")
-                        return []
+                # Проверяем наличие репозитория
+                if not result['data'].get('repository'):
+                    print(f"❌ Репозиторий {repo} не найден")
+                    return []
 
-                    # Проверяем наличие пулл-реквестов
-                    if not result['data']['repository'].get('pullRequests'):
-                        print(f"❌ Нет пулл-реквестов в репозитории {repo}")
-                        return []
+                # Проверяем наличие пулл-реквестов
+                if not result['data']['repository'].get('pullRequests'):
+                    print(f"❌ Нет пулл-реквестов в репозитории {repo}")
+                    return []
 
-                    # Обрабатываем пулл-реквесты
-                    pull_requests = result['data']['repository']['pullRequests']['edges']
-                    for pr in pull_requests:
-                        node = pr.get('node')
-                        if not node:
-                            continue
-                            
-                        # Проверяем наличие автора и его логина
-                        author = node.get('author')
-                        if not author or not author.get('login'):
-                            continue
-                            
-                        # Проверяем, что это нужный пользователь
-                        if author['login'] == username:
-                            pr_data = {
-                                'url': node.get('url', ''),
-                                'state': node.get('state', 'UNKNOWN'),
-                                'merged_at': node.get('mergedAt'),
-                                'reviews': node.get('reviews', {}).get('totalCount', 0),
-                                'comments': node.get('comments', {}).get('totalCount', 0)
-                            }
-                            all_pull_requests.append(pr_data)
+                # Обрабатываем пулл-реквесты
+                pull_requests = result['data']['repository']['pullRequests']['edges']
+                for pr in pull_requests:
+                    node = pr.get('node')
+                    if not node:
+                        continue
+                        
+                    # Проверяем наличие автора и его логина
+                    author = node.get('author')
+                    if not author or not author.get('login'):
+                        continue
+                        
+                    # Проверяем, что это нужный пользователь
+                    if author['login'] == username:
+                        pr_data = {
+                            'url': node.get('url', ''),
+                            'state': node.get('state', 'UNKNOWN'),
+                            'merged_at': node.get('mergedAt'),
+                            'reviews': node.get('reviews', {}).get('totalCount', 0),
+                            'comments': node.get('comments', {}).get('totalCount', 0)
+                        }
+                        all_pull_requests.append(pr_data)
 
-                    # Обновляем курсор для следующей страницы
-                    page_info = result['data']['repository']['pullRequests']['pageInfo']
-                    has_next_page = page_info.get('hasNextPage', False)
-                    cursor = page_info.get('endCursor')
+                # Обновляем курсор для следующей страницы
+                page_info = result['data']['repository']['pullRequests']['pageInfo']
+                has_next_page = page_info.get('hasNextPage', False)
+                cursor = page_info.get('endCursor')
 
-            except aiohttp.ClientError as e:
-                print(f"❌ Ошибка при выполнении запроса: {e}")
-                return []
-            except Exception as e:
-                print(f"❌ Неожиданная ошибка: {e}")
-                return []
+        except aiohttp.ClientError as e:
+            print(f"❌ Ошибка при выполнении запроса: {e}")
+            return []
+        except Exception as e:
+            print(f"❌ Неожиданная ошибка: {e}")
+            return []
 
     return all_pull_requests
 
@@ -134,17 +135,17 @@ async def get_github_user_info(username):
     }
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
-                if response.status == 404:
-                    print(f"❌ Пользователь {username} не найден")
-                    return None
-                response.raise_for_status()
-                user_info = await response.json()
-                if not user_info:
-                    print(f"❌ Нет данных о пользователе {username}")
-                    return None
-                return user_info
+        session = await get_http_session()
+        async with session.get(url, headers=headers) as response:
+            if response.status == 404:
+                print(f"❌ Пользователь {username} не найден")
+                return None
+            response.raise_for_status()
+            user_info = await response.json()
+            if not user_info:
+                print(f"❌ Нет данных о пользователе {username}")
+                return None
+            return user_info
     except aiohttp.ClientError as e:
         print(f"❌ Ошибка при получении информации о пользователе: {e}")
         return None

@@ -23,6 +23,9 @@ def _ensure_db_initialized(connection: sqlite3.Connection) -> None:
 			)
 			"""
 		)
+		# Helpful index for due-date lookups and ordering by created_at
+		connection.execute("CREATE INDEX IF NOT EXISTS idx_vacation_due ON vacation_team(date(data_end_vacation))")
+		connection.execute("CREATE INDEX IF NOT EXISTS idx_vacation_created ON vacation_team(date(created_at))")
 
 	# Seed initial data once if table is empty
 	cur = connection.execute("SELECT COUNT(1) FROM vacation_team")
@@ -58,12 +61,23 @@ def _ensure_db_initialized(connection: sqlite3.Connection) -> None:
 			)
 
 
+def _tune_sqlite(connection: sqlite3.Connection) -> None:
+	"""Apply runtime PRAGMAs for better performance with low memory impact."""
+	cur = connection.cursor()
+	cur.execute("PRAGMA journal_mode=WAL;")
+	cur.execute("PRAGMA synchronous=NORMAL;")
+	cur.execute("PRAGMA temp_store=MEMORY;")
+	cur.execute("PRAGMA mmap_size=33554432;")  # 32MB
+	cur.close()
+
+
 def get_sqlite_connection() -> sqlite3.Connection:
 	"""
 	Open (and initialize) a SQLite connection for vacation data.
 	"""
 	os.makedirs(DB_DIR, exist_ok=True)
 	conn = sqlite3.connect(DB_PATH)
+	_tune_sqlite(conn)
 	# Return rows as tuples for compatibility with existing code
 	_ensure_db_initialized(conn)
 	return conn

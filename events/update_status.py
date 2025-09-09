@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse, urlunparse
 
 import aiohttp
+from Tools import get_http_session
 import dateutil.parser
 import disnake
 
@@ -33,8 +34,8 @@ async def fetch_status(url: str) -> dict:
     Функция для запроса статуса с указанного URL.
     """
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url + "/status") as resp:
+        session = await get_http_session()
+        async with session.get(url + "/status") as resp:
                 if resp.status != 200:
                     raise aiohttp.ClientResponseError(
                         resp.request_info,

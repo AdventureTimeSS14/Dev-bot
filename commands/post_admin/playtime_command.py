@@ -7,6 +7,7 @@ import yaml
 from bot_init import bot
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADDRESS_MRP, POST_ADMIN_HEADERS
+from Tools import get_http_session
 
 GITHUB_URLS = [
     "https://raw.githubusercontent.com/AdventureTimeSS14/space_station_ADT/master/Resources/Prototypes/Roles/play_time_trackers.yml",
@@ -15,11 +16,11 @@ GITHUB_URLS = [
 ]
 
 async def fetch_yaml(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status == 200:
-                return yaml.safe_load(await response.text())
-            return None
+    session = await get_http_session()
+    async with session.get(url) as response:
+        if response.status == 200:
+            return yaml.safe_load(await response.text())
+        return None
 
 async def get_all_playtime_ids():
     all_ids = []
@@ -107,16 +108,16 @@ async def playtime_addrole(ctx, nickname: str, protojob: str, time: str):
     )
 
     # Отправка POST запроса асинхронно без ожидания ответа
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.post(url, json=data, headers=POST_ADMIN_HEADERS) as response:
-                # Можно проверять успешность отправки, но не будем ожидать результата
-                if response.status == 200:
-                    print("Запрос отправлен")
-                else:
-                    await ctx.send(f"❌ Код ошибки: {response.status}")
-        except Exception as e:
-            print(f"Ошибка: {str(e)}")
+    session = await get_http_session()
+    try:
+        async with session.post(url, json=data, headers=POST_ADMIN_HEADERS) as response:
+            # Можно проверять успешность отправки, но не будем ожидать результата
+            if response.status == 200:
+                print("Запрос отправлен")
+            else:
+                await ctx.send(f"❌ Код ошибки: {response.status}")
+    except Exception as e:
+        print(f"Ошибка: {str(e)}")
 
 
 @bot.command()
@@ -138,32 +139,32 @@ async def playtime_generalrole(ctx, nickname: str):
 
     await ctx.send(f"✅ Запрос на добавление времени для **{nickname}** отправлен!\n🔄 Обрабатываю...")
 
-    async with aiohttp.ClientSession() as session:
-        tasks = []
+    session = await get_http_session()
+    tasks = []
 
-        # Отправка запросов на каждую роль
-        for job, time in job_times.items():
-            data = {
-                "NickName": nickname,
-                "JobIdPrototype": job,
-                "Time": str(time),
-            }
-            tasks.append(session.post(url, json=data, headers=POST_ADMIN_HEADERS))
+    # Отправка запросов на каждую роль
+    for job, time in job_times.items():
+        data = {
+            "NickName": nickname,
+            "JobIdPrototype": job,
+            "Time": str(time),
+        }
+        tasks.append(session.post(url, json=data, headers=POST_ADMIN_HEADERS))
 
-        # Выполняем все запросы параллельно
-        responses = await asyncio.gather(*tasks, return_exceptions=True)
+    # Выполняем все запросы параллельно
+    responses = await asyncio.gather(*tasks, return_exceptions=True)
 
-        success_count = 0
-        error_messages = []
+    success_count = 0
+    error_messages = []
 
-        for response in responses:
-            if isinstance(response, Exception):
-                error_messages.append(str(response))
-            elif response.status == 200:
-                success_count += 1
-            else:
-                error_text = await response.text()
-                error_messages.append(f"Ошибка {response.status}: {error_text}")
+    for response in responses:
+        if isinstance(response, Exception):
+            error_messages.append(str(response))
+        elif response.status == 200:
+            success_count += 1
+        else:
+            error_text = await response.text()
+            error_messages.append(f"Ошибка {response.status}: {error_text}")
 
     # Вывод результатов
     print(f"✅ Успешно обработано запросов: {success_count}/{len(job_times) + 1}")
@@ -202,21 +203,21 @@ async def playtime_allrole(ctx, nickname: str):
 
     await ctx.send(f"✅ Запрос на добавление времени для **{nickname}** отправлен!\n🔄 Обрабатываю...")
 
-    async with aiohttp.ClientSession() as session:
-        tasks = []
+    session = await get_http_session()
+    tasks = []
 
-        for job, time in job_times.items():
-            data = {
-                "NickName": nickname,
-                "JobIdPrototype": job,
-                "Time": str(time),
-            }
-            # Отправка запроса без ожидания ответа
-            await asyncio.sleep(6.5)
-            tasks.append(asyncio.create_task(send_post_request(session, url, data, job, ctx)))
+    for job, time in job_times.items():
+        data = {
+            "NickName": nickname,
+            "JobIdPrototype": job,
+            "Time": str(time),
+        }
+        # Отправка запроса без ожидания ответа
+        await asyncio.sleep(6.5)
+        tasks.append(asyncio.create_task(send_post_request(session, url, data, job, ctx)))
 
-        # Выполняем все запросы параллельно
-        await asyncio.gather(*tasks)
+    # Выполняем все запросы параллельно
+    await asyncio.gather(*tasks)
 
 async def send_post_request(session, url, data, job, ctx):
     # Отправка запроса без ожидания ответа
@@ -230,12 +231,12 @@ async def send_post_request(session, url, data, job, ctx):
 # async def check_role(ctx, protojob: str):
 #     try:
 #         ProtoIdJob = protojob
-
+#
 #         all_roles = await get_all_roles()
 #         if not ProtoIdJob in all_roles:
 #             await ctx.send(f"❌ Ошибка!! Указанной **{ProtoIdJob}** не существует!")
 #             return
-
+#
 #         await ctx.send(f"ВСЁ ОКЕЙ 💚 {ProtoIdJob} ТАКАЯ ЕСТЬ")
 #     except Exception as e:
 #         await ctx.send(f"An error occurred: {e}")
