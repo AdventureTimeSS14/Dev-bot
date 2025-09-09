@@ -4,7 +4,7 @@ from datetime import date
 import disnake
 
 from bot_init import bot
-from commands.dbCommand.get_db_connection import get_db_connection
+from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -59,13 +59,13 @@ async def add_vacation(ctx, user: disnake.Member, end_date: str, *, reason: str)
     cursor = None
 
     try:
-        # Подключение к БД (без await, так как mariadb синхронный)
-        conn = get_db_connection()
+        # Подключение к SQLite
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
 
         # Вставка данных
         cursor.execute(
-            "INSERT INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (%s, %s, %s)",
+            "INSERT OR REPLACE INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (?, ?, ?)",
             (user.id, sql_date, reason)
         )
         conn.commit()

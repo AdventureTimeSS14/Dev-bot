@@ -164,3 +164,4 @@ test.py
 pylint_report.txt
 /cache
 update_container.sh
+data/vacations.sqlite3

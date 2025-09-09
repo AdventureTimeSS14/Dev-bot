@@ -1,10 +1,10 @@
 import disnake
-import mariadb
+import sqlite3
 
 from bot_init import bot
-from commands.dbCommand.get_db_connection import get_db_connection
+from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 from commands.misc.check_roles import has_any_role_by_keys
-from config import DATABASE, LOG_CHANNEL_ID
+from config import LOG_CHANNEL_ID
 
 COLOR = disnake.Color.dark_purple()
 
@@ -13,80 +13,43 @@ COLOR = disnake.Color.dark_purple()
 @has_any_role_by_keys("whitelist_role_id_administration_post")
 async def db_info(ctx):
     """
-    Команда для получения информации о базе данных MariaDB.
+    Информация о базе данных SQLite (vacations.sqlite3).
     """
     conn = None
+    cursor = None
     try:
-        # Устанавливаем соединение с базой данных
-        conn = get_db_connection()
+        # Соединение с SQLite
+        conn = get_sqlite_connection()
+        cursor = conn.cursor()
 
-        # Создаем embed для ответа
         avatar_url = ctx.author.avatar.url if ctx.author.avatar else None
         embed = disnake.Embed(
             title="Информация о базе данных",
-            description=f"Подключение к базе данных {DATABASE} выполнено успешно!",
+            description="Подключение к локальной базе данных SQLite выполнено успешно!",
             color=COLOR,
         )
         embed.set_author(name=ctx.author.name, icon_url=avatar_url)
 
-        # Добавляем общую информацию
-        embed.add_field(
-            name="Статус соединения",
-            value="Соединение открыто" if conn.open else "Соединение закрыто",
-            inline=False,
-        )
-        # embed.add_field(name="Хост", value=HOST, inline=True)
-        # embed.add_field(name="Порт", value=PORT, inline=True)
-        # embed.add_field(name="Имя пользователя", value=USER, inline=True)
+        # Версия SQLite (библиотеки)
+        embed.add_field(name="Версия SQLite", value=sqlite3.sqlite_version, inline=False)
 
-        # Выполняем запросы к базе данных
-        cursor = conn.cursor()
-
-        # Запрос версии сервера
-        cursor.execute("SELECT VERSION()")
-        server_version = cursor.fetchone()
-        embed.add_field(
-            name="Версия MariaDB", value=server_version[0], inline=False
-        )
-
-        # Запрос списка таблиц
-        cursor.execute("SHOW TABLES")
-        tables = cursor.fetchall()
-
+        # Список таблиц
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tables = [row[0] for row in cursor.fetchall()]
         if tables:
-            table_list = "\n".join([table[0] for table in tables])
-            embed.add_field(
-                name="Список таблиц", value=table_list, inline=False
-            )
+            embed.add_field(name="Список таблиц", value="\n".join(tables), inline=False)
         else:
-            embed.add_field(
-                name="Список таблиц",
-                value="В базе данных нет таблиц.",
-                inline=False,
-            )
+            embed.add_field(name="Список таблиц", value="В базе данных нет таблиц.", inline=False)
 
-        # Отправляем embed-ответ
+        # Пример статистики по таблице vacation_team
+        if "vacation_team" in tables:
+            cursor.execute("SELECT COUNT(1) FROM vacation_team")
+            total = cursor.fetchone()[0]
+            embed.add_field(name="vacation_team: записей", value=str(total), inline=False)
+
         await ctx.send(embed=embed)
 
-    except mariadb.Error as db_error:
-        # Обработка ошибок базы данных
-        error_embed = disnake.Embed(
-            title="Ошибка подключения к базе данных",
-            description=str(db_error),
-            color=disnake.Color.red(),
-        )
-        await ctx.send(embed=error_embed)
-
-        # Логируем ошибку в лог-канал
-        log_channel = bot.get_channel(LOG_CHANNEL_ID)
-        if log_channel:
-            await log_channel.send(
-                f"❌ Ошибка подключения к базе данных: {db_error}. "
-                f"Запрошено пользователем {ctx.author}.\n_ _"
-            )
-
     except Exception as e:
-        # Общая обработка ошибок
         error_embed = disnake.Embed(
             title="Ошибка",
             description=f"Произошла непредвиденная ошибка: {e}",
@@ -94,16 +57,15 @@ async def db_info(ctx):
         )
         await ctx.send(embed=error_embed)
 
-        # Логируем ошибку в лог-канал
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             await log_channel.send(
-                f"❌ Непредвиденная ошибка при выполнении команды db_info: "
-                f"{e}. Запрошено пользователем {ctx.author}.\n_ _"
+                f"❌ Непредвиденная ошибка при выполнении команды db_info: {e}. "
+                f"Запрошено пользователем {ctx.author}.\n_ _"
             )
 
     finally:
-        # Закрываем соединение с базой данных
-        if conn and conn.open:
+        if cursor:
+            cursor.close()
+        if conn:
             conn.close()
-            print("Соединение с базой данных закрыто.")

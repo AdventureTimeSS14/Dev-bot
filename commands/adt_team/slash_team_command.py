@@ -4,7 +4,7 @@ import disnake
 from disnake import Option
 
 from bot_init import bot
-from commands.dbCommand.get_db_connection import get_db_connection
+from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -73,12 +73,12 @@ async def team_add_vacation_slash(
 
     try:
         # Подключение к БД (без await, так как mariadb синхронный)
-        conn = get_db_connection()
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
 
         # Вставка данных
         cursor.execute(
-            "INSERT INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (%s, %s, %s)",
+            "INSERT OR REPLACE INTO vacation_team (discord_id, data_end_vacation, reason) VALUES (?, ?, ?)",
             (user.id, sql_date, reason)
         )
         conn.commit()
@@ -160,10 +160,10 @@ async def team_end_vacation_slash(
 
     try:
         # Подключение к базе данных
-        conn = get_db_connection()
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
         # Удаление записи из БД
-        cursor.execute("DELETE FROM vacation_team WHERE discord_id = %s", (user.id,))
+        cursor.execute("DELETE FROM vacation_team WHERE discord_id = ?", (user.id,))
         conn.commit()
         
         # Удаляем роль отпуска у пользователя
@@ -264,12 +264,14 @@ async def team_extend_vacation_slash(
 
     try:
         # Подключение к базе данных
-        conn = get_db_connection()
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
 
         # Обновление записи в БД
-        cursor.execute("UPDATE vacation_team SET data_end_vacation = %s, reason = %s WHERE discord_id = %s",
-                       (sql_date, reason, user.id))
+        cursor.execute(
+            "UPDATE vacation_team SET data_end_vacation = ?, reason = ? WHERE discord_id = ?",
+            (sql_date, reason, user.id)
+        )
         conn.commit()
 
         # Создаем Embed для уведомления в админ-канале

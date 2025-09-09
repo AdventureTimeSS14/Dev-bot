@@ -3,7 +3,7 @@ from disnake.ext import commands
 from disnake.ui import Button, View
 
 from bot_init import bot
-from commands.dbCommand.get_db_connection import get_db_connection
+from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 
 
 @bot.command(name="show_vacation", description="Показать информацию о всех отпусках.")
@@ -11,11 +11,8 @@ async def show_vacation(ctx):
     conn = None
     cursor = None
     try:
-        # Подключаемся к базе данных
-        conn = get_db_connection()
-        if not conn:
-            await ctx.send("❌ Ошибка: Не удалось установить соединение с базой данных.")
-            return
+        # Подключаемся к SQLite
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
 
         # Получаем все записи из таблицы vacation_team

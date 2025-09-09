@@ -5,7 +5,7 @@
 import disnake
 
 from bot_init import bot
-from commands.dbCommand.get_db_connection import get_db_connection
+from commands.dbCommand.get_sqlite_connection import get_sqlite_connection
 from commands.misc.check_roles import has_any_role_by_keys
 from config import ADMIN_TEAM, VACATION_ROLE
 
@@ -37,12 +37,12 @@ async def end_vacation(ctx, user: disnake.Member):
     cursor = None
 
     try:
-        # Подключение к базе данных
-        conn = get_db_connection()
+        # Подключение к SQLite
+        conn = get_sqlite_connection()
         cursor = conn.cursor()
 
         # Удаление записи из БД
-        cursor.execute("DELETE FROM vacation_team WHERE discord_id = %s", (user.id,))
+        cursor.execute("DELETE FROM vacation_team WHERE discord_id = ?", (user.id,))
         conn.commit()
 
         # Удаляем роль отпуска у пользователя
