@@ -172,15 +172,14 @@ def get_uptime():
 async def system_info(ctx):
     """Команда для отображения системной информации (Windows/Linux)"""
     embed = disnake.Embed(
-        title=f"📊 Системная информация ({platform.system()})",
+        title="📊 Системная информация",
         color=disnake.Color.blue()
     )
     
     # Информация о системе
     embed.add_field(
         name="🖥️ Система",
-        value=f"**ОС:** {platform.system()} {platform.release()}\n"
-              f"**Версия:** {platform.version()}\n"
+        value=f"**ОС (тип):** {platform.system()}\n"
               f"**Архитектура:** {platform.machine()}",
         inline=False
     )
@@ -188,8 +187,7 @@ async def system_info(ctx):
     # Информация о процессоре
     embed.add_field(
         name="⚙️ Процессор",
-        value=f"**Модель:** {platform.processor()}\n"
-              f"**Ядер:** {os.cpu_count()}",
+        value=f"**Ядер:** {os.cpu_count()}",
         inline=False
     )
     
@@ -241,15 +239,7 @@ async def system_info(ctx):
             value=f"**Аптайм:** {uptime}",
             inline=False
         )
-    
-    # Информация о Python
-    embed.add_field(
-        name="🐍 Python",
-        value=f"**Версия:** {sys.version.split()[0]}\n"
-              f"**Путь:** {sys.executable}",
-        inline=False
-    )
-    
+
     # Информация о Disnake
     embed.add_field(
         name="🤖 Disnake",
