@@ -497,7 +497,8 @@ async def check_forum_thread_messages(message):
         if (hasattr(message.channel, 'type') and 
             message.channel.type == disnake.ChannelType.public_thread and 
             hasattr(message.channel, 'parent_id') and
-            message.channel.parent_id == 1245787985891561544):
+            (message.channel.parent_id == 1245787985891561544 or 
+            message.channel.parent_id == 1090335703273054218)):
             
             # Игнорируем сообщения от самого бота
             if message.author == bot.user:
