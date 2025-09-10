@@ -170,92 +170,81 @@ def get_uptime():
 
 @bot.command(name="systeminfo", help="Выводит информацию о системе бота")
 async def system_info(ctx):
-    """Команда для отображения системной информации (Windows/Linux)"""
-    embed = disnake.Embed(
-        title=f"📊 Системная информация ({platform.system()})",
-        color=disnake.Color.blue()
-    )
-    
-    # Информация о системе
-    embed.add_field(
-        name="🖥️ Система",
-        value=f"**ОС:** {platform.system()} {platform.release()}\n"
-              f"**Версия:** {platform.version()}\n"
-              f"**Архитектура:** {platform.machine()}",
-        inline=False
-    )
-    
-    # Информация о процессоре
-    embed.add_field(
-        name="⚙️ Процессор",
-        value=f"**Модель:** {platform.processor()}\n"
-              f"**Ядер:** {os.cpu_count()}",
-        inline=False
-    )
-    
-    # Информация о памяти
+    """Команда для отображения системной информации в стиле neofetch"""
+    hostname = platform.node() or "host"
+    username = os.getenv("USERNAME") or os.getenv("USER") or "bot"
+
+    os_line = f"{platform.system()} {platform.release()} {platform.machine()}"
+    host_line = platform.platform()
+    kernel_line = platform.release()
+    uptime_line = get_uptime() or "N/A"
+
+    cpu_model = platform.processor() or "CPU"
+    cpu_cores = os.cpu_count() or 1
+    cpu_line = f"{cpu_model} ({cpu_cores})"
+
     mem_info = get_memory_info()
     if mem_info:
-        used = mem_info['total'] - mem_info['free']
-        percent = (used / mem_info['total']) * 100
-        embed.add_field(
-            name="💾 Память",
-            value=f"**Всего:** {round(mem_info['total'] / (1024**3), 2)} GB\n"
-                  f"**Использовано:** {round(used / (1024**3), 2)} GB\n"
-                  f"**Свободно:** {round(mem_info['free'] / (1024**3), 2)} GB\n"
-                  f"**Загрузка:** {round(percent, 2)}%",
-            inline=False
-        )
+        used_b = mem_info['total'] - mem_info['free']
+        total_mib = int(round(mem_info['total'] / (1024**2)))
+        used_mib = int(round(used_b / (1024**2)))
+        mem_line = f"{used_mib}MiB / {total_mib}MiB"
     else:
-        embed.add_field(
-            name="💾 Память",
-            value="Не удалось получить данные",
-            inline=False
-        )
-    
-    # Информация о диске
-    disk_info = get_disk_info()
-    if disk_info:
-        used = disk_info['total'] - disk_info['free']
-        percent = (used / disk_info['total']) * 100
-        embed.add_field(
-            name="💽 Диск" + (" (C:\\)" if platform.system() == "Windows" else ""),
-            value=f"**Всего:** {round(disk_info['total'] / (1024**3), 2)} GB\n"
-                  f"**Использовано:** {round(used / (1024**3), 2)} GB\n"
-                  f"**Свободно:** {round(disk_info['free'] / (1024**3), 2)} GB\n"
-                  f"**Загрузка:** {round(percent, 2)}%",
-            inline=False
-        )
-    else:
-        embed.add_field(
-            name="💽 Диск",
-            value="Не удалось получить данные",
-            inline=False
-        )
-    
-    # Время работы системы
-    uptime = get_uptime()
-    if uptime:
-        embed.add_field(
-            name="⏱️ Время работы",
-            value=f"**Аптайм:** {uptime}",
-            inline=False
-        )
-    
-    # Информация о Python
-    embed.add_field(
-        name="🐍 Python",
-        value=f"**Версия:** {sys.version.split()[0]}\n"
-              f"**Путь:** {sys.executable}",
-        inline=False
-    )
-    
-    # Информация о Disnake
-    embed.add_field(
-        name="🤖 Disnake",
-        value=f"**Версия:** {disnake.__version__}",
-        inline=False
-    )
-    
-    embed.set_footer(text=f"Запрос выполнен: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    await ctx.send(embed=embed)
+        mem_line = "N/A"
+
+    # Не всегда есть корректные данные по пакетам/терминалу/GPU в окружении бота
+    packages_line = "N/A"
+    shell_line = f"python {sys.version.split()[0]}"
+    terminal_line = "discord"
+    gpu_line = "N/A"
+
+    ascii_art = [
+        "            .-/+oossssoo+/-.",
+        "        `:+ssssssssssssssssss+:`",
+        "      -+ssssssssssssssssssyyssss+-",
+        "    .ossssssssssssssssssdMMMNysssso.",
+        "   /ssssssssssshdmmNNmmyNMMMMhssssss/",
+        "  +ssssssssshmydMMMMMMMNddddyssssssss+",
+        " /sssssssshNMMMyhhyyyyhmNMMMNhssssssss/",
+        ".ssssssssdMMMNhsssssssssshNMMMdssssssss.",
+        "+sssshhhyNMMNyssssssssssssyNMMMysssssss+",
+        "ossyNMMMNyMMhsssssssssssssshmmmhssssssso",
+        "ossyNMMMNyMMhsssssssssssssshmmmhssssssso",
+        "+sssshhhyNMMNyssssssssssssyNMMMysssssss+",
+        ".ssssssssdMMMNhsssssssssshNMMMdssssssss.",
+        " /sssssssshNMMMyhhyyyyhdNMMMNhssssssss/",
+        "  +sssssssssdmydMMMMMMMMddddyssssssss+",
+        "   /ssssssssssshdmNNNNmyNMMMMhssssss/",
+        "    .ossssssssssssssssssdMMMNysssso.",
+        "      -+sssssssssssssssssyyyssss+-",
+        "        `:+ssssssssssssssssss+:`",
+        "            .-/+oossssoo+/-.",
+    ]
+
+    info_lines = [
+        f"{username}@{hostname}",
+        "--------------------",
+        f"OS: {os_line}",
+        f"Host: {host_line}",
+        f"Kernel: {kernel_line}",
+        f"Uptime: {uptime_line}",
+        f"Packages: {packages_line}",
+        f"Shell: {shell_line}",
+        f"Terminal: {terminal_line}",
+        f"CPU: {cpu_line}",
+        f"GPU: {gpu_line}",
+        f"Memory: {mem_line}",
+        f"Python: {sys.version.split()[0]}",
+        f"Disnake: {disnake.__version__}",
+    ]
+
+    left_width = max(len(line) for line in ascii_art)
+    gap = "   "
+    combined_lines = []
+    for i in range(max(len(ascii_art), len(info_lines))):
+        left = ascii_art[i] if i < len(ascii_art) else ""
+        right = info_lines[i] if i < len(info_lines) else ""
+        combined_lines.append(left.ljust(left_width) + gap + right)
+
+    output = "\n".join(combined_lines)
+    await ctx.send(f"```\n{output}\n```")
