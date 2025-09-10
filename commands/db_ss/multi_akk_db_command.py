@@ -47,21 +47,20 @@ def fetch_player_data(user_name):
 
     return result, related_results
 
-def fetch_sponsor_data(user_name):
+def fetch_sponsor_data_by_user_id(user_id):
     """
-    Получает данные спонсора по никнейму из таблицы sponsors.
+    Получает данные спонсора по user_id из таблицы sponsors.
     """
     conn = psycopg2.connect(**DB_PARAMS_SPONSOR)
     cursor = conn.cursor()
 
-    # Запрос для получения данных спонсора
     query = """
     SELECT user_id, player_name, tier, ooccolor, have_priority_join, allowed_markings, extra_slots, expire_date, allow_job
     FROM sponsors
-    WHERE player_name = %s
+    WHERE user_id = %s
     """
-    cursor.execute(query, (user_name,))
-    result = cursor.fetchone()  # Получаем первую запись (если есть)
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchone()
 
     cursor.close()
     conn.close()
@@ -268,7 +267,8 @@ def get_discord_info_by_user_id(user_id: str):
 @has_any_role_by_keys("whitelist_role_id_administration_post", "general_adminisration_role")
 async def check_nick(ctx, *, user_name: str):
     data, related_accounts = fetch_player_data(user_name)
-    data_sponsor = fetch_sponsor_data(user_name)  
+    # Спонсора теперь ищем по user_id (uuid)
+    data_sponsor = None
 
     if data:
         player_id, uuid, first_seen_time_str, last_seen_user_name, last_seen_time_str, last_seen_address, last_seen_hwid = data
@@ -294,6 +294,8 @@ async def check_nick(ctx, *, user_name: str):
         
         # Проверяем привязку Discord-аккаунта
         discord_id = get_discord_info_by_user_id(uuid)
+        # Получаем данные спонсора по user_id
+        data_sponsor = fetch_sponsor_data_by_user_id(uuid)
 
         if discord_id:
             discord_member = await ctx.guild.fetch_member(int(discord_id)) if ctx.guild else None
@@ -392,7 +394,7 @@ async def check_nick_file(ctx, *, user_name: str):
                 # Пропустить если совпадает с текущими данными
                 if related_user_name == last_seen_user_name:
                     continue
-                
+                related_last_seen_time_str = format_datetime(related_last_seen_time, 'short')
                 if related_address == last_seen_address and related_hwid != last_seen_hwid:
                     related_accounts_str += (f'> **{related_user_name}** [IP] | Последний заход в игру: {related_last_seen_time_str}\n')
                 elif related_hwid == last_seen_hwid and related_address != last_seen_address:
