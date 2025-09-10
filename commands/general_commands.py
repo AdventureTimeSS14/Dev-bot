@@ -289,18 +289,10 @@ async def system_info(ctx):
                     return lines[0]
         return "N/A"
 
-    def _ellipsize(text: str, max_len: int = 36) -> str:
-        try:
-            return text if len(text) <= max_len else (text[: max_len - 1] + "…")
-        except Exception:
-            return text
-
     packages_line = detect_packages_count()
     shell_line = f"python {sys.version.split()[0]}"
     terminal_line = "discord"
     gpu_line = detect_gpu()
-    host_display = _ellipsize(host_line, 36)
-    gpu_display = _ellipsize(gpu_line, 36)
 
     ascii_art = [
         "            .-/+oossssoo+/-.",
@@ -329,14 +321,14 @@ async def system_info(ctx):
         f"{username}@{hostname}",
         "--------------------",
         f"OS: {os_line}",
-        f"Host: {host_display}",
+        f"Host: {host_line}",
         f"Kernel: {kernel_line}",
         f"Uptime: {uptime_line}",
         f"Packages: {packages_line}",
         f"Shell: {shell_line}",
         f"Terminal: {terminal_line}",
         f"CPU: {cpu_line}",
-        f"GPU: {gpu_display}",
+        f"GPU: {gpu_line}",
         f"Memory: {mem_line}",
         f"Python: {sys.version.split()[0]}",
         f"Disnake: {disnake.__version__}",
