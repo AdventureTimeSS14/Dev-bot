@@ -5,6 +5,8 @@ import datetime
 import os
 import platform
 import sys
+import subprocess
+import shutil
 
 import disnake
 from disnake.ext import commands
@@ -193,10 +195,104 @@ async def system_info(ctx):
         mem_line = "N/A"
 
     # Не всегда есть корректные данные по пакетам/терминалу/GPU в окружении бота
-    packages_line = "N/A"
+    def run_and_get_lines(cmd_list):
+        try:
+            completed = subprocess.run(cmd_list, capture_output=True, text=True, timeout=3)
+            if completed.returncode == 0 and completed.stdout:
+                return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        except Exception:
+            return None
+        return None
+
+    def detect_packages_count():
+        system = platform.system()
+        # Linux package managers
+        if system == "Linux":
+            # dpkg
+            if shutil.which("dpkg"):  # count installed packages
+                lines = run_and_get_lines(["dpkg", "-l"]) or []
+                # filter out header lines starting with '||/' or 'Desired='
+                count = sum(1 for ln in lines if ln and not ln.startswith("Desired=") and not ln.startswith("||/"))
+                if count:
+                    return str(count)
+            # rpm
+            if shutil.which("rpm"):
+                lines = run_and_get_lines(["rpm", "-qa"]) or []
+                if lines:
+                    return str(len(lines))
+            # pacman
+            if shutil.which("pacman"):
+                lines = run_and_get_lines(["pacman", "-Q"]) or []
+                if lines:
+                    return str(len(lines))
+            # apk
+            if shutil.which("apk"):
+                lines = run_and_get_lines(["apk", "info"]) or []
+                if lines:
+                    return str(len(lines))
+        # macOS
+        if system == "Darwin":
+            if shutil.which("brew"):
+                lines = run_and_get_lines(["brew", "list"]) or []
+                if lines:
+                    return str(len(lines))
+            if shutil.which("port"):
+                lines = run_and_get_lines(["port", "installed"]) or []
+                # skip header lines like 'The following ports are currently installed:'
+                filtered = [ln for ln in lines if ln and not ln.lower().startswith("the following")]
+                if filtered:
+                    return str(len(filtered))
+        # Windows (best-effort)
+        if system == "Windows":
+            if shutil.which("winget"):
+                lines = run_and_get_lines(["winget", "list"]) or []
+                # skip header lines (first 2 usually)
+                if len(lines) > 2:
+                    return str(max(0, len(lines) - 2))
+            if shutil.which("choco"):
+                lines = run_and_get_lines(["choco", "list", "-l"]) or []
+                # last line is a summary like 'X packages installed.'
+                if lines:
+                    try:
+                        last = lines[-1]
+                        num = int("".join(ch for ch in last if ch.isdigit()))
+                        if num:
+                            return str(num)
+                    except Exception:
+                        return str(len(lines))
+            if shutil.which("scoop"):
+                lines = run_and_get_lines(["scoop", "list"]) or []
+                if lines:
+                    # skip header if present
+                    return str(len([ln for ln in lines if not ln.lower().startswith("installed apps")]))
+        return "N/A"
+
+    def detect_gpu():
+        system = platform.system()
+        if system == "Linux":
+            if shutil.which("lspci"):
+                lines = run_and_get_lines(["sh", "-c", "lspci | grep -i 'vga\|3d' -m 1"]) or []
+                if lines:
+                    return lines[0]
+        if system == "Darwin":
+            if shutil.which("system_profiler"):
+                lines = run_and_get_lines(["system_profiler", "SPDisplaysDataType"]) or []
+                for ln in lines:
+                    if "Chipset Model" in ln or "Chipset" in ln or "Model" in ln:
+                        parts = ln.split(":", 1)
+                        return parts[1].strip() if len(parts) == 2 else ln.strip()
+        if system == "Windows":
+            # Try PowerShell CIM
+            if shutil.which("powershell"):
+                lines = run_and_get_lines(["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_VideoController | Select-Object -First 1 -ExpandProperty Name)"]) or []
+                if lines:
+                    return lines[0]
+        return "N/A"
+
+    packages_line = detect_packages_count()
     shell_line = f"python {sys.version.split()[0]}"
     terminal_line = "discord"
-    gpu_line = "N/A"
+    gpu_line = detect_gpu()
 
     ascii_art = [
         "            .-/+oossssoo+/-.",
