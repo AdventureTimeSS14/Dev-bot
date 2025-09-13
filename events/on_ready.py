@@ -21,6 +21,7 @@ from tasks.update_status_presence_task import update_presence
 from tasks.update_status_server_message_eddit_task import \
     update_status_server_message_eddit
 from tasks.update_time_shutdows_task import update_time_shutdows
+from tasks.update_admin_info_task import update_admin_info_embed
 from tasks.whitelist_application_task import update_whitelist_application
 
 
@@ -79,7 +80,8 @@ async def on_ready():
             (check_end_vacation, "Check End Vacation"),
             (update_permission_stats, "Update Permission Stats"),
             (clear_doker_replay_ss14, "Clear Doker Replay"),
-            (check_size_log, "Check Adminlogs size")
+            (check_size_log, "Check Adminlogs size"),
+            (update_admin_info_embed, "Update Admin Info Embed")
         ]
         # search_results = await search_bans_in_multiple_channels("TestSearcheeeeeeeeeeeeeee")
 
