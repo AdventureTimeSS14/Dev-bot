@@ -49,12 +49,15 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Send DMs about new commits to MY_USER_ID
-        if: ${{ secrets.DISCORD_KEY != '' }}
         env:
           DISCORD_KEY: ${{ secrets.DISCORD_KEY }}
           MY_USER_ID: "328502766622474240"
         run: |
           set -e
+          if [ -z "${DISCORD_KEY}" ]; then
+            echo "DISCORD_KEY secret is not set. Skipping DM step."
+            exit 0
+          fi
           BEFORE=${{ github.event.before }}
           AFTER=${{ github.event.after }}
           COMMITS=$(git rev-list --reverse "$BEFORE..$AFTER")
