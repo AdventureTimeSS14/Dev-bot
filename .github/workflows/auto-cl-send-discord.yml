@@ -85,12 +85,25 @@ jobs:
             COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
             COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
 
-            CONTENT="🟣 [$SHORT_SHA] Новый коммит\nАвтор: $AUTHOR_NAME\nДата: $COMMIT_DATE\n$COMMIT_URL\n\n$COMMIT_MESSAGE"
+            MESSAGE_JSON=$(jq -n \
+              --arg short "$SHORT_SHA" \
+              --arg url "$COMMIT_URL" \
+              --arg author "$AUTHOR_NAME" \
+              --arg date "$COMMIT_DATE" \
+              --arg message "$COMMIT_MESSAGE" \
+              '{
+                embeds: [{
+                  title: ("🟣 [" + $short + "] Новый коммит"),
+                  url: $url,
+                  description: ("**Автор:** " + $author + "\n**Дата:** " + $date + "\n" + $url + "\n\n```" + $message + "```"),
+                  color: 10181046
+                }]
+              }'
+            )
 
-            ESCAPED=$(printf '%s' "$CONTENT" | jq -Rs .)
             curl -sS -X POST \
               -H "Authorization: Bot $DISCORD_KEY" \
               -H "Content-Type: application/json" \
-              -d "{\"content\": $ESCAPED }" \
+              -d "$MESSAGE_JSON" \
               https://discord.com/api/v10/channels/$DM_CHANNEL_ID/messages > /dev/null
           done
