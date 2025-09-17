@@ -145,6 +145,14 @@ async def monitor_commits():
         if channel:
             await channel.send(message)
 
+        # # Отправляем личное сообщение владельцу
+        # try:
+        #     user = bot.get_user(MY_USER_ID) or await bot.fetch_user(MY_USER_ID)
+        #     if user:
+        #         await user.send(message)
+        # except Exception:  # noqa: BLE001 — уведомление не критично для рестарта
+        #     pass
+
         await shutdown_def()
 
         # Завершаем работу бота

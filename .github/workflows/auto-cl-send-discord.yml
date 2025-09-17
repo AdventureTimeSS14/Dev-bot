@@ -47,3 +47,46 @@ jobs:
           done
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Send DMs about new commits to MY_USER_ID
+        if: ${{ secrets.DISCORD_BOT_TOKEN != '' }}
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          MY_USER_ID: "328502766622474240"
+        run: |
+          set -e
+          BEFORE=${{ github.event.before }}
+          AFTER=${{ github.event.after }}
+          COMMITS=$(git rev-list --reverse "$BEFORE..$AFTER")
+          if [ -z "$COMMITS" ]; then
+            echo "No commits to DM"
+            exit 0
+          fi
+
+          DM_CREATE_RESPONSE=$(curl -sS -X POST \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"recipient_id\": \"$MY_USER_ID\"}" \
+            https://discord.com/api/v10/users/@me/channels)
+          DM_CHANNEL_ID=$(echo "$DM_CREATE_RESPONSE" | jq -r '.id')
+          if [ "$DM_CHANNEL_ID" = "null" ] || [ -z "$DM_CHANNEL_ID" ]; then
+            echo "Failed to get DM channel id"
+            echo "$DM_CREATE_RESPONSE"
+            exit 0
+          fi
+
+          for COMMIT_SHA in $COMMITS; do
+            SHORT_SHA=$(git show -s --format="%h" $COMMIT_SHA)
+            AUTHOR_NAME=$(git show -s --format="%an" $COMMIT_SHA)
+            COMMIT_DATE=$(git show -s --format="%cd" --date=format:"%Y-%m-%d %H:%M" $COMMIT_SHA)
+            COMMIT_MESSAGE=$(git show -s --format="%B" $COMMIT_SHA)
+            COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
+
+            CONTENT="🟣 [$SHORT_SHA] Новый коммит\nАвтор: $AUTHOR_NAME\nДата: $COMMIT_DATE\n$COMMIT_URL\n\n$COMMIT_MESSAGE"
+
+            curl -sS -X POST \
+              -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": $(jq -Rn --arg c \"$CONTENT\" '$c') }" \
+              https://discord.com/api/v10/channels/$DM_CHANNEL_ID/messages > /dev/null
+          done
