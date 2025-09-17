@@ -49,9 +49,9 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Send DMs about new commits to MY_USER_ID
-        if: ${{ secrets.DISCORD_BOT_TOKEN != '' }}
+        if: ${{ secrets.DISCORD_KEY != '' }}
         env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_KEY: ${{ secrets.DISCORD_KEY }}
           MY_USER_ID: "328502766622474240"
         run: |
           set -e
@@ -64,7 +64,7 @@ jobs:
           fi
 
           DM_CREATE_RESPONSE=$(curl -sS -X POST \
-            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Authorization: Bot $DISCORD_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"recipient_id\": \"$MY_USER_ID\"}" \
             https://discord.com/api/v10/users/@me/channels)
@@ -85,7 +85,7 @@ jobs:
             CONTENT="🟣 [$SHORT_SHA] Новый коммит\nАвтор: $AUTHOR_NAME\nДата: $COMMIT_DATE\n$COMMIT_URL\n\n$COMMIT_MESSAGE"
 
             curl -sS -X POST \
-              -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+              -H "Authorization: Bot $DISCORD_KEY" \
               -H "Content-Type: application/json" \
               -d "{\"content\": $(jq -Rn --arg c \"$CONTENT\" '$c') }" \
               https://discord.com/api/v10/channels/$DM_CHANNEL_ID/messages > /dev/null
