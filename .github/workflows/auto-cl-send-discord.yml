@@ -87,9 +87,10 @@ jobs:
 
             CONTENT="🟣 [$SHORT_SHA] Новый коммит\nАвтор: $AUTHOR_NAME\nДата: $COMMIT_DATE\n$COMMIT_URL\n\n$COMMIT_MESSAGE"
 
+            ESCAPED=$(printf '%s' "$CONTENT" | jq -Rs .)
             curl -sS -X POST \
               -H "Authorization: Bot $DISCORD_KEY" \
               -H "Content-Type: application/json" \
-              -d "{\"content\": $(jq -Rn --arg c \"$CONTENT\" '$c') }" \
+              -d "{\"content\": $ESCAPED }" \
               https://discord.com/api/v10/channels/$DM_CHANNEL_ID/messages > /dev/null
           done
