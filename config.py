@@ -91,6 +91,9 @@ AUTHOR = "AdventureTimeSS14"
 REPO_NAME = "Dev-bot"
 SECOND_UPDATE_CHANGELOG = 30  # Частота обновлений изменений в журнале
 
+BLOCKED_USER_ID = 321949700297064450
+BLOCKED_CATEGORY_ID = 1060210696907915284
+
 # Инициализация сессии для запросов
 GLOBAL_SESSION = requests.Session()
 GLOBAL_SESSION.headers.update({"Authorization": f"token {GITHUB}"})
