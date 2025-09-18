@@ -82,8 +82,8 @@ async def on_ready():
             (update_permission_stats, "Update Permission Stats"),
             (clear_doker_replay_ss14, "Clear Doker Replay"),
             (check_size_log, "Check Adminlogs size"),
-            (update_admin_info_embed, "Update Admin Info Embed"),
-            (enforce_category_block, "Enforce Category Block")
+            (update_admin_info_embed, "Update Admin Info Embed")
+            # (enforce_category_block, "Enforce Category Block")
         ]
         # search_results = await search_bans_in_multiple_channels("TestSearcheeeeeeeeeeeeeee")
 
