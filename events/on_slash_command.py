@@ -2,6 +2,7 @@ from disnake import AppCommandInteraction, Embed
 
 from bot_init import bot
 from config import LOG_CHANNEL_ID
+from modules.command_usage import increment_command_usage
 
 
 @bot.event
@@ -28,6 +29,13 @@ async def on_slash_command(interaction: AppCommandInteraction, result=None):
     guild = interaction.guild
     command_name = interaction.application_command.name
     options = interaction.data.get("options", [])
+
+    # Инкремент статистики использования
+    try:
+        if command_name:
+            increment_command_usage(command_name)
+    except Exception as e:
+        print(f"[usage] Ошибка учёта слэш-команды: {e}")
 
     # Форматируем аргументы команды
     args_str = ", ".join(

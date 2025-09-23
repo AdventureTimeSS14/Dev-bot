@@ -7,6 +7,7 @@ from disnake.ui import View
 from bot_init import bot
 from components.button_help_components import button_bug_report
 from config import LOG_CHANNEL_ID, MY_USER_ID
+from modules.command_usage import increment_command_usage
 
 
 @bot.event
@@ -41,6 +42,13 @@ async def on_command(ctx):
     log_message = format_command_log_message(
         ctx, current_time, channel_info, message_link
     )
+
+    # Инкремент статистики использования
+    try:
+        if ctx and ctx.command and ctx.command.name:
+            increment_command_usage(ctx.command.name)
+    except Exception as e:  # noqa: BLE001 — не блокируем выполнение при ошибке учёта
+        print(f"[usage] Ошибка учёта команды: {e}")
 
     # Отправляем лог-сообщение в канал
     try:

@@ -10,6 +10,7 @@ import disnake
 from disnake.ext import commands
 
 from bot_init import bot
+from modules.command_usage import get_top_commands
 
 
 @bot.command(name="ping", help="Проверяет задержку бота.")
@@ -56,6 +57,32 @@ async def git_info(ctx):
 
     # Отправляем Embed
     await ctx.send(embed=embed)
+
+
+@bot.slash_command(name="top_commands", description="Показать топ самых используемых команд")
+async def slash_top_commands(inter: disnake.ApplicationCommandInteraction, limit: int = 10):
+    if not inter.response.is_done():
+        await inter.response.defer(ephemeral=True)
+
+    try:
+        limit = max(1, min(25, int(limit)))
+    except Exception:
+        limit = 10
+
+    top = get_top_commands(limit)
+    if not top:
+        await inter.edit_original_response(content="Пока нет данных по использованию команд.")
+        return
+
+    lines = [f"`{i+1:>2}.` **/{name}** — **{count}**"
+             for i, (name, count) in enumerate(top)]
+
+    embed = disnake.Embed(
+        title="🏆 Топ команд",
+        description="\n".join(lines),
+        color=disnake.Color.gold()
+    )
+    await inter.edit_original_response(embed=embed)
 
 @bot.command(name="wiki")
 async def wiki_info(ctx):
