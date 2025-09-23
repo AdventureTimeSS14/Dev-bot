@@ -28,3 +28,4 @@ jobs:
             source venv/bin/activate
             pip install -r requirements.txt
             pm2 restart Dev-Bot || pm2 start /root/Dev-bot/venv/bin/python --name Dev-Bot -- /root/Dev-bot/main.py
+
