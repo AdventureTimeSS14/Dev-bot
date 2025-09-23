@@ -6,7 +6,7 @@ from config import LOG_CHANNEL_ID
 from modules.command_usage import get_top_commands
 
 
-@tasks.loop(minutes=30)
+@tasks.loop(hours=12)
 async def report_top_commands():
 	"""Периодически отправляет топ команд в лог-канал."""
 	channel = bot.get_channel(LOG_CHANNEL_ID)
