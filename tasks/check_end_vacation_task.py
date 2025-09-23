@@ -65,6 +65,7 @@ async def check_end_vacation():
                     member = await guild.fetch_member(user_id)
                 except disnake.NotFound:
                     print(f"❌ Пользователь с ID {user_id} не найден на Discord.")
+                    sqlite_vacations_db.remove_vacation(user_id)
                     continue
                 except disnake.HTTPException as e:
                     print(f"❌ Ошибка при запросе пользователя {user_id}: {e}")
