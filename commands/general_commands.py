@@ -62,7 +62,7 @@ async def git_info(ctx):
 @bot.slash_command(name="top_commands", description="Показать топ самых используемых команд")
 async def slash_top_commands(inter: disnake.ApplicationCommandInteraction, limit: int = 10):
     if not inter.response.is_done():
-        await inter.response.defer(ephemeral=True)
+        await inter.response.defer(ephemeral=False)
 
     try:
         limit = max(1, min(25, int(limit)))
