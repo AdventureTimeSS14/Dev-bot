@@ -20,7 +20,7 @@ async def update_admin_info_embed():
     Обновляет сообщение с ID 1416298908757262407 в канале 1309169384413069372.
     """
     try:
-        await send_log("▶️ Обновление admin_info эмбеда...")
+        print("▶️ Обновление admin_info эмбеда...")
         channel = bot.get_channel(ADMIN_INFO_CHANNEL_ID)
         if not channel:
             print(f"❌ Канал с ID {ADMIN_INFO_CHANNEL_ID} не найден")
@@ -42,7 +42,7 @@ async def update_admin_info_embed():
             message = await channel.fetch_message(ADMIN_INFO_MESSAGE_ID)
             await message.edit(embed=embed)
             print(f"✅ Эмбед admin_info успешно обновлен (ID: {ADMIN_INFO_MESSAGE_ID})")
-            await send_log("✅ Эмбед admin_info обновлён.")
+            print("✅ Эмбед admin_info обновлён.")
             
         except disnake.NotFound:
             print(f"❌ Сообщение с ID {ADMIN_INFO_MESSAGE_ID} не найдено. Создаем новое...")
