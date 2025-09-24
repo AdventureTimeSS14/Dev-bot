@@ -13,9 +13,20 @@ DOWNLOAD_URL = "http://control.adventurestation.space:9000/api/endpoints/4/docke
 async def async_get_jwt_token():
     session = await get_http_session()
     async with session.post(AUTH_URL, json={"username": PORTAINER_USERNAME, "password": PORTAINER_PASSWORD}) as response:
-        response.raise_for_status()
+        if response.status >= 400:
+            try:
+                error_text = await response.text()
+            except Exception:
+                error_text = "<no body>"
+            raise aiohttp.ClientResponseError(
+                request_info=response.request_info,
+                history=response.history,
+                status=response.status,
+                message=f"Auth failed: {error_text}",
+                headers=response.headers,
+            )
         data = await response.json()
-        return data["jwt"]
+        return data.get("jwt")
 
 async def async_list_files(token):
     headers = {"Authorization": f"Bearer {token}"}
@@ -39,20 +50,6 @@ async def async_delete_replay(token, file_name):
         else:
             print(f"⚠️ Ошибка при удалении {file_name}: {response.status}")
 
-async def async_get_jwt_token():
-    session = await get_http_session()
-    async with session.post(AUTH_URL, json={"username": PORTAINER_USERNAME, "password": PORTAINER_PASSWORD}) as response:
-        response.raise_for_status()
-        data = await response.json()
-        return data["jwt"]
-
-async def async_list_files(token):
-    headers = {"Authorization": f"Bearer {token}"}
-    params = {"path": "/", "volumeID": "SS14_REPLAY"}
-    session = await get_http_session()
-    async with session.get(LIST_URL, headers=headers, params=params) as response:
-        response.raise_for_status()
-        return await response.json()
 
 async def async_download_file(token, file_name, save_path):
     headers = {"Authorization": f"Bearer {token}"}

@@ -49,7 +49,7 @@ async def clear_google_drive_replays():
         return 0
 
 async def clear_replay():
-    log_channel = None
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
     try:
         token = await async_get_jwt_token()
         files = await async_list_files(token)
@@ -90,7 +90,7 @@ async def clear_replay():
     except Exception as e:
         print(f"Ошибка в clear_replay: {str(e)}")
         if log_channel:
-                await log_channel.send(f"❌ Ошибка при очистке реплеев: `{str(e)}`")
+            await log_channel.send(f"❌ Ошибка при очистке реплеев: `{str(e)}`")
 
 
 # Запуск задачи каждые 12ч
