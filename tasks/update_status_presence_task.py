@@ -5,6 +5,7 @@ import disnake
 from disnake.ext import tasks
 
 from bot_init import bot
+from Tools import send_log
 
 
 class AnimatedStatus:
@@ -102,6 +103,7 @@ status_manager = AnimatedStatus()
 async def update_presence():
     """Анимированный статус бота"""
     try:
+        print("▶️ Обновление статуса присутствия...")
         today = datetime.now()
         
         # Пасхалка на 1 апреля
@@ -121,9 +123,11 @@ async def update_presence():
             )
         
         await bot.change_presence(activity=activity)
+        print("✅ Статус обновлён.")
 
     except Exception as e:
         print(f"Ошибка при обновлении статуса: {e}")
+        await send_log(f"❌ Ошибка при обновлении статуса: {e}")
         await bot.change_presence(
             activity=disnake.Activity(
                 type=disnake.ActivityType.watching,

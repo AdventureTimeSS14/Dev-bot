@@ -4,6 +4,7 @@ import time
 from disnake import Activity, ActivityType
 
 from bot_init import bot, db_sponsor, ss14_db
+from Tools import send_log
 from commands.misc.search_bans_in_channel import \
     search_bans_in_multiple_channels
 from config import LOG_CHANNEL_ID
@@ -33,9 +34,13 @@ async def start_task_if_not_running(task, task_name: str):
     """
     if not task.is_running():
         task.start()
-        print(f"✅ Задача {task_name} запущена.")
+        msg = f"✅ Задача {task_name} запущена."
+        print(msg)
+        await send_log(msg)
     else:
-        print(f"⚙️ Задача {task_name} уже работает.")
+        msg = f"⚙️ Задача {task_name} уже работает."
+        print(msg)
+        await send_log(msg)
 
 
 @bot.event
@@ -54,6 +59,8 @@ async def on_ready():
 
     print("✅ Connected to Discord successfully.")
     print(f"✅ Guilds: {guild_names}")  # Выводит список серверов, к которым подключен бот.
+    await send_log("✅ Подключение к Discord успешно.")
+    await send_log(f"✅ Guilds: {guild_names}")
 
     bot.start_time = time.time()  # Сохраняем время старта бота
 
@@ -96,18 +103,15 @@ async def on_ready():
     print(db_sponsor.get_connection_status_report())
 
     print(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
+    await send_log(f"✅ Bot {bot.user.name} (ID: {bot.user.id}) is ready to work!")
 
     # Уведомляем в лог-канале, что бот активен
-    channel = bot.get_channel(LOG_CHANNEL_ID)
-    if channel:
-        await channel.send(
-            content=(
-                f"✅ **{bot.user.name} успешно активирована!**\n"
-                f"🔹 **Статус:** Бот запущен и готов к работе.\n_ _"
-            )
+    await send_log(
+        (
+            f"✅ **{bot.user.name} успешно активирована!**\n"
+            f"🔹 **Статус:** Бот запущен и готов к работе.\n_ _"
         )
-    else:
-        print(f"❌ Не удалось найти канал с ID {LOG_CHANNEL_ID} для логов.")
+    )
 
     # Запуск задачи для автоматического завершения работы через определённое время
     # bot.loop.create_task(shutdown_after_time())

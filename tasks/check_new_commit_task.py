@@ -4,6 +4,7 @@ import requests
 from disnake.ext import tasks
 
 from bot_init import bot
+from Tools import send_log
 from commands.misc.shutdows_deff import shutdown_def
 from config import AUTHOR, GITHUB, LOG_CHANNEL_ID
 
@@ -98,8 +99,10 @@ async def check_for_new_commit():
         return False, None
 
     except requests.exceptions.RequestException as e:
-        print(f"Ошибка при подключении к GitHub API: {e}")
-        sys.exit(1)
+        msg = f"Ошибка при подключении к GitHub API: {e}"
+        print(msg)
+        await send_log(f"❌ {msg}")
+        return False, None
 
 
 @tasks.loop(seconds=50)
@@ -108,10 +111,12 @@ async def monitor_commits():
     Проверяет наличие новых коммитов каждые 50 секунд.
     При обнаружении нового коммита, перезапускает бота.
     """
+    print("▶️ Проверка новых коммитов...")
     new_commit_found, commit_data = await check_for_new_commit()
 
     if new_commit_found:
         print("Перезапуск бота из-за нового коммита.")
+        await send_log("♻️ Обнаружен новый коммит — перезапуск бота...")
 
         # Получаем данные о последнем коммите
         commit_message = commit_data["message"]
@@ -144,6 +149,8 @@ async def monitor_commits():
         channel = bot.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send(message)
+        else:
+            await send_log(message)
 
         # # Отправляем личное сообщение владельцу
         # try:
@@ -157,4 +164,4 @@ async def monitor_commits():
 
         # Завершаем работу бота
         await bot.close()
-        sys.exit(0)
+        # Не вызываем sys.exit здесь в задаче; доверяем внешнему процесс-менеджеру

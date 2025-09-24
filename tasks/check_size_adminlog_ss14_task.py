@@ -2,14 +2,17 @@ from disnake.ext import tasks
 
 from bot_init import bot, ss14_db
 from config import LOG_CHANNEL_ID
+from Tools import send_log
 
 
 @tasks.loop(hours=12)
 async def check_size_log():
     try:
+        await send_log("▶️ Проверка размера таблицы admin_log...")
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if not log_channel:
             print("❌ Не удалось получить канал логов.")
+            await send_log("❌ Не удалось получить канал логов.")
             return
 
         for db_name in ['main', 'dev']:
@@ -44,8 +47,14 @@ async def check_size_log():
                             f"Размер в гигабайтах: **{size_in_gb:.2f} GB**\n"
                             f"⚠️ Требуется внимание! <@&1113669851475623976>"
                         )
+                    else:
+                        await send_log(
+                            f"ℹ️ Размер admin_log в `{db_name}`: {size_in_gb:.2f} GB (порог 21 GB)"
+                        )
     except Exception as e:
-        print(f"Ошибка в check_size_log: {e}")
+        msg = f"Ошибка в check_size_log: {e}"
+        print(msg)
+        await send_log(f"❌ {msg}")
 
 
 # TODO: Доделать чтобы при превышении 17 Гб, 

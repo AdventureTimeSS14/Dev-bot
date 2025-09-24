@@ -1,6 +1,10 @@
 import asyncio
 
 import aiohttp
+from typing import Optional
+
+from bot_init import bot
+from config import LOG_CHANNEL_ID
 
 _session: aiohttp.ClientSession | None = None
 
@@ -28,3 +32,21 @@ async def close_http_session() -> None:
 	global _session
 	if _session and not _session.closed:
 		await _session.close()
+
+
+async def send_log(message: str, *, embed: Optional[object] = None) -> None:
+    """
+    Отправляет лог-сообщение в Discord-канал LOG_CHANNEL_ID.
+    При ошибке отправки выводит сообщение в консоль.
+    """
+    try:
+        channel = bot.get_channel(LOG_CHANNEL_ID)
+        if channel is not None:
+            if embed is not None:
+                await channel.send(content=message or None, embed=embed)
+            else:
+                await channel.send(message)
+        else:
+            print(f"❌ Не удалось найти канал логов {LOG_CHANNEL_ID}. Сообщение: {message}")
+    except Exception as e:
+        print(f"❌ Ошибка при отправке сообщения в лог-канал: {e}. Сообщение: {message}")

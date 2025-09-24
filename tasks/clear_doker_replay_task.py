@@ -9,6 +9,7 @@ from config import (LOG_CHANNEL_ID, SCOPES, SERVICE_ACCOUNT_INFO,
 from modules.method_portaner_replay import (async_delete_replay,
                                             async_get_jwt_token,
                                             async_list_files)
+from Tools import send_log
 
 
 async def clear_google_drive_replays():
@@ -42,15 +43,20 @@ async def clear_google_drive_replays():
             print(f"🗑️ Удалён файл с диска: {file['name']}")
 
         print(f"✅ Удалено {len(files_to_delete)} файлов с Google Drive.")
+        if len(files_to_delete) > 0:
+            await send_log(f"🧹 Google Drive: удалено {len(files_to_delete)} файлов.")
         return len(files_to_delete)
 
     except HttpError as error:
-        print(f"Ошибка при очистке Google Drive: {error}")
+        msg = f"❌ Ошибка при очистке Google Drive: {error}"
+        print(msg)
+        await send_log(msg)
         return 0
 
 async def clear_replay():
     log_channel = bot.get_channel(LOG_CHANNEL_ID)
     try:
+        await send_log("▶️ Старт очистки реплеев (Portainer + Google Drive)...")
         token = await async_get_jwt_token()
         files = await async_list_files(token)
 
@@ -70,27 +76,36 @@ async def clear_replay():
         # Удаляем с Portainer если > 50
         if len(replay_files) > 50:
             files_to_delete = replay_files[:-50]
+            failures = []
             for file in files_to_delete:
-                await async_delete_replay(token, file["Name"])
-                deleted_names.append(file["Name"])
+                try:
+                    await async_delete_replay(token, file["Name"])
+                    deleted_names.append(file["Name"])
+                except Exception as e:
+                    failures.append((file["Name"], str(e)))
+            if failures:
+                fail_text = "\n".join(f"`{n}`: {err}" for n, err in failures[:20])
+                await send_log(f"⚠️ Ошибки удаления {len(failures)} реплеев в Portainer (первые 20):\n{fail_text}")
 
         # Чистим Google Drive
         deleted_drive_count = await clear_google_drive_replays()
 
         # Лог в Discord
-        if log_channel and (deleted_names or deleted_drive_count > 0):
+        if deleted_names or deleted_drive_count > 0:
             log_msg = f"🧹 Очистка реплеев:\n"
             if deleted_names:
                 log_msg += f"С Portainer удалено {len(deleted_names)}:\n" + \
-                           "\n".join(f"`{name}`" for name in deleted_names) + "\n"
+                           "\n".join(f"`{name}`" for name in deleted_names[:50]) + ("\n..." if len(deleted_names) > 50 else "\n")
             if deleted_drive_count > 0:
                 log_msg += f"С Google Drive удалено {deleted_drive_count} файлов."
-            await log_channel.send(log_msg)
+            await send_log(log_msg)
+        else:
+            await send_log("ℹ️ Очистка реплеев: ничего не удалено (порог 50 не превышен).")
 
     except Exception as e:
-        print(f"Ошибка в clear_replay: {str(e)}")
-        if log_channel:
-            await log_channel.send(f"❌ Ошибка при очистке реплеев: `{str(e)}`")
+        msg = f"❌ Ошибка в clear_replay: {str(e)}"
+        print(msg)
+        await send_log(msg)
 
 
 # Запуск задачи каждые 12ч
