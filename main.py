@@ -4,13 +4,7 @@ import requests
 from disnake import Intents
 from disnake.ext.commands import Bot, has_role
 
-from dataConfig import GITHUB_USER_KEY
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
-KEY = os.getenv("DISCORD_KEY")
+from dataConfig import GITHUB_USER_KEY, DISCORD_KEY
 
 intent = Intents.all()
 intent.message_content = True
@@ -32,7 +26,6 @@ async def print_command(ctx, *, text: str):
 
 # TODO: Добавить декоратор на права доступа
 @bot.command(name="publish")
-@has_role("Куратор Проекта")
 async def publish_command(ctx, branch: str = "master"):
 
     if not branch:
@@ -50,14 +43,13 @@ async def publish_command(ctx, branch: str = "master"):
         "ref": branch,
     }
 
-    response = requests.post(url=url, headers=headers, data=data)
-    print(f"Res text: {response.text}")
+    response = requests.post(url=url, headers=headers, json=data)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or 204:
         print(f"True Res stat: {response.status_code}")
         await ctx.send(f"Код: {response.status_code}. Запрос на паблиш отправлен")
     else:
         print(f"False Res stat: {response.status_code}")
         await ctx.send(f"Код: {response.status_code}. Запрос на паблиш не отправлен")
 
-bot.run(KEY)
+bot.run(DISCORD_KEY)
