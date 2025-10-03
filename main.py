@@ -24,7 +24,7 @@ bot = Bot(
 
 '''Команда, дублирующая текст пользователя'''
 @bot.command(name="print")
-async def print_command(ctx, text: str):
+async def print_command(ctx, *, text: str):
     await ctx.send(f"{ctx.author.mention}: {text}")
 
 bot.run(KEY)
