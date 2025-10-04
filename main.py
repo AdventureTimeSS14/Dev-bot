@@ -31,8 +31,7 @@ async def publish_command(ctx, branch: str = "master"):
     if not branch:
         await ctx.send("Не указана ветка для паблиша")
 
-    # TODO: Поменять репу на АДТ
-    url = f"https://api.github.com/repos/AdventureTimeSS14/Dev-bot/actions/workflows/test_action.yml/dispatches"
+    url = f"https://api.github.com/repos/AdventureTimeSS14/space_station_ADT/actions/workflows/publish-adt.yml/dispatches"
     
     headers = {
         "Accept": "application/vnd.github.v3+json",
