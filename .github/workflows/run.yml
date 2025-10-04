@@ -27,4 +27,5 @@ jobs:
       - name: Run Bot
         env:
           DISCORD_KEY: ${{ secrets.DISCORD_KEY }}
+          USER_KEY_GITHUB: ${{ secrets.USER_KEY_GITHUB }}
         run: python main.py
