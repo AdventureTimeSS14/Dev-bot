@@ -24,12 +24,12 @@ bot = Bot(
 async def print_command(ctx, *, text: str):
     await ctx.send(f"{ctx.author.mention}: {text}")
 
-# TODO: Добавить декоратор на права доступа
+@has_role(1060264704838209586)
 @bot.command(name="publish")
 async def publish_command(ctx, branch: str = "master"):
 
     if not branch:
-        ctx.send("Не указана ветка для паблиша")
+        await ctx.send("Не указана ветка для паблиша")
 
     # TODO: Поменять репу на АДТ
     url = f"https://api.github.com/repos/AdventureTimeSS14/Dev-bot/actions/workflows/test_action.yml/dispatches"
@@ -43,13 +43,15 @@ async def publish_command(ctx, branch: str = "master"):
         "ref": branch,
     }
 
-    response = requests.post(url=url, headers=headers, json=data)
+    try:
+        response = requests.post(url=url, headers=headers, json=data)
 
-    if response.status_code == 200 or 204:
-        print(f"True Res stat: {response.status_code}")
-        await ctx.send(f"Код: {response.status_code}. Запрос на паблиш отправлен")
-    else:
-        print(f"False Res stat: {response.status_code}")
-        await ctx.send(f"Код: {response.status_code}. Запрос на паблиш не отправлен")
+        if response.status_code == 204:
+            await ctx.send(f"Код {response.status_code}. Запрос на паблиш отправлен")
+        else:
+            await ctx.send(f"Код {response.status_code}. Запрос на паблиш не отправлен")
+
+    except Exception as e:
+        await ctx.send(f"Ошибка при отправке запроса: {e}")
 
 bot.run(DISCORD_KEY)
