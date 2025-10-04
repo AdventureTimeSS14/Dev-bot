@@ -13,4 +13,4 @@ def get_env(key: str):
     return env
 
 DISCORD_KEY = get_env("DISCORD_KEY")
-GITHUB_USER_KEY = get_env("GITHUB_USER_KEY")
+USER_KEY_GITHUB = get_env("USER_KEY_GITHUB")

@@ -4,7 +4,7 @@ import requests
 from disnake import Intents
 from disnake.ext.commands import Bot, has_role
 
-from dataConfig import GITHUB_USER_KEY, DISCORD_KEY
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY
 
 intent = Intents.all()
 intent.message_content = True
@@ -36,7 +36,7 @@ async def publish_command(ctx, branch: str = "master"):
     
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"Bearer {GITHUB_USER_KEY}"
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
     }
     
     data = {
