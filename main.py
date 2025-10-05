@@ -1,11 +1,12 @@
 import aiohttp
 
+from datetime import datetime
 from disnake import Intents, Embed
 from disnake.ext.commands import Bot, has_role
 
-from template_embed import embed_status
+from template_embed import embed_status, embed_log
 
-from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID
 
 intent = Intents.all()
 intent.message_content = True
@@ -19,6 +20,17 @@ bot = Bot(
     command_prefix="&",
     intents=intent
 )
+
+@bot.event
+async def on_command(ctx):
+    # Создание эмбеда. TODO: Вынести в отдельную функцию
+    embed = Embed(title=embed_log["title"], color=embed_log["color"])
+    for field in embed_log["fields"]:
+        embed.add_field(name=field["name"], value=eval(field["value"]), inline=field["inline"])
+        
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
+    if log_channel:
+        await log_channel.send(embed=embed)
 
 '''Команда, дублирующая текст пользователя'''
 @bot.command(name="print")

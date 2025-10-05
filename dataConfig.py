@@ -20,3 +20,5 @@ def get_env(key: str):
 
 DISCORD_KEY = get_env("DISCORD_KEY")
 USER_KEY_GITHUB = get_env("USER_KEY_GITHUB")
+
+LOG_CHANNEL_ID = 1141810442721833060
