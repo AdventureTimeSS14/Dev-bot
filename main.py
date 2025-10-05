@@ -2,7 +2,7 @@ import aiohttp
 
 from datetime import datetime
 from disnake import Intents, Embed
-from disnake.ext.commands import Bot, has_role
+from disnake.ext.commands import Bot, has_any_role
 
 from template_embed import embed_status, embed_log
 
@@ -39,7 +39,7 @@ async def print_command(ctx, *, text: str):
 
 
 '''Команда для отправки паблиша какой-либо ветки'''
-@has_role(ROLE_ACCESS_HEADS)
+@has_any_role(*ROLE_ACCESS_HEADS)
 @bot.command(name="publish")
 async def publish_command(ctx, branch: str = "master"):
     if not branch:
