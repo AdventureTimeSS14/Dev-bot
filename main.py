@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot, has_any_role
 
 from template_embed import embed_status, embed_log
 
-from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP
 
 intent = Intents.all()
 intent.message_content = True
@@ -71,10 +71,10 @@ async def publish_command(ctx, branch: str = "master"):
 @bot.command(name="status")
 async def status_command(ctx, server: str = "mrp"):
     if server.lower() == "mrp":
-        address = "193.164.18.155"
+        address = ADDRESS_MRP
         port = "1212"
     elif server.lower() == "dev":
-        address = "5.180.174.139"
+        address = ADDRESS_DEV
         port = "1211"
     else:
         await ctx.send("Неверный сервер: dev или mrp")
