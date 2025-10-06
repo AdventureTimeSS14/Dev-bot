@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot, has_any_role
 
 from template_embed import embed_status, embed_log
 
-from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
 
 intent = Intents.all()
 intent.message_content = True
@@ -95,6 +95,36 @@ async def status_command(ctx, server: str = "mrp"):
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Ошибка: код {resp.status}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="update")
+async def update_command(ctx, server: str = "mrp"):
+
+    if server.lower() == "mrp":
+        address = ADDRESS_MRP
+        data = DATA_MRP
+        headers = HEADERS_MRP
+    elif server.lower() == "dev":
+        address = ADDRESS_DEV
+        data = DATA_DEV
+        headers = HEADERS_DEV
+    else:
+        await ctx.send("Неверный сервер: mrp или dev")
+        return
+
+    url = f"http://{address}:5000/instances/{server.upper()}/update"
+
+    await ctx.send(f"Запуск обновления {server.upper()}...")
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=data) as resp:
+                if resp.status == 200:
+                    await ctx.send(f"Код {resp.status}. Обновление на {server.upper()} успешно отправлено.")
+                else:
+                    await ctx.send(f"Код {resp.status}. Обновление на {server.upper()} сервер не отправлено")
     except Exception as e:
         await ctx.send(f"Ошибка: {e}")
     
