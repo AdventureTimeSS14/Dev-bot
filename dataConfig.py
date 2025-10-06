@@ -24,4 +24,42 @@ USER_KEY_GITHUB = get_env("USER_KEY_GITHUB")
 ADDRESS_MRP = "193.164.18.155"
 ADDRESS_DEV = "5.180.174.139"
 
+POST_PASSWORD_MRP = get_env("POST_PASSWORD_MRP")
+POST_PASSWORD_DEV = get_env("POST_PASSWORD_DEV")
+
+POST_AUTHORIZATION_MRP = get_env("POST_AUTHORIZATION_MRP")
+POST_AUTHORIZATION_DEV = get_env("POST_AUTHORIZATION_DEV")
+
+POST_USER_AGENT = get_env("POST_USER_AGENT")
+
 LOG_CHANNEL_ID = 1141810442721833060
+
+DATA_MRP = {
+    "Username": "MRP",
+    "Password": POST_PASSWORD_MRP
+}
+
+HEADERS_MRP = {
+    "Authorization": POST_AUTHORIZATION_MRP,
+    "Content-Length": str(len(DATA_MRP)),
+    "Host": f"{ADDRESS_MRP}:5000",
+    "User-Agent": POST_USER_AGENT,
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive"
+}
+
+DATA_DEV = {
+    "Username": "DEV",
+    "Password": POST_PASSWORD_DEV
+}
+
+HEADERS_DEV = {
+    "Authorization": POST_AUTHORIZATION_DEV,
+    "Content-Length": str(len(DATA_DEV)),
+    "Host": f"{ADDRESS_DEV}:5000",
+    "User-Agent": POST_USER_AGENT,
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive"
+}
