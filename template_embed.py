@@ -24,3 +24,12 @@ embed_log = {
         {"name": "Использованная команда", "value": "ctx.message.jump_url", "inline": False}
     ]
 }
+
+embed_publish_status = {
+    "title": "Статус workflow publish-adt.yml",
+    "fields": [
+        {"name": "Статус", "value": "translated_status", "inline": False},
+        {"name": "Ветка", "value": "branch", "inline": False},
+        {"name": "Пользователь", "value": "user", "inline": False}
+    ]
+}
