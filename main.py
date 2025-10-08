@@ -1,4 +1,5 @@
 import aiohttp
+import random
 
 from datetime import datetime
 from disnake import Intents, Embed
@@ -32,10 +33,11 @@ async def on_command(ctx):
     if log_channel:
         await log_channel.send(embed=embed)
 
-'''Команда, дублирующая текст пользователя'''
-@bot.command(name="print")
-async def print_command(ctx, *, text: str):
-    await ctx.send(f"{ctx.author.mention}: {text}")
+'''Команда, для проверки работы бота'''
+@bot.command(name="check")
+async def check_command(ctx):
+    responses = ["Да, я тут!", "Работаю!", "Привет!", "На связи!"]
+    await ctx.send(random.choice(responses))
 
 
 '''Команда для отправки паблиша какой-либо ветки'''
