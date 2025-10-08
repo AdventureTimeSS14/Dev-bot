@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot, has_any_role
 
 from template_embed import embed_status, embed_log, embed_publish_status
 
-from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, ROLE_ACCESS_MAINTAINER, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
 
 intent = Intents.all()
 intent.message_content = True
@@ -39,7 +39,7 @@ async def print_command(ctx, *, text: str):
 
 
 '''Команда для отправки паблиша какой-либо ветки'''
-@has_any_role(*ROLE_ACCESS_HEADS)
+@has_any_role(*ROLE_ACCESS_MAINTAINER)
 @bot.command(name="publish")
 async def publish_command(ctx, branch: str = "master"):
     if not branch:
