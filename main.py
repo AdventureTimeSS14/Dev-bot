@@ -2,6 +2,7 @@ import aiohttp
 import random
 
 from datetime import datetime
+from disnake.ext import commands
 from disnake import Intents, Embed
 from disnake.ext.commands import Bot, has_any_role
 
@@ -32,6 +33,11 @@ async def on_command(ctx):
     log_channel = bot.get_channel(LOG_CHANNEL_ID)
     if log_channel:
         await log_channel.send(embed=embed)
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("❌ Неизвестная команда")
 
 '''Команда, для проверки работы бота'''
 @bot.command(name="check")
