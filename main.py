@@ -8,7 +8,7 @@ from disnake.ext.commands import Bot, has_any_role
 
 from template_embed import embed_status, embed_log, embed_publish_status, embed_repoinfo, embed_git_team, embed_branch, embed_git_invite, embed_git_remove, embed_git_help
 
-from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, ROLE_ACCESS_MAINTAINER, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
+from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, ROLE_ACCESS_MAINTAINER, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP, POST_ADMIN_HEADERS, ROLE_ACCESS_ADMIN
 
 intent = Intents.all()
 intent.message_content = True
@@ -384,5 +384,28 @@ async def git_help_command(ctx):
             inline=field["inline"]
         )
     await ctx.send(embed=embed)
+
+@has_any_role(*ROLE_ACCESS_ADMIN)
+@bot.command(name="bunker")
+async def bunker_command(ctx, switch: str):
+    if switch.lower() not in ["on", "off"]:
+        await ctx.send("Используйте 'on' или 'off'.")
+        return
+
+    bunker_bool = switch.lower() == "on"
+    status = "включен" if bunker_bool else "выключен"
+
+    url = f"http://{ADDRESS_MRP}:1212/admin/actions/panic_bunker"
+    data = {"game.panic_bunker.enabled": bunker_bool}
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.patch(url, headers=POST_ADMIN_HEADERS, json=data) as resp:
+                if resp.status == 200:
+                    await ctx.send(f"Паник-бункер {status}.")
+                else:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
     
 bot.run(DISCORD_KEY)

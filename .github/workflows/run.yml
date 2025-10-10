@@ -33,4 +33,7 @@ jobs:
           POST_AUTHORIZATION_MRP: ${{ secrets.POST_AUTHORIZATION_MRP }}
           POST_AUTHORIZATION_DEV: ${{ secrets.POST_AUTHORIZATION_DEV }}
           POST_USER_AGENT: ${{ secrets.POST_USER_AGENT }}
+          ADMIN_API: ${{ secrets.ADMIN_API }}
+          ADMIN_GUID: ${{ secrets.ADMIN_GUID }}
+          ADMIN_NAME: ${{ secrets.ADMIN_NAME }}
         run: python main.py
