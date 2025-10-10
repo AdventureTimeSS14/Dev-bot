@@ -65,3 +65,39 @@ embed_branch = {
         {"name": "Ветки", "value": "'\\n\\n'.join([b['name'] for b in branches]) or 'Нет веток'", "inline": False}
     ]
 }
+
+embed_git_invite = {
+    "title": "Результат приглашения в организацию AdventureTimeSS14",
+    "color": 0x00ff00,
+    "fields": [
+        {"name": "Пользователь", "value": "username", "inline": False},
+        {"name": "Статус", "value": "result", "inline": False}
+    ]
+}
+
+embed_git_remove = {
+    "title": "Результат удаления из организации AdventureTimeSS14",
+    "color": 0x00ff00,
+    "fields": [
+        {"name": "Пользователь", "value": "username", "inline": False},
+        {"name": "Статус", "value": "result", "inline": False}
+    ]
+}
+
+embed_git_help = {
+    "title": "Список Git-команд бота",
+    "color": 0x0099ff,
+    "description": "Префикс: `&`",
+    "fields": [
+        {"name": "&publish <branch>. По умолчанию master", "value": "Отправляет запрос на паблиш ветки.", "inline": False},
+        {"name": "&publish_status", "value": "Показывает статус последнего запуска GitHub Actions workflow publish-adt.yml.", "inline": False},
+        {"name": "&update <mrp/dev>. По умолчанию mrp", "value": "Обновляет сервер.", "inline": False},
+        {"name": "&git_repoinfo", "value": "Показывает информацию о репозитории.", "inline": False},
+        {"name": "&git_team", "value": "Показывает участников организации AdventureTimeSS14.", "inline": False},
+        {"name": "&git_invite <username>", "value": "Приглашает пользователя в организацию.", "inline": False},
+        {"name": "&git_remove <username>", "value": "Удаляет пользователя из организации.", "inline": False},
+        {"name": "&add_maint <username>", "value": "Добавляет участника в команду adt_maintainer.", "inline": False},
+        {"name": "&del_maint <username>", "value": "Удаляет участника из команды adt_maintainer.", "inline": False},
+        {"name": "&branch", "value": "Показывает список веток репозитория.", "inline": False},
+    ]
+}
