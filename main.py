@@ -6,7 +6,7 @@ from disnake.ext import commands
 from disnake import Intents, Embed
 from disnake.ext.commands import Bot, has_any_role
 
-from template_embed import embed_status, embed_log, embed_publish_status
+from template_embed import embed_status, embed_log, embed_publish_status, embed_repoinfo, embed_git_team, embed_branch, embed_git_invite, embed_git_remove, embed_git_help
 
 from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, ROLE_ACCESS_MAINTAINER, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
 
@@ -136,6 +136,7 @@ async def update_command(ctx, server: str = "mrp"):
     except Exception as e:
         await ctx.send(f"Ошибка: {e}")
 
+@has_any_role(*ROLE_ACCESS_MAINTAINER)
 @bot.command(name="publish_status")
 async def publish_status_command(ctx):
     url = "https://api.github.com/repos/AdventureTimeSS14/space_station_ADT/actions/workflows/publish-adt.yml/runs"
@@ -182,6 +183,206 @@ async def publish_status_command(ctx):
         value = eval(field["value"], {"translated_status": translated_status, "branch": branch, "user": user})
         embed.add_field(name=field["name"], value=value, inline=field["inline"])
 
+    await ctx.send(embed=embed)
+
+@bot.command(name="branch")
+async def branch_command(ctx):
+    url = f"https://api.github.com/repos/AdventureTimeSS14/space_station_ADT/branches"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as resp:
+                if resp.status != 200:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+                    return
+                branches = await resp.json()
+
+        embed = Embed(title=embed_branch["title"], color=embed_branch["color"])
+        for field in embed_branch["fields"]:
+            value = eval(field["value"], {"branches": branches})
+            embed.add_field(name=field["name"], value=f"`{value}`", inline=field["inline"])
+
+        await ctx.send(embed=embed)
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@bot.command(name="git_repoinfo")
+async def git_repoinfo_command(ctx):
+    url = "https://api.github.com/repos/AdventureTimeSS14/space_station_ADT"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                await ctx.send(f"Ошибка {resp.status}")
+                return
+            data = await resp.json()
+
+        pr_url = f"{url}/pulls?state=open"
+        async with session.get(pr_url, headers=headers) as resp:
+            pr_data = await resp.json()
+            pr_count = len(pr_data)
+
+        # Контрибьютеры
+        contrib_url = f"{url}/contributors"
+        async with session.get(contrib_url, headers=headers) as resp:
+            contrib_data = await resp.json()
+            contrib_count = len(contrib_data)
+
+    embed = Embed(title=embed_repoinfo["title"], description=eval(embed_repoinfo["description"]), color=embed_repoinfo["color"])
+    for field in embed_repoinfo["fields"]:
+        value = eval(field["value"])
+        embed.add_field(name=field["name"], value=value, inline=field["inline"])
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="git_team")
+async def git_team_command(ctx):
+    url = "https://api.github.com/orgs/AdventureTimeSS14/members"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                await ctx.send(f"Ошибка {resp.status}")
+                return
+            members = await resp.json()
+
+    embed = Embed(title=embed_git_team["title"], color=embed_git_team["color"])
+    for field in embed_git_team["fields"]:
+        value = eval(field["value"], {"members": members})
+        embed.add_field(name=field["name"], value=value, inline=field["inline"])
+
+    await ctx.send(embed=embed)
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="add_maint")
+async def add_maint_command(ctx, github_login: str):
+    url = f"https://api.github.com/orgs/AdventureTimeSS14/teams/adt_maintainer/memberships/{github_login}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}",
+    }
+    data = {"role": "maintainer"}
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.put(url, headers=headers, json=data) as resp:
+                if resp.status == 200:
+                    await ctx.send(f"Участник {github_login} добавлен в команду adt_maintainer.")
+                else:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="del_maint")
+async def del_maint_command(ctx, github_login: str):
+    url = f"https://api.github.com/orgs/AdventureTimeSS14/teams/adt_maintainer/memberships/{github_login}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}",
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(url, headers=headers) as resp:
+                if resp.status == 204:
+                    await ctx.send(f"Участник {github_login} удалён из команды adt_maintainer.")
+                else:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="git_invite")
+async def git_invite_command(ctx, username: str):
+    headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {USER_KEY_GITHUB}"}
+    user_url = f"https://api.github.com/users/{username}"
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            # Получаем ID пользователя
+            async with session.get(user_url, headers=headers) as user_resp:
+                if user_resp.status != 200:
+                    result = f"Не удалось отправить приглашение: Пользователь {username} не найден"
+                    embed_color = 0xff0000
+                else:
+                    user_data = await user_resp.json()
+                    user_id = user_data["id"]
+                    invite_url = "https://api.github.com/orgs/AdventureTimeSS14/invitations"
+                    data = {"invitee_id": user_id, "role": "direct_member"}
+                    
+                    # Отправляем приглашение
+                    async with session.post(invite_url, headers=headers, json=data) as invite_resp:
+                        if invite_resp.status == 201:
+                            result = "Приглашение успешно отправлено"
+                            embed_color = 0x00ff00
+                        else:
+                            result = f"Не удалось отправить приглашение: {await invite_resp.text()}"
+                            embed_color = 0xff0000
+
+        embed = Embed(title=embed_git_invite["title"], color=embed_color)
+        for field in embed_git_invite["fields"]:
+            embed.add_field(name=field["name"], value=eval(field["value"], {"result": result, "username": username}), inline=field["inline"])
+        
+        await ctx.send(embed=embed)
+    except Exception as e:
+        embed = Embed(title=embed_git_invite["title"], color=0xff0000)
+        embed.add_field(name="Пользователь", value=username, inline=False)
+        embed.add_field(name="Статус", value=f"Не удалось отправить приглашение: {e}", inline=False)
+        await ctx.send(embed=embed)
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="git_remove")
+async def git_remove_command(ctx, username: str):
+    url = f"https://api.github.com/orgs/AdventureTimeSS14/memberships/{username}"
+    headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {USER_KEY_GITHUB}"}
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(url, headers=headers) as resp:
+                if resp.status == 204:
+                    result = "Пользователь успешно удалён"
+                    embed_color = 0x00ff00
+                else:
+                    result = f"Не удалось удалить пользователя: {await resp.text()}"
+                    embed_color = 0xff0000
+
+        embed = Embed(title=embed_git_remove["title"], color=embed_color)
+        for field in embed_git_remove["fields"]:
+            embed.add_field(name=field["name"], value=eval(field["value"], {"result": result, "username": username}), inline=field["inline"])
+        
+        await ctx.send(embed=embed)
+    except Exception as e:
+        embed = Embed(title=embed_git_remove["title"], color=0xff0000)
+        embed.add_field(name="Пользователь", value=username, inline=False)
+        embed.add_field(name="Статус", value=f"Не удалось удалить пользователя: {e}", inline=False)
+        await ctx.send(embed=embed)
+
+@bot.command(name="git_help")
+async def git_help_command(ctx):
+    embed = Embed(
+        title=embed_git_help["title"],
+        color=embed_git_help["color"],
+        description=embed_git_help["description"]
+    )
+    for field in embed_git_help["fields"]:
+        embed.add_field(
+            name=field["name"],
+            value=field["value"],
+            inline=field["inline"]
+        )
     await ctx.send(embed=embed)
     
 bot.run(DISCORD_KEY)
