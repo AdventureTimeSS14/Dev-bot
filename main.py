@@ -34,10 +34,10 @@ async def on_command(ctx):
     if log_channel:
         await log_channel.send(embed=embed)
 
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CommandNotFound):
-#         await ctx.send("❌ Неизвестная команда")
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("❌ Неизвестная команда")
 
 '''Команда, для проверки работы бота'''
 @bot.command(name="check")
