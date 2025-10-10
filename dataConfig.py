@@ -1,4 +1,6 @@
 import os
+import json
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,6 +16,13 @@ ROLE_ACCESS_MAINTAINER = [
     1266161300036390913, # Руководство отдела разработки
     1054827766211694593, # Админ
     1338486326328164352 # Maintainer
+]
+
+ROLE_ACCESS_ADMIN = [
+    1054908932868538449, # Руководство проекта
+    1266161300036390913, # Руководство отдела разработки
+    1054827766211694593, # Админ
+    1248667383334178902, # Администрация
 ]
 
 # Функция для получения значения скрытого ключа
@@ -38,6 +47,10 @@ POST_AUTHORIZATION_MRP = get_env("POST_AUTHORIZATION_MRP")
 POST_AUTHORIZATION_DEV = get_env("POST_AUTHORIZATION_DEV")
 
 POST_USER_AGENT = get_env("POST_USER_AGENT")
+
+ADMIN_GUID = get_env("ADMIN_GUID")
+ADMIN_NAME = get_env("ADMIN_NAME")
+ADMIN_API = get_env("ADMIN_API")
 
 LOG_CHANNEL_ID = 1141810442721833060
 
@@ -69,4 +82,15 @@ HEADERS_DEV = {
     "Accept": "application/json",
     "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive"
+}
+
+DATA_ADMIN = {
+    "Guid": str(ADMIN_GUID),
+    "Name": str(ADMIN_NAME)
+}
+
+POST_ADMIN_HEADERS = {
+    "Authorization": f"SS14Token {ADMIN_API}",
+    "Content-Type": "application/json",
+    "Actor": json.dumps(DATA_ADMIN)
 }
