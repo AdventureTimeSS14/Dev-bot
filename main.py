@@ -6,7 +6,7 @@ from disnake.ext import commands
 from disnake import Intents, Embed
 from disnake.ext.commands import Bot, has_any_role
 
-from template_embed import embed_status, embed_log, embed_publish_status
+from template_embed import embed_status, embed_log, embed_publish_status, embed_repoinfo, embed_git_team, embed_branch
 
 from dataConfig import USER_KEY_GITHUB, DISCORD_KEY, ROLE_ACCESS_HEADS, ROLE_ACCESS_MAINTAINER, LOG_CHANNEL_ID, ADDRESS_DEV, ADDRESS_MRP, DATA_MRP, DATA_DEV, HEADERS_DEV, HEADERS_MRP
 
@@ -34,10 +34,10 @@ async def on_command(ctx):
     if log_channel:
         await log_channel.send(embed=embed)
 
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send("❌ Неизвестная команда")
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.CommandNotFound):
+#         await ctx.send("❌ Неизвестная команда")
 
 '''Команда, для проверки работы бота'''
 @bot.command(name="check")
@@ -136,6 +136,7 @@ async def update_command(ctx, server: str = "mrp"):
     except Exception as e:
         await ctx.send(f"Ошибка: {e}")
 
+@has_any_role(*ROLE_ACCESS_MAINTAINER)
 @bot.command(name="publish_status")
 async def publish_status_command(ctx):
     url = "https://api.github.com/repos/AdventureTimeSS14/space_station_ADT/actions/workflows/publish-adt.yml/runs"
@@ -183,5 +184,124 @@ async def publish_status_command(ctx):
         embed.add_field(name=field["name"], value=value, inline=field["inline"])
 
     await ctx.send(embed=embed)
+
+@bot.command(name="branch")
+async def branch_command(ctx):
+    url = f"https://api.github.com/repos/AdventureTimeSS14/space_station_ADT/branches"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as resp:
+                if resp.status != 200:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+                    return
+                branches = await resp.json()
+
+        embed = Embed(title=embed_branch["title"], color=embed_branch["color"])
+        for field in embed_branch["fields"]:
+            value = eval(field["value"], {"branches": branches})
+            embed.add_field(name=field["name"], value=f"`{value}`", inline=field["inline"])
+
+        await ctx.send(embed=embed)
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@bot.command(name="git_repoinfo")
+async def git_repoinfo_command(ctx):
+    url = "https://api.github.com/repos/AdventureTimeSS14/space_station_ADT"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                await ctx.send(f"Ошибка {resp.status}")
+                return
+            data = await resp.json()
+
+        pr_url = f"{url}/pulls?state=open"
+        async with session.get(pr_url, headers=headers) as resp:
+            pr_data = await resp.json()
+            pr_count = len(pr_data)
+
+        # Контрибьютеры
+        contrib_url = f"{url}/contributors"
+        async with session.get(contrib_url, headers=headers) as resp:
+            contrib_data = await resp.json()
+            contrib_count = len(contrib_data)
+
+    embed = Embed(title=embed_repoinfo["title"], description=eval(embed_repoinfo["description"]), color=embed_repoinfo["color"])
+    for field in embed_repoinfo["fields"]:
+        value = eval(field["value"])
+        embed.add_field(name=field["name"], value=value, inline=field["inline"])
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="git_team")
+async def git_team_command(ctx):
+    url = "https://api.github.com/orgs/AdventureTimeSS14/members"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}"
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                await ctx.send(f"Ошибка {resp.status}")
+                return
+            members = await resp.json()
+
+    embed = Embed(title=embed_git_team["title"], color=embed_git_team["color"])
+    for field in embed_git_team["fields"]:
+        value = eval(field["value"], {"members": members})
+        embed.add_field(name=field["name"], value=value, inline=field["inline"])
+
+    await ctx.send(embed=embed)
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="add_maint")
+async def add_maint_command(ctx, github_login: str):
+    url = f"https://api.github.com/orgs/AdventureTimeSS14/teams/adt_maintainer/memberships/{github_login}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}",
+    }
+    data = {"role": "maintainer"}
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.put(url, headers=headers, json=data) as resp:
+                if resp.status == 200:
+                    await ctx.send(f"Участник {github_login} добавлен в команду adt_maintainer.")
+                else:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
+
+@has_any_role(*ROLE_ACCESS_HEADS)
+@bot.command(name="del_maint")
+async def del_maint_command(ctx, github_login: str):
+    url = f"https://api.github.com/orgs/AdventureTimeSS14/teams/adt_maintainer/memberships/{github_login}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {USER_KEY_GITHUB}",
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(url, headers=headers) as resp:
+                if resp.status == 204:
+                    await ctx.send(f"Участник {github_login} удалён из команды adt_maintainer.")
+                else:
+                    await ctx.send(f"Ошибка {resp.status}: {await resp.text()}")
+    except Exception as e:
+        await ctx.send(f"Ошибка: {e}")
     
 bot.run(DISCORD_KEY)
