@@ -25,7 +25,6 @@ async def status_command(ctx, server: str = "mrp"):
                 if resp.status == 200:
                     data = await resp.json()
 
-                    # Создание эмбеда. TODO: Вынести в отдельную функцию
                     embed = Embed(title=embed_status["title"], color=embed_status["color"])
                     for field in embed_status["fields"]:
                         embed.add_field(name=field["name"], value=eval(field["value"]), inline=field["inline"])
