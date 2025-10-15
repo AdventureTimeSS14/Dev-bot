@@ -41,7 +41,7 @@ class NicknameModal(disnake.ui.Modal):
                 return
         except Exception as e:
             await inter.send(f"❌ Вы ввели не UID", ephemeral=True)
-            await tech_channel.send(f"⚠️ Вы ввели не UID.")
+            await tech_channel.send(f"⚠️ Ошибка: Пользователь {inter.author.name} пытался привязать аккаунт вводя {inter.text_values["guid"].strip()}")
             return
 
         success, message = await ss14_db.link_user(guid, discord_id)
