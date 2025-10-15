@@ -92,6 +92,7 @@ embed_git_help = {
         {"name": "&publish <branch>. По умолчанию master", "value": "Отправляет запрос на паблиш ветки.", "inline": False},
         {"name": "&publish_status", "value": "Показывает статус последнего запуска GitHub Actions workflow publish-adt.yml.", "inline": False},
         {"name": "&update <mrp/dev>. По умолчанию mrp", "value": "Обновляет сервер.", "inline": False},
+        {"name": "&restart <mrp/dev>. По умолчанию mrp", "value": "Перезагружает сервер.", "inline": False},
         {"name": "&git_repoinfo", "value": "Показывает информацию о репозитории.", "inline": False},
         {"name": "&git_team", "value": "Показывает участников организации AdventureTimeSS14.", "inline": False},
         {"name": "&git_invite <username>", "value": "Приглашает пользователя в организацию.", "inline": False},
@@ -99,5 +100,33 @@ embed_git_help = {
         {"name": "&add_maint <username>", "value": "Добавляет участника в команду adt_maintainer.", "inline": False},
         {"name": "&del_maint <username>", "value": "Удаляет участника из команды adt_maintainer.", "inline": False},
         {"name": "&branch", "value": "Показывает список веток репозитория.", "inline": False},
+    ]
+}
+
+embed_admin_info = {
+    "title": "Информация о сервере SS14",
+    "color": 0x3498db,
+    "fields": [
+        {"name": "ID Раунда", "value": 'data.get("RoundId", "Не задано")', "inline": False},
+        {"name": "Название карты", "value": 'data.get("Map", {}).get("Name", "Не задано")', "inline": False},
+        {"name": "MOTD", "value": 'data.get("MOTD", "Нет сообщения")', "inline": False},
+        {"name": "Геймпресет", "value": 'data.get("GamePreset", "Не задано")', "inline": False},
+        {"name": "Игроки", "value": '"\\n".join([f"{p.get(\"Name\", \"?\")} - {\"Админ\" if p.get(\"IsAdmin\") else \"Игрок\"} ({p.get(\"PingUser\", \"?\")} ms)" for p in data.get("Players", []) if not p.get("IsDeadminned")]) or "Нет игроков"', "inline": False},
+        {"name": "Деадмины", "value": '"\\n".join([f"{p.get(\"Name\", \"?\")} ({p.get(\"PingUser\", \"?\")} ms)" for p in data.get("Players", []) if p.get("IsDeadminned")]) or "Нет"', "inline": False},
+        {"name": "Активные админы", "value": '"\\n".join([f"{p.get(\"Name\", \"?\")}" for p in data.get("Players", []) if p.get("IsAdmin") and not p.get("IsDeadminned")]) or "Нет"', "inline": False},
+        {"name": "Правила игры", "value": '"\\n".join(data.get("GameRules", [])) or "Нет правил"', "inline": False},
+        {"name": "Panic Bunker", "value": '"\\n".join([f"{k}: {v}" for k, v in data.get("PanicBunker", {}).items() if v is not None]) or "Не активирован"', "inline": False},
+    ]
+}
+
+embed_admin_help = {
+    "title": "Список админ-команд бота",
+    "color": 0xFF0000,
+    "description": "Префикс: `&`",
+    "fields": [
+        {"name": "Управление правами", "value": '&admin <nickname> — Проверка прав админа.\n&add_permission <username> \"<title>\" \"<permission>\" <server> — Добавить права на сервере DEV/MRP.\n&del_permission <username> <server> — Удалить права на сервере DEV/MRP.\n&tweak_permission <username> \"<title>\" \"<permission>\" <server> — Изменить права на сервере DEV/MRP.', "inline": False},
+        {"name": "Информация о игроке", "value": '&check_nick <nickname> — Проверка на мультиаккаунт.\n&get_ckey <Discord id> — Получить ckey по ID дискорда.\n&notelist <nickname> — Заметки игрока.\n&banlist <nickname> — Банлист игрока.', "inline": False},
+        {"name": "Баны и модерация", "value": '&ban <nickname> \"<reason>\" <time> в минутах — Выдает бан игроку.\n&kick <nickname> \"<reason>\" — Кик.\n&pardon <ban_id> — Разбанивает игрока.', "inline": False},
+        {"name": "Сервер", "value": '&status <mrp/dev> (по умолчанию mrp) - Информация о сервере\n&admin_info — Подробная информация о сервере.\n&bunker <on/off> — Включает/выключает бункер.\n&restart <server> — Рестарт сервера.', "inline": False},
     ]
 }

@@ -1,5 +1,6 @@
 from disnake import Intents
 from disnake.ext.commands import Bot
+from AHelperManager.database_ss14 import DatabaseManagerSS14
 
 intent = Intents.all()
 intent.message_content = True
@@ -13,3 +14,5 @@ bot = Bot(
     command_prefix="&",
     intents=intent
 )
+
+ss14_db = DatabaseManagerSS14()

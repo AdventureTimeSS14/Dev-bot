@@ -1,6 +1,7 @@
 aiohappyeyeballs==2.6.1
 aiohttp==3.12.15
 aiosignal==1.4.0
+asyncpg==0.30.0
 attrs==25.3.0
 certifi==2025.8.3
 charset-normalizer==3.4.3
@@ -10,6 +11,7 @@ idna==3.10
 multidict==6.6.4
 propcache==0.3.2
 python-dotenv==1.1.1
+pytz==2025.2
 requests==2.32.5
 typing_extensions==4.15.0
 urllib3==2.5.0
