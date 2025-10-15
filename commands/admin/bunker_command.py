@@ -2,9 +2,7 @@ import aiohttp
 
 from bot_init import bot
 from dataConfig import POST_ADMIN_HEADERS, ROLE_ACCESS_ADMIN, ADDRESS_MRP
-from disnake import Embed
 from disnake.ext.commands import has_any_role
-from template_embed import embed_git_invite
 
 @has_any_role(*ROLE_ACCESS_ADMIN)
 @bot.command(name="bunker")

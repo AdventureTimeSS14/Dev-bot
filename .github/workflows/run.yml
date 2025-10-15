@@ -3,8 +3,11 @@ name: Run Bot
 on:
   schedule:
     - cron: '0 */6 * * *'
-
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run:
@@ -36,4 +39,11 @@ jobs:
           ADMIN_API: ${{ secrets.ADMIN_API }}
           ADMIN_GUID: ${{ secrets.ADMIN_GUID }}
           ADMIN_NAME: ${{ secrets.ADMIN_NAME }}
+          DATABASE_MRP: ${{ secrets.DATABASE_MRP }}
+          DATABASE_DEV: ${{ secrets.DATABASE_DEV }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          DATABASE_PASS: ${{ secrets.DATABASE_PASS }}
+
         run: python main.py
