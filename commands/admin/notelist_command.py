@@ -5,7 +5,7 @@ from disnake.ext.commands import has_any_role
 
 '''Команда для просмотра заметок игрока'''
 @has_any_role(*ROLE_ACCESS_ADMIN)
-@bot.command(name="player_notes")
+@bot.command(name="notelist")
 async def player_notes_command(ctx, nickname: str):
     notes = await ss14_db.search_notes_player(nickname)
 
