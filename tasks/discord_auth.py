@@ -1,4 +1,5 @@
 import disnake
+import uuid
 
 from bot_init import ss14_db, bot
 from disnake.ext import tasks
@@ -35,13 +36,10 @@ class NicknameModal(disnake.ui.Modal):
             return
 
         try:
-            if not await ss14_db.get_player_name(guid):
-                await inter.send("❌ UID не найден в БД.", ephemeral=True)
-                await tech_channel.send(f"⚠️ Пользователь {inter.author.name} ({discord_id}) ввел несуществующий UID: {guid}.")
-                return
-        except Exception as e:
-            await inter.send(f"❌ Вы ввели не UID", ephemeral=True)
-            await tech_channel.send(f"⚠️ Ошибка: Пользователь {inter.author.name} пытался привязать аккаунт вводя {inter.text_values["guid"].strip()}")
+            uuid.UUID(guid)
+        except ValueError as e:
+            await inter.send(f"⚠️ Вы ввели невалидный UID", ephemeral=True)
+            await tech_channel.send(f"⚠️ Ошибка: Пользователь {inter.author.name} пытался привязать аккаунт вводя невалидный {inter.text_values["guid"].strip()}")
             return
 
         success, message = await ss14_db.link_user(guid, discord_id)
