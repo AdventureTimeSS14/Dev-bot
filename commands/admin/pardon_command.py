@@ -1,13 +1,13 @@
 from bot_init import bot
 from disnake.ext.commands import has_any_role
 from bot_init import ss14_db
-from dataConfig import ROLE_ACCESS_ADMIN
+from dataConfig import ROLE_ACCESS_DEPARTAMENT_OF_UNBAN_ADMIN
 from datetime import datetime
 
 import pytz
 
 '''Команда для разбана игрока с сервера MRP'''
-@has_any_role(*ROLE_ACCESS_ADMIN)
+@has_any_role(*ROLE_ACCESS_DEPARTAMENT_OF_UNBAN_ADMIN)
 @bot.command(name="pardon")
 async def pardon_command(ctx, ban_id: int):
     ds_id = str(ctx.author.id)
