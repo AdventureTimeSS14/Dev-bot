@@ -1,10 +1,10 @@
 import aiohttp
 
 from bot_init import bot
-from dataConfig import POST_ADMIN_HEADERS, ROLE_ACCESS_ADMIN, ADDRESS_MRP
+from dataConfig import POST_ADMIN_HEADERS, ROLE_ACCESS_DOWN_ADMIN, ADDRESS_MRP
 from disnake.ext.commands import has_any_role
 
-@has_any_role(*ROLE_ACCESS_ADMIN)
+@has_any_role(*ROLE_ACCESS_DOWN_ADMIN)
 @bot.command(name="bunker")
 async def bunker_command(ctx, switch: str):
     if switch.lower() not in ["on", "off"]:
