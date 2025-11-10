@@ -305,3 +305,17 @@ class DatabaseManagerSS14:
             return False, f"Ошибка: {e}"
         finally:
             await conn.close()
+
+    async def get_logs_by_round(self, username: str, round_id: int, db_name: str = 'mrp'):
+        conn = await self.get_connection(db_name)
+        try:
+            keywords = ["used placement system to create", "Дебаг", "Админ", "was respawned", "Трюки", "Покарать"]
+
+            like_username = f"%{username}%"
+            or_conditions = " OR ".join(f"message ILIKE '%{kw}%'" for kw in keywords)
+            query = f"SELECT message FROM admin_log WHERE round_id = $1 AND message ILIKE $2 AND ({or_conditions})"
+            
+            results = await conn.fetch(query, round_id, like_username)
+            return results
+        finally:
+            await conn.close()
